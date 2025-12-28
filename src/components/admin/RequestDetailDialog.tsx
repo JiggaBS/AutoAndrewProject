@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Dialog, DialogContent, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -271,8 +271,11 @@ export function RequestDetailDialog({ request, onUpdateStatus, onUpdateRequest, 
         </Button>
       </DialogTrigger>
       <DialogContent className="left-0 top-0 translate-x-0 translate-y-0 w-screen max-w-none h-[100dvh] rounded-none sm:left-[50%] sm:top-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:max-w-2xl sm:h-auto sm:max-h-[90vh] sm:rounded-lg overflow-hidden p-0 gap-0 bg-card border-border [&>button]:hidden flex flex-col">
-        <DialogDescription className="sr-only">
+        <DialogTitle className="sr-only">
           Dettagli richiesta di valutazione per {request.make} {request.model} {request.year}
+        </DialogTitle>
+        <DialogDescription className="sr-only">
+          Informazioni complete sulla richiesta di valutazione veicolo
         </DialogDescription>
         <div className="flex flex-col h-full min-h-0 overflow-hidden">
           {/* Header */}

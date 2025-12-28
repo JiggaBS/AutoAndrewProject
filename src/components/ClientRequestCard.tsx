@@ -308,8 +308,11 @@ export function ClientRequestCard({ request, autoOpen }: ClientRequestCardProps)
       {/* Image Lightbox */}
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
         <DialogContent className="max-w-4xl p-0 bg-black/90 border-none">
-          <DialogDescription className="sr-only">
+          <DialogTitle className="sr-only">
             {language === "it" ? "Visualizzazione immagine a schermo intero" : "Full screen image view"}
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            {selectedImage ? `${request.make} ${request.model} - ${language === "it" ? "Immagine" : "Image"}` : ""}
           </DialogDescription>
           <button
             onClick={() => setSelectedImage(null)}

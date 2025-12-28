@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Dialog, DialogContent, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 
 interface MessageBubbleProps {
   message: Message;
@@ -236,8 +236,11 @@ function AttachmentPreview({ attachment }: { attachment: MessageAttachment }) {
         {/* Image Preview Modal */}
         <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
           <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black/95 border-none">
-            <DialogDescription className="sr-only">
+            <DialogTitle className="sr-only">
               {language === 'it' ? 'Anteprima immagine' : 'Image preview'}
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              {attachment.name}
             </DialogDescription>
             <button
               onClick={() => setIsPreviewOpen(false)}
@@ -302,8 +305,11 @@ function AttachmentPreview({ attachment }: { attachment: MessageAttachment }) {
       {isPdf && (
         <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
           <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-background border">
-            <DialogDescription className="sr-only">
+            <DialogTitle className="sr-only">
               {language === 'it' ? 'Anteprima documento' : 'Document preview'}
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              {attachment.name}
             </DialogDescription>
             <div className="flex items-center justify-between p-4 border-b">
               <h3 className="text-lg font-semibold truncate flex-1 mr-4">{attachment.name}</h3>
