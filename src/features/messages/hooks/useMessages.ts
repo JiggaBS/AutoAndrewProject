@@ -19,7 +19,19 @@ export function useMessages(requestId: string) {
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      return (data || []) as Message[];
+      
+      // Transform database format to Message type
+      // Handle both old format (message, sender_id) and new format (body, sender_user_id)
+      return (data || []).map((raw: any): Message => ({
+        id: raw.id,
+        request_id: raw.request_id || requestId,
+        sender_user_id: raw.sender_user_id || raw.sender_id || null,
+        sender_type: raw.sender_type === 'client' ? 'user' : (raw.sender_type || 'user'),
+        body: raw.body || raw.message || '',
+        attachments: raw.attachments || null,
+        created_at: raw.created_at || new Date().toISOString(),
+        read_at: raw.read_at || null,
+      }));
     },
     enabled: !!requestId,
   });
@@ -234,9 +246,36 @@ export function useMessages(requestId: string) {
           filter: `request_id=eq.${requestId}`,
         },
         (payload) => {
-          const newMessage = payload.new as Message;
+          // Validate payload
+          if (!payload.new) {
+            console.error('Received null payload.new in realtime subscription');
+            return;
+          }
+
+          const rawMessage = payload.new as any;
+          
+          // Validate required fields
+          if (!rawMessage.id) {
+            console.error('Received message without id:', rawMessage);
+            return;
+          }
+
+          // Transform database format to Message type
+          // Handle both old format (message, sender_id) and new format (body, sender_user_id)
+          const newMessage: Message = {
+            id: rawMessage.id,
+            request_id: rawMessage.request_id || requestId,
+            sender_user_id: rawMessage.sender_user_id || rawMessage.sender_id || null,
+            sender_type: rawMessage.sender_type === 'client' ? 'user' : (rawMessage.sender_type || 'user'),
+            body: rawMessage.body || rawMessage.message || '',
+            attachments: rawMessage.attachments || null,
+            created_at: rawMessage.created_at || new Date().toISOString(),
+            read_at: rawMessage.read_at || null,
+          };
+
           queryClient.setQueryData<Message[]>(['messages', requestId], (old) => {
             if (!old) return [newMessage];
+            // Check if message already exists to avoid duplicates
             if (old.some((m) => m.id === newMessage.id)) return old;
             return [...old, newMessage];
           });

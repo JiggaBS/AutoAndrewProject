@@ -47,10 +47,25 @@ export function useRealtimeNotifications({
           table: 'valuation_messages',
         },
         async (payload) => {
+          // Validate payload
+          if (!payload.new) {
+            console.error('Received null payload.new in notification subscription');
+            return;
+          }
+
           const newMessage = payload.new as any;
           
+          // Validate required fields
+          if (!newMessage.id || !newMessage.request_id) {
+            console.error('Received message with missing required fields:', newMessage);
+            return;
+          }
+
+          // Normalize sender_type (handle both 'client' and 'user')
+          const senderType = newMessage.sender_type === 'client' ? 'user' : (newMessage.sender_type || 'user');
+          
           // For admin: notify on user messages
-          if (isAdmin && newMessage.sender_type === 'user') {
+          if (isAdmin && senderType === 'user') {
             showNotification(
               language === "it" ? "Nuovo messaggio" : "New message",
               language === "it" ? "Hai ricevuto un nuovo messaggio da un cliente" : "You received a new message from a client"
@@ -60,13 +75,18 @@ export function useRealtimeNotifications({
           }
           
           // For client: notify on admin messages
-          if (!isAdmin && newMessage.sender_type === 'admin') {
+          if (!isAdmin && senderType === 'admin') {
             // Check if this message is for the current user's request
-            const { data: request } = await supabase
+            const { data: request, error } = await supabase
               .from('valuation_requests')
               .select('email, user_id')
               .eq('id', newMessage.request_id)
               .single();
+            
+            if (error) {
+              console.error('Error fetching request for notification:', error);
+              return;
+            }
             
             if (request && (request.email === userEmail || request.user_id === userId)) {
               showNotification(
