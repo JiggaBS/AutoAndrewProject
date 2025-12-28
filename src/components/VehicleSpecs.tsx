@@ -76,7 +76,10 @@ export function VehicleSpecs({ vehicle }: VehicleSpecsProps) {
 
       {/* Additional Specs */}
       {(vehicle.emissions_class || vehicle.combined_consumption || vehicle.warranty || 
-        vehicle.num_seats || vehicle.owners_count || vehicle.doors_count || vehicle.weight) && (
+        (vehicle.num_seats !== undefined && vehicle.num_seats !== null) ||
+        (vehicle.owners_count !== undefined && vehicle.owners_count !== null) ||
+        (vehicle.doors_count !== undefined && vehicle.doors_count !== null) ||
+        (vehicle.weight !== undefined && vehicle.weight !== null)) && (
         <div className="mt-6 pt-4 border-t border-border">
           <h4 className="font-medium text-foreground mb-3">{t("specs.additionalDetails")}</h4>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -113,7 +116,7 @@ export function VehicleSpecs({ vehicle }: VehicleSpecsProps) {
                 </p>
               </div>
             )}
-            {vehicle.num_seats && (
+            {vehicle.num_seats !== undefined && vehicle.num_seats !== null && (
               <div className="spec-item flex-col items-start gap-1">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Users className="w-4 h-4" />
@@ -135,7 +138,7 @@ export function VehicleSpecs({ vehicle }: VehicleSpecsProps) {
                 </p>
               </div>
             )}
-            {vehicle.doors_count && (
+            {vehicle.doors_count !== undefined && vehicle.doors_count !== null && (
               <div className="spec-item flex-col items-start gap-1">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <DoorOpen className="w-4 h-4" />
@@ -146,7 +149,7 @@ export function VehicleSpecs({ vehicle }: VehicleSpecsProps) {
                 </p>
               </div>
             )}
-            {vehicle.weight && (
+            {vehicle.weight !== undefined && vehicle.weight !== null && (
               <div className="spec-item flex-col items-start gap-1">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Weight className="w-4 h-4" />
