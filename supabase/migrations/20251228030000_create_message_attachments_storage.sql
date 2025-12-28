@@ -30,20 +30,14 @@ ON CONFLICT (id) DO NOTHING;
 
 -- Policy: Users can upload files to their own request folders
 -- Path format: request/{request_id}/{filename}
+-- Uses user_owns_valuation_request function to safely check ownership
 CREATE POLICY "Users can upload message attachments"
 ON storage.objects FOR INSERT
 TO authenticated
 WITH CHECK (
   bucket_id = 'message-attachments'
   AND (string_to_array(name, '/'))[1] = 'request'
-  AND EXISTS (
-    SELECT 1 FROM public.valuation_requests vr
-    WHERE vr.id::text = (string_to_array(name, '/'))[2]
-    AND (
-      vr.user_id = auth.uid()
-      OR vr.email = (SELECT email FROM auth.users WHERE id = auth.uid())
-    )
-  )
+  AND public.user_owns_valuation_request((string_to_array(name, '/'))[2]::uuid)
 );
 
 -- Policy: Admins can upload files to any request folder
@@ -61,20 +55,14 @@ WITH CHECK (
 
 -- Policy: Users can read files from their own request folders
 -- Path format: request/{request_id}/{filename}
+-- Uses user_owns_valuation_request function to safely check ownership
 CREATE POLICY "Users can read their message attachments"
 ON storage.objects FOR SELECT
 TO authenticated
 USING (
   bucket_id = 'message-attachments'
   AND (string_to_array(name, '/'))[1] = 'request'
-  AND EXISTS (
-    SELECT 1 FROM public.valuation_requests vr
-    WHERE vr.id::text = (string_to_array(name, '/'))[2]
-    AND (
-      vr.user_id = auth.uid()
-      OR vr.email = (SELECT email FROM auth.users WHERE id = auth.uid())
-    )
-  )
+  AND public.user_owns_valuation_request((string_to_array(name, '/'))[2]::uuid)
 );
 
 -- Policy: Admins can read all message attachments
