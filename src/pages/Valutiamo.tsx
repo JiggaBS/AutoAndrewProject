@@ -177,10 +177,11 @@ export default function Valutiamo() {
 
         if (profile && !profileError) {
           // Profile found in database
-          const fullName = `${profile.name} ${profile.surname}`;
+          // Fix: Handle null surname properly - filter out null/undefined values
+          const fullName = [profile.name, profile.surname].filter(Boolean).join(" ") || profile.name || "";
           setUserProfile({
             name: fullName,
-            surname: profile.surname,
+            surname: profile.surname || "",
             phone: profile.phone,
             email: user.email || "",
           });

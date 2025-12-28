@@ -82,6 +82,7 @@ export function NotificationBell({ isAdmin, userId, userEmail }: NotificationBel
     }
 
     // Client: only own requests
+    // Fetch by user_id OR email (for backward compatibility)
     const base = supabase
       .from("valuation_requests")
       .select(
@@ -90,8 +91,12 @@ export function NotificationBell({ isAdmin, userId, userEmail }: NotificationBel
       .order("last_message_at", { ascending: false, nullsFirst: false })
       .limit(10);
 
-    // Prefer user_id when available; fallback to email
-    const query = userId ? base.eq("user_id", userId) : base.eq("email", userEmail!);
+    // Use OR to match either user_id or email
+    const query = userId && userEmail 
+      ? base.or(`user_id.eq.${userId},email.eq.${userEmail}`)
+      : userId 
+        ? base.eq("user_id", userId)
+        : base.eq("email", userEmail!);
 
     const { data } = await query;
 

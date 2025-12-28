@@ -257,10 +257,11 @@ export default function CustomerArea() {
     
     setLoadingRequests(true);
     try {
+      // Fetch requests by user_id OR email (for backward compatibility)
       const { data, error } = await supabase
         .from("valuation_requests")
         .select("*")
-        .eq("email", user.email)
+        .or(`user_id.eq.${user.id},email.eq.${user.email}`)
         .order("created_at", { ascending: false });
 
       if (error) throw error;

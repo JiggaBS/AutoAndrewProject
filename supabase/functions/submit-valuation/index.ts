@@ -182,6 +182,7 @@ const handler = async (req: Request): Promise<Response> => {
       estimated_value: data.estimated_value ?? null,
       images: data.images ?? [],
       status: "pending",
+      user_id: data.user_id ?? null, // Include user_id if provided
     };
 
     // Save to database
