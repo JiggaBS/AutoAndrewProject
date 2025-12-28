@@ -242,18 +242,54 @@ export default function Admin() {
   const fetchRequests = async () => {
     setLoadingRequests(true);
     try {
-      const { data, error } = await supabase
+      // First verify admin role
+      const { data: isAdminCheck, error: roleError } = await supabase.rpc("has_role", {
+        _user_id: user!.id,
+        _role: "admin"
+      });
+
+      if (roleError) {
+        console.error("Role check error in fetchRequests:", roleError);
+        toast({
+          title: "Errore",
+          description: "Errore verifica permessi: " + roleError.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!isAdminCheck) {
+        console.error("User is not admin, cannot fetch requests");
+        toast({
+          title: "Errore",
+          description: "Non hai i permessi per visualizzare le richieste",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Fetch requests
+      const { data, error, count } = await supabase
         .from("valuation_requests")
-        .select("*")
+        .select("*", { count: "exact" })
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Fetch error details:", error);
+        throw error;
+      }
+
+      console.log(`Fetched ${data?.length || 0} requests (total in DB: ${count || 0})`);
       setRequests((data as ValuationRequest[]) || []);
+      
+      if (data && data.length === 0 && count === 0) {
+        console.log("No requests found in database");
+      }
     } catch (error: any) {
       console.error("Fetch error:", error);
       toast({
         title: "Errore",
-        description: "Impossibile caricare le richieste",
+        description: error.message || "Impossibile caricare le richieste",
         variant: "destructive",
       });
     } finally {
@@ -720,10 +756,39 @@ export default function Admin() {
                         {filteredRequests.length} di {requests.length} richieste
                       </CardDescription>
                     </div>
-                    <Button variant="outline" size="sm" onClick={fetchRequests} className="shrink-0">
-                      <RefreshCw className="w-4 h-4 lg:mr-2" />
-                      <span className="hidden lg:inline">Aggiorna</span>
-                    </Button>
+                    <div className="flex gap-2 shrink-0">
+                      <Button variant="outline" size="sm" onClick={fetchRequests} className="shrink-0">
+                        <RefreshCw className="w-4 h-4 lg:mr-2" />
+                        <span className="hidden lg:inline">Aggiorna</span>
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={async () => {
+                          // Debug: Check if we can query directly
+                          try {
+                            const { data, error, count } = await supabase
+                              .from("valuation_requests")
+                              .select("*", { count: "exact", head: false });
+                            console.log("Debug query result:", { data, error, count });
+                            toast({
+                              title: "Debug Info",
+                              description: `Found ${count || 0} requests. Check console for details.`,
+                            });
+                          } catch (e: any) {
+                            console.error("Debug query error:", e);
+                            toast({
+                              title: "Debug Error",
+                              description: e.message,
+                              variant: "destructive",
+                            });
+                          }
+                        }}
+                        className="hidden lg:flex"
+                      >
+                        Debug
+                      </Button>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3 lg:space-y-4 px-3 lg:px-6 pb-3 lg:pb-6">
