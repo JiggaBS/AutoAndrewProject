@@ -476,6 +476,8 @@ export function RequestDetailDialog({ request, onUpdateStatus, onUpdateRequest, 
                         src={img}
                         alt={`Foto ${idx + 1}`}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        crossOrigin="anonymous"
+                        referrerPolicy="no-referrer"
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
                         <Eye className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -537,6 +539,8 @@ export function RequestDetailDialog({ request, onUpdateStatus, onUpdateRequest, 
                       alt={`Foto ${expandedImageIndex + 1}`}
                       className="max-w-[95vw] max-h-[calc(100vh-200px)] w-auto h-auto object-contain pointer-events-none select-none"
                       draggable={false}
+                      crossOrigin="anonymous"
+                      referrerPolicy="no-referrer"
                     />
                   </div>
 
@@ -589,7 +593,13 @@ export function RequestDetailDialog({ request, onUpdateStatus, onUpdateRequest, 
                               : "border-white/30 opacity-50 hover:opacity-100 hover:border-white/60"
                           )}
                         >
-                          <img src={img} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
+                          <img 
+                            src={img} 
+                            alt={`Thumbnail ${idx + 1}`} 
+                            className="w-full h-full object-cover"
+                            crossOrigin="anonymous"
+                            referrerPolicy="no-referrer"
+                          />
                         </button>
                       ))}
                     </div>

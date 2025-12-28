@@ -104,6 +104,8 @@ export const LazyImage = forwardRef<HTMLDivElement, LazyImageProps>(({
           onError={handleError}
           loading="lazy"
           decoding="async"
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
         />
       )}
     </div>

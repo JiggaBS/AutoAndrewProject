@@ -259,6 +259,8 @@ export function ClientRequestCard({ request, autoOpen }: ClientRequestCardProps)
                         src={image} 
                         alt={`${request.make} ${request.model} - ${index + 1}`}
                         className="w-full h-full object-cover"
+                        crossOrigin="anonymous"
+                        referrerPolicy="no-referrer"
                       />
                     </button>
                   ))}
@@ -318,6 +320,8 @@ export function ClientRequestCard({ request, autoOpen }: ClientRequestCardProps)
               src={selectedImage} 
               alt="Full size"
               className="w-full h-auto max-h-[90vh] object-contain"
+              crossOrigin="anonymous"
+              referrerPolicy="no-referrer"
             />
           )}
         </DialogContent>
