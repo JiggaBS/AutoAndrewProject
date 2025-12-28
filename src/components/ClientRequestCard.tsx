@@ -9,6 +9,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { 
@@ -168,9 +169,9 @@ export function ClientRequestCard({ request, autoOpen }: ClientRequestCardProps)
                 </div>
                 <div>
                   <DialogTitle className="text-xl font-bold">{request.make} {request.model}</DialogTitle>
-                  <p className="text-sm text-muted-foreground">
+                  <DialogDescription className="text-sm text-muted-foreground">
                     {language === "it" ? "Anno" : "Year"} {request.year} • ID: {request.id.slice(0, 8).toUpperCase()}
-                  </p>
+                  </DialogDescription>
                 </div>
               </div>
               <Badge className={`${statusColors[request.status]} px-3 py-1`}>
@@ -307,6 +308,9 @@ export function ClientRequestCard({ request, autoOpen }: ClientRequestCardProps)
       {/* Image Lightbox */}
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
         <DialogContent className="max-w-4xl p-0 bg-black/90 border-none">
+          <DialogDescription className="sr-only">
+            {language === "it" ? "Visualizzazione immagine a schermo intero" : "Full screen image view"}
+          </DialogDescription>
           <button
             onClick={() => setSelectedImage(null)}
             className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors z-10"

@@ -137,9 +137,12 @@ export function NotificationBell({ isAdmin, userId, userEmail }: NotificationBel
         () => refreshFromDb()
       )
       .subscribe((status) => {
-        // Useful for debugging if user reports it still doesn't update
-        // eslint-disable-next-line no-console
-        console.log("[NotificationBell] realtime status:", status);
+        // Only log errors, not successful subscriptions (to reduce console noise)
+        if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+          // eslint-disable-next-line no-console
+          console.warn("[NotificationBell] realtime status:", status, "- falling back to polling");
+        }
+        // Successful subscription is silent - polling fallback ensures reliability
       });
 
     return () => {

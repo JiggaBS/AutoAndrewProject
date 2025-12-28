@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -271,6 +271,9 @@ export function RequestDetailDialog({ request, onUpdateStatus, onUpdateRequest, 
         </Button>
       </DialogTrigger>
       <DialogContent className="left-0 top-0 translate-x-0 translate-y-0 w-screen max-w-none h-[100dvh] rounded-none sm:left-[50%] sm:top-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:max-w-2xl sm:h-auto sm:max-h-[90vh] sm:rounded-lg overflow-hidden p-0 gap-0 bg-card border-border [&>button]:hidden flex flex-col">
+        <DialogDescription className="sr-only">
+          Dettagli richiesta di valutazione per {request.make} {request.model} {request.year}
+        </DialogDescription>
         <div className="flex flex-col h-full min-h-0 overflow-hidden">
           {/* Header */}
           <div className="p-4 sm:p-6 pb-3 sm:pb-4 pt-[calc(1rem+env(safe-area-inset-top))] sm:pt-6 shrink-0">
