@@ -12,7 +12,7 @@ interface ActivityLogEntry {
   action: string;
   entity_type: string;
   entity_id: string;
-  details: Record<string, any> | null;
+  details: Record<string, unknown> | null;
   created_at: string;
   read_at: string | null;
 }

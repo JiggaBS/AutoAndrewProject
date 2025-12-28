@@ -183,45 +183,54 @@ export default function CustomerArea() {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  useEffect(() => {
-    if (user) {
-      fetchRequests();
-      fetchSavedVehicles();
-      fetchProfile(user.id);
+  const fetchRequests = useCallback(async () => {
+    if (!user) return;
+    
+    setLoadingRequests(true);
+    try {
+      // Fetch requests by user_id OR email (for backward compatibility)
+      const { data, error } = await supabase
+        .from("valuation_requests")
+        .select("*")
+        .or(`user_id.eq.${user.id},email.eq.${user.email}`)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      const typedData = (data || []).map(item => ({
+        ...item,
+        images: Array.isArray(item.images) ? item.images : []
+      })) as ValuationRequest[];
+      setRequests(typedData);
+    } catch (error) {
+      console.error("Error fetching requests:", error);
+    } finally {
+      setLoadingRequests(false);
     }
   }, [user]);
 
-  // Realtime notifications for client
-  const handleNewMessage = useCallback(() => {
-    fetchRequests(); // Refresh to show new message indicators
-  }, []);
+  const fetchSavedVehicles = useCallback(async () => {
+    if (!user) return;
+    
+    setLoadingSaved(true);
+    try {
+      const result = await supabase
+        .from("saved_vehicles")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
 
-  const handleRequestUpdate = useCallback(() => {
-    fetchRequests(); // Refresh the requests list
-  }, []);
+      const { data, error } = result;
 
-  useRealtimeNotifications({
-    isAdmin: false,
-    userId: user?.id,
-    userEmail: user?.email,
-    onNewMessage: handleNewMessage,
-    onRequestUpdate: handleRequestUpdate,
-  });
-
-  // Handle URL query param for auto-opening request
-  useEffect(() => {
-    const requestId = new URLSearchParams(location.search).get("request");
-    if (requestId) {
-      setActiveSection("requests");
-      setAutoOpenRequestId(requestId);
-      navigate("/dashboard", { replace: true });
-      // Clear autoOpenRequestId after dialog has time to open
-      const timer = setTimeout(() => setAutoOpenRequestId(null), 500);
-      return () => clearTimeout(timer);
+      if (error) throw error;
+      setSavedVehicles(data || []);
+    } catch (error) {
+      console.error("Error fetching saved vehicles:", error);
+    } finally {
+      setLoadingSaved(false);
     }
-  }, [location.search, navigate]);
+  }, [user]);
 
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = useCallback(async (userId: string) => {
     try {
       const { data, error } = await supabase
         .from("user_profiles")
@@ -238,7 +247,7 @@ export default function CustomerArea() {
         
         if (needsUpdate && user) {
           // Update profile with missing data from metadata
-          const updateData: any = {};
+          const updateData: Record<string, string> = {};
           if (!data.surname && metadata.surname) updateData.surname = metadata.surname;
           if (!data.phone && metadata.phone) updateData.phone = metadata.phone;
           
@@ -308,65 +317,56 @@ export default function CustomerArea() {
           email: user?.email || "",
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error fetching profile:", error);
     }
-  };
+  }, [user]);
 
-  const fetchRequests = async () => {
-    if (!user) return;
-    
-    setLoadingRequests(true);
-    try {
-      // Fetch requests by user_id OR email (for backward compatibility)
-      const { data, error } = await supabase
-        .from("valuation_requests")
-        .select("*")
-        .or(`user_id.eq.${user.id},email.eq.${user.email}`)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      const typedData = (data || []).map(item => ({
-        ...item,
-        images: Array.isArray(item.images) ? item.images : []
-      })) as ValuationRequest[];
-      setRequests(typedData);
-    } catch (error: any) {
-      console.error("Error fetching requests:", error);
-    } finally {
-      setLoadingRequests(false);
+  useEffect(() => {
+    if (user) {
+      fetchRequests();
+      fetchSavedVehicles();
+      fetchProfile(user.id);
     }
-  };
+  }, [user, fetchRequests, fetchSavedVehicles, fetchProfile]);
 
-  const fetchSavedVehicles = async () => {
-    if (!user) return;
-    
-    setLoadingSaved(true);
-    try {
-      const result = await supabase
-        .from("saved_vehicles" as any)
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
+  // Realtime notifications for client
+  const handleNewMessage = useCallback(() => {
+    fetchRequests(); // Refresh to show new message indicators
+  }, [fetchRequests]);
 
-      const { data, error } = result as { data: SavedVehicle[] | null; error: any };
+  const handleRequestUpdate = useCallback(() => {
+    fetchRequests(); // Refresh the requests list
+  }, [fetchRequests]);
 
-      if (error) throw error;
-      setSavedVehicles(data || []);
-    } catch (error: any) {
-      console.error("Error fetching saved vehicles:", error);
-    } finally {
-      setLoadingSaved(false);
+  useRealtimeNotifications({
+    isAdmin: false,
+    userId: user?.id,
+    userEmail: user?.email,
+    onNewMessage: handleNewMessage,
+    onRequestUpdate: handleRequestUpdate,
+  });
+
+  // Handle URL query param for auto-opening request
+  useEffect(() => {
+    const requestId = new URLSearchParams(location.search).get("request");
+    if (requestId) {
+      setActiveSection("requests");
+      setAutoOpenRequestId(requestId);
+      navigate("/dashboard", { replace: true });
+      // Clear autoOpenRequestId after dialog has time to open
+      const timer = setTimeout(() => setAutoOpenRequestId(null), 500);
+      return () => clearTimeout(timer);
     }
-  };
+  }, [location.search, navigate]);
 
   const handleRemoveSaved = async (savedId: string) => {
     try {
       const result = await supabase
-        .from("saved_vehicles" as any)
+        .from("saved_vehicles")
         .delete()
         .eq("id", savedId);
-      const { error } = result as { error: any };
+      const { error } = result;
 
       if (error) throw error;
 
@@ -375,7 +375,7 @@ export default function CustomerArea() {
         title: language === "it" ? "Rimosso" : "Removed",
         description: language === "it" ? "Veicolo rimosso dai preferiti" : "Vehicle removed from favorites",
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error removing saved vehicle:", error);
     }
   };
@@ -444,7 +444,7 @@ export default function CustomerArea() {
       });
 
       await fetchProfile(user.id);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error saving profile:", error);
       toast({
         title: "Errore",
@@ -475,7 +475,7 @@ export default function CustomerArea() {
         title: language === "it" ? "Email inviata" : "Email sent",
         description: language === "it" ? "Controlla la tua casella email" : "Check your inbox",
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error resending verification:", error);
     } finally {
       setSendingVerification(false);
@@ -490,7 +490,7 @@ export default function CustomerArea() {
         title: language === "it" ? "Disconnesso" : "Logged out",
         description: language === "it" ? "Arrivederci!" : "Goodbye!",
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error logging out:", error);
     }
   };
@@ -530,11 +530,11 @@ export default function CustomerArea() {
       });
       
       navigate("/");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error deleting account:", error);
       toast({
         title: language === "it" ? "Errore" : "Error",
-        description: error.message || (language === "it" ? "Impossibile eliminare l'account" : "Unable to delete account"),
+        description: error instanceof Error ? error.message : (language === "it" ? "Impossibile eliminare l'account" : "Unable to delete account"),
         variant: "destructive",
       });
     } finally {
@@ -599,11 +599,11 @@ export default function CustomerArea() {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error changing password:", error);
       toast({
         title: language === "it" ? "Errore" : "Error",
-        description: error.message || (language === "it" ? "Impossibile cambiare la password" : "Unable to change password"),
+        description: error instanceof Error ? error.message : (language === "it" ? "Impossibile cambiare la password" : "Unable to change password"),
         variant: "destructive",
       });
     } finally {

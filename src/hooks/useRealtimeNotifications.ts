@@ -7,8 +7,8 @@ interface NotificationOptions {
   isAdmin: boolean;
   userId?: string;
   userEmail?: string;
-  onNewMessage?: (message: any) => void;
-  onRequestUpdate?: (request: any) => void;
+  onNewMessage?: (message: Record<string, unknown>) => void;
+  onRequestUpdate?: (request: Record<string, unknown>) => void;
 }
 
 export function useRealtimeNotifications({
@@ -53,7 +53,7 @@ export function useRealtimeNotifications({
             return;
           }
 
-          const newMessage = payload.new as any;
+          const newMessage = payload.new as Record<string, unknown>;
           
           // Validate required fields
           if (!newMessage.id || !newMessage.request_id) {
@@ -112,8 +112,8 @@ export function useRealtimeNotifications({
           table: 'valuation_requests',
         },
         async (payload) => {
-          const updatedRequest = payload.new as any;
-          const oldRequest = payload.old as any;
+          const updatedRequest = payload.new as Record<string, unknown>;
+          const oldRequest = payload.old as Record<string, unknown>;
           
           // For admin: notify on new requests or status changes
           if (isAdmin) {
@@ -159,7 +159,7 @@ export function useRealtimeNotifications({
       .subscribe();
 
     // Subscribe to new requests (admin only)
-    let newRequestsChannel: any = null;
+    let newRequestsChannel: ReturnType<typeof supabase.channel> | null = null;
     if (isAdmin) {
       newRequestsChannel = supabase
         .channel('new-requests-notifications')
@@ -171,7 +171,7 @@ export function useRealtimeNotifications({
             table: 'valuation_requests',
           },
           (payload) => {
-            const newRequest = payload.new as any;
+            const newRequest = payload.new as Record<string, unknown>;
             showNotification(
               language === "it" ? "Nuova richiesta" : "New request",
               `${newRequest.make} ${newRequest.model} (${newRequest.year})`

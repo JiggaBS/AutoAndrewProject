@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Star, Share2, Printer, MapPin, CheckCircle } from "lucide-react";
 import { Header } from "@/components/Header";
@@ -25,9 +25,42 @@ const VehicleDetail = () => {
   const [isSaved, setIsSaved] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  const loadVehicle = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      // First try to get from API
+      const response = await fetchVehicles({
+        limit: 100
+      });
+      if (response.success && response.data) {
+        const found = response.data.find(v => v.ad_number.toString() === id);
+        if (found) {
+          setVehicle(found);
+          setIsLoading(false);
+          return;
+        }
+      }
+      // Fallback to sample data
+      const sampleVehicle = sampleVehicles.find(v => v.ad_number.toString() === id);
+      setVehicle(sampleVehicle || null);
+    } catch (error) {
+      console.error('Error loading vehicle:', error);
+      const sampleVehicle = sampleVehicles.find(v => v.ad_number.toString() === id);
+      setVehicle(sampleVehicle || null);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [id]);
+
+  const checkIfSaved = useCallback(async () => {
+    if (!vehicle) return;
+    const saved = await isVehicleSaved(vehicle);
+    setIsSaved(saved);
+  }, [vehicle]);
+
   useEffect(() => {
     loadVehicle();
-  }, [id]);
+  }, [loadVehicle]);
 
   useEffect(() => {
     if (vehicle) {
@@ -35,7 +68,7 @@ const VehicleDetail = () => {
       // Track vehicle view
       trackVehicleView(vehicle.ad_number.toString(), `${vehicle.make} ${vehicle.model}`);
     }
-  }, [vehicle]);
+  }, [vehicle, checkIfSaved]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("it-IT", {
@@ -43,12 +76,6 @@ const VehicleDetail = () => {
       currency: "EUR",
       maximumFractionDigits: 0
     }).format(price);
-  };
-
-  const checkIfSaved = async () => {
-    if (!vehicle) return;
-    const saved = await isVehicleSaved(vehicle);
-    setIsSaved(saved);
   };
 
   const handleSaveToggle = async () => {
@@ -125,33 +152,6 @@ const VehicleDetail = () => {
 
   const handlePrint = () => {
     window.print();
-  };
-
-  const loadVehicle = async () => {
-    setIsLoading(true);
-    try {
-      // First try to get from API
-      const response = await fetchVehicles({
-        limit: 100
-      });
-      if (response.success && response.data) {
-        const found = response.data.find(v => v.ad_number.toString() === id);
-        if (found) {
-          setVehicle(found);
-          setIsLoading(false);
-          return;
-        }
-      }
-      // Fallback to sample data
-      const sampleVehicle = sampleVehicles.find(v => v.ad_number.toString() === id);
-      setVehicle(sampleVehicle || null);
-    } catch (error) {
-      console.error('Error loading vehicle:', error);
-      const sampleVehicle = sampleVehicles.find(v => v.ad_number.toString() === id);
-      setVehicle(sampleVehicle || null);
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   if (isLoading) {

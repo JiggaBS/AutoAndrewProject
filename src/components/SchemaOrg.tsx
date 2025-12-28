@@ -3,7 +3,7 @@ import { Vehicle } from "@/data/sampleVehicles";
 
 interface SchemaOrgProps {
   type: "Organization" | "WebSite" | "Product" | "ItemList" | "BreadcrumbList" | "FAQPage";
-  data: Record<string, any>;
+  data: Record<string, unknown>;
 }
 
 /**
@@ -116,7 +116,7 @@ export const VehicleProductSchema = ({ vehicle }: { vehicle: Vehicle }) => {
     ? parseInt(vehicle.mileage.replace(/\D/g, "")) 
     : null;
   
-  const schemaData: Record<string, any> = {
+  const schemaData: Record<string, unknown> = {
     name: productName,
     description: description,
     image: vehicleImage,

@@ -29,6 +29,16 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
     setIsImageLoading(true);
   }, [currentIndex]);
 
+  const goToPrevious = useCallback(() => {
+    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+    resetTransform();
+  }, [images.length, resetTransform]);
+
+  const goToNext = useCallback(() => {
+    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+    resetTransform();
+  }, [images.length, resetTransform]);
+
   // Keyboard navigation
   useEffect(() => {
     if (!isFullscreen) return;
@@ -56,7 +66,7 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isFullscreen]);
+  }, [isFullscreen, goToPrevious, goToNext]);
 
   if (!images || images.length === 0) {
     return (
@@ -70,16 +80,6 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
       </div>
     );
   }
-
-  const goToPrevious = () => {
-    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-    resetTransform();
-  };
-
-  const goToNext = () => {
-    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-    resetTransform();
-  };
 
   const goToIndex = (index: number) => {
     setCurrentIndex(index);

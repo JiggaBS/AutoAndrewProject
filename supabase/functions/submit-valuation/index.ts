@@ -294,9 +294,7 @@ const handler = async (req: Request): Promise<Response> => {
       JSON.stringify({ 
         success: true, 
         message: "Richiesta inviata con successo",
-        id: insertedData.id,
-        savedPrice: insertedData.price,  // Debug: return saved price
-        debug: { priceReceived: rawData.price, priceSaved: insertedData.price }
+        id: insertedData.id
       }),
       {
         status: 200,

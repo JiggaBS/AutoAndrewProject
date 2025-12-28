@@ -20,7 +20,9 @@ export const GoogleAnalytics = () => {
         try {
           const { data, error } = await supabase.functions.invoke("public-config");
           if (!error && data) {
-            measurementId = (data as any)?.gaMeasurementId || "";
+            measurementId = (data && typeof data === 'object' && 'gaMeasurementId' in data) 
+              ? String(data.gaMeasurementId) 
+              : "";
             if (measurementId && typeof window !== "undefined") {
               localStorage.setItem("ga_measurement_id", measurementId);
             }
@@ -37,7 +39,7 @@ export const GoogleAnalytics = () => {
         return;
       }
 
-      (window as any).__GA_MEASUREMENT_ID = measurementId;
+      window.__GA_MEASUREMENT_ID = measurementId;
 
       // Check if already initialized
       if (window.gtag && window.dataLayer) {
@@ -52,8 +54,8 @@ export const GoogleAnalytics = () => {
 
       // Initialize dataLayer and gtag
       window.dataLayer = window.dataLayer || [];
-      window.gtag = function () {
-        window.dataLayer.push(arguments);
+      window.gtag = function (...args: unknown[]) {
+        window.dataLayer?.push(args);
       };
       window.gtag("js", new Date());
       window.gtag("config", measurementId, {

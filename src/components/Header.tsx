@@ -79,12 +79,12 @@ export const Header = forwardRef<HTMLElement>((props, ref) => {
     const fetchLogoTextSetting = async () => {
       try {
         const result = await supabase
-          .from("app_settings" as any)
+          .from("app_settings")
           .select("value")
           .eq("key", "logo_text_visible")
           .maybeSingle();
 
-        const { data, error } = result as { data: { value: string } | null; error: any };
+        const { data, error } = result;
 
         if (error) {
           console.error("Error fetching logo text setting:", error);
@@ -100,12 +100,12 @@ export const Header = forwardRef<HTMLElement>((props, ref) => {
     const fetchPublishButtonSetting = async () => {
       try {
         const result = await supabase
-          .from("app_settings" as any)
+          .from("app_settings")
           .select("value")
           .eq("key", "publish_button_visible")
           .maybeSingle();
 
-        const { data, error } = result as { data: { value: string } | null; error: any };
+        const { data, error } = result;
 
         if (error) {
           console.error("Error fetching publish button setting:", error);
@@ -131,8 +131,8 @@ export const Header = forwardRef<HTMLElement>((props, ref) => {
           table: "app_settings",
           filter: "key=eq.logo_text_visible",
         },
-        (payload: any) => {
-          if (payload.new) {
+        (payload) => {
+          if (payload.new && typeof payload.new === 'object' && 'value' in payload.new) {
             setIsLogoTextVisible(payload.new.value === "true");
           }
         }
@@ -145,8 +145,8 @@ export const Header = forwardRef<HTMLElement>((props, ref) => {
           table: "app_settings",
           filter: "key=eq.publish_button_visible",
         },
-        (payload: any) => {
-          if (payload.new) {
+        (payload) => {
+          if (payload.new && typeof payload.new === 'object' && 'value' in payload.new) {
             setIsPublishButtonVisible(payload.new.value === "true");
           }
         }
@@ -166,7 +166,7 @@ export const Header = forwardRef<HTMLElement>((props, ref) => {
         title: t("nav.logout"),
         description: t("nav.logout"),
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error logging out:", error);
       toast({
         title: t("common.error"),

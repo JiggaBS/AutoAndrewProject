@@ -165,7 +165,7 @@ export default function Auth() {
         // Use upsert to handle case where trigger already created profile
         if (signUpData.user) {
           const result = await supabase
-            .from("user_profiles" as any)
+            .from("user_profiles")
             .upsert({
               user_id: signUpData.user.id,
               name,
@@ -177,7 +177,7 @@ export default function Auth() {
               onConflict: 'user_id'
             });
 
-          const { error: profileError } = result as { error: any };
+          const { error: profileError } = result;
 
           if (profileError) {
             console.error("Error creating/updating user profile:", profileError);
@@ -202,10 +202,10 @@ export default function Auth() {
           throw error;
         }
       }
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: t("auth.error"),
-        description: error.message || t("auth.error.auth"),
+        description: error instanceof Error ? error.message : t("auth.error.auth"),
         variant: "destructive",
       });
     } finally {
@@ -224,10 +224,10 @@ export default function Auth() {
       });
 
       if (error) throw error;
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: t("auth.error"),
-        description: error.message || t("auth.error.google"),
+        description: error instanceof Error ? error.message : t("auth.error.google"),
         variant: "destructive",
       });
       setLoading(false);
@@ -269,10 +269,10 @@ export default function Auth() {
         description: t("auth.success.emailSentDesc"),
       });
       setResetEmail("");
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: t("auth.error"),
-        description: error.message || t("auth.error.sendReset"),
+        description: error instanceof Error ? error.message : t("auth.error.sendReset"),
         variant: "destructive",
       });
     } finally {
@@ -319,10 +319,10 @@ export default function Auth() {
       setConfirmPassword("");
       setActiveTab("login");
       setShowForgotPassword(false);
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: t("auth.error"),
-        description: error.message || t("auth.error.updatePassword"),
+        description: error instanceof Error ? error.message : t("auth.error.updatePassword"),
         variant: "destructive",
       });
     } finally {

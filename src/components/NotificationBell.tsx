@@ -66,7 +66,7 @@ export function NotificationBell({ isAdmin, userId, userEmail }: NotificationBel
         .order("last_message_at", { ascending: false, nullsFirst: false })
         .limit(10);
 
-      const mapped: BellItem[] = (data || []).map((r: any) => ({
+      const mapped: BellItem[] = (data || []).map((r) => ({
         requestId: r.id,
         title: language === "it" ? "Aggiornamento richiesta" : "Request update",
         description:
@@ -100,7 +100,7 @@ export function NotificationBell({ isAdmin, userId, userEmail }: NotificationBel
 
     const { data } = await query;
 
-    const mapped: BellItem[] = (data || []).map((r: any) => ({
+    const mapped: BellItem[] = (data || []).map((r) => ({
       requestId: r.id,
       title: language === "it" ? "Aggiornamento richiesta" : "Request update",
       description:
@@ -140,7 +140,6 @@ export function NotificationBell({ isAdmin, userId, userEmail }: NotificationBel
         // Only log errors in development mode to reduce console noise in production
         // Polling fallback ensures reliability even if realtime fails
         if (import.meta.env.DEV && (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED")) {
-          // eslint-disable-next-line no-console
           console.debug("[NotificationBell] realtime status:", status, "- falling back to polling");
         }
         // Successful subscription is silent - polling fallback ensures reliability
@@ -157,7 +156,6 @@ export function NotificationBell({ isAdmin, userId, userEmail }: NotificationBel
         const { error } = await supabase.rpc("mark_thread_read", { p_request_id: requestId });
         if (error) throw error;
       } catch (e) {
-        // eslint-disable-next-line no-console
         console.warn("[NotificationBell] mark_thread_read failed", e);
       }
     },
@@ -178,7 +176,6 @@ export function NotificationBell({ isAdmin, userId, userEmail }: NotificationBel
     for (const it of unreadThreads) {
       // sequential is fine here; at most 10 items and keeps it simple
       // (tool parallelization rule doesn't apply inside runtime)
-      // eslint-disable-next-line no-await-in-loop
       await markThreadRead(it.requestId);
     }
     await refreshFromDb();

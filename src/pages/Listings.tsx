@@ -237,12 +237,13 @@ const Listings = forwardRef<HTMLDivElement>((props, ref) => {
           aVal = parseInt(a.mileage?.replace(/\D/g, "") || "0");
           bVal = parseInt(b.mileage?.replace(/\D/g, "") || "0");
           break;
-        case "first_registration_date":
+        case "first_registration_date": {
           const aMatch = a.first_registration_date?.match(/(\d{4})/);
           const bMatch = b.first_registration_date?.match(/(\d{4})/);
           aVal = aMatch ? parseInt(aMatch[1]) : 0;
           bVal = bMatch ? parseInt(bMatch[1]) : 0;
           break;
+        }
         case "ad_number":
         default:
           aVal = a.ad_number;

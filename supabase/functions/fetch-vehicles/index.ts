@@ -295,7 +295,25 @@ serve(async (req) => {
 
     const apiUrl = `${baseUrl}?${params.toString()}`;
 
-    const response = await fetch(apiUrl);
+    // Add timeout to prevent hanging requests
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds
+
+    let response;
+    try {
+      response = await fetch(apiUrl, { signal: controller.signal });
+      clearTimeout(timeoutId);
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.error('Request timeout after 10 seconds');
+        return new Response(
+          JSON.stringify({ success: false, error: 'Request timeout - API non disponibile' }),
+          { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      throw error;
+    }
     
     if (!response.ok) {
       console.error('API response not OK:', response.status, response.statusText);

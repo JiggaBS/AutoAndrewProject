@@ -11,7 +11,11 @@ Questo documento descrive l'integrazione di Google Analytics e dei meta tag SEO 
 3. Vai su **Admin** > **Data Streams** > Seleziona il tuo stream web
 4. Copia il **Measurement ID** (formato: `G-XXXXXXXXXX`)
 
-### 2. Configurare la variabile d'ambiente
+### 2. Metodi di Configurazione
+
+L'applicazione supporta **3 metodi** per configurare Google Analytics (in ordine di priorità):
+
+#### Metodo 1: Variabile d'ambiente (Consigliato per produzione)
 
 Crea un file `.env` nella root del progetto e aggiungi:
 
@@ -22,9 +26,26 @@ VITE_SITE_URL=https://tuodominio.com
 
 **Nota**: Sostituisci `G-XXXXXXXXXX` con il tuo Measurement ID reale e `https://tuodominio.com` con l'URL del tuo sito.
 
+#### Metodo 2: Edge Function `public-config` (Consigliato per configurazione dinamica)
+
+L'applicazione può recuperare il Measurement ID dall'edge function `public-config` di Supabase. Questo permette di cambiare la configurazione senza ricompilare l'applicazione.
+
+1. Vai su **Supabase Dashboard** → **Edge Functions** → **public-config**
+2. Configura il secret `GA_MEASUREMENT_ID` nella funzione
+3. La funzione restituirà automaticamente il valore al frontend
+
+**Vantaggi**: Configurazione centralizzata, nessuna ricompilazione necessaria.
+
+#### Metodo 3: localStorage (Fallback automatico)
+
+Se configurato tramite edge function, il valore viene automaticamente salvato in `localStorage` per migliorare le performance nelle visite successive.
+
 ### 3. Per lo sviluppo locale
 
-Per testare Google Analytics in locale, puoi usare un Measurement ID di test o lasciare la variabile vuota (verrà mostrato solo un warning in console).
+Per testare Google Analytics in locale, puoi:
+- Usare un Measurement ID di test nel file `.env`
+- Lasciare la variabile vuota (verrà mostrato solo un warning in console)
+- Configurare tramite edge function `public-config`
 
 ## Funzionalità Google Analytics
 
@@ -127,10 +148,15 @@ trackEvent("custom_action", "custom_category", "custom_label", value);
 
 ### Google Analytics non funziona
 
-1. Verifica che `VITE_GA_MEASUREMENT_ID` sia impostato correttamente nel file `.env`
-2. Riavvia il server di sviluppo dopo aver modificato il file `.env`
-3. Controlla la console del browser per eventuali errori
-4. Verifica che il Measurement ID sia corretto su Google Analytics
+1. **Verifica la configurazione** (controlla nell'ordine):
+   - Variabile `VITE_GA_MEASUREMENT_ID` nel file `.env`
+   - Edge function `public-config` configurata correttamente
+   - `localStorage.getItem("ga_measurement_id")` nel browser
+2. **Riavvia il server** di sviluppo dopo aver modificato il file `.env`
+3. **Controlla la console** del browser per eventuali errori o warning
+4. **Verifica il Measurement ID** su Google Analytics (formato: `G-XXXXXXXXXX`)
+5. **Controlla la rete**: Verifica che le richieste a `googletagmanager.com` non siano bloccate
+6. **Testa l'edge function**: Chiama manualmente `/functions/v1/public-config` per verificare la risposta
 
 ### Meta tag non aggiornati
 

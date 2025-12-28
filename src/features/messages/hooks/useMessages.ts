@@ -22,7 +22,7 @@ export function useMessages(requestId: string) {
       
       // Transform database format to Message type
       // Handle both old format (message, sender_id) and new format (body, sender_user_id)
-      return (data || []).map((raw: any): Message => ({
+      return (data || []).map((raw): Message => ({
         id: raw.id,
         request_id: raw.request_id || requestId,
         sender_user_id: raw.sender_user_id || raw.sender_id || null,
@@ -85,7 +85,7 @@ export function useMessages(requestId: string) {
       // For private buckets, we need to generate a signed URL
       const { data: signedUrlData, error: urlError } = await supabase.storage
         .from('message-attachments')
-        .createSignedUrl(filePath, 31536000); // 1 year expiry
+        .createSignedUrl(filePath, 60 * 60 * 24); // 24 hours expiry
 
       if (urlError) {
         console.error('Signed URL error:', urlError);
@@ -252,7 +252,7 @@ export function useMessages(requestId: string) {
             return;
           }
 
-          const rawMessage = payload.new as any;
+          const rawMessage = payload.new as Record<string, unknown>;
           
           // Validate required fields
           if (!rawMessage.id) {

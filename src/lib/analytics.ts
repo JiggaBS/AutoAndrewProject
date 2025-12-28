@@ -5,9 +5,10 @@ declare global {
     gtag?: (
       command: string,
       targetId: string | Date,
-      config?: Record<string, any>
+      config?: Record<string, unknown>
     ) => void;
-    dataLayer?: any[];
+    dataLayer?: unknown[];
+    __GA_MEASUREMENT_ID?: string;
   }
 }
 
@@ -20,7 +21,7 @@ const getGaMeasurementId = () => {
 
   if (typeof window === "undefined") return "";
   return (
-    (window as any).__GA_MEASUREMENT_ID ||
+    window.__GA_MEASUREMENT_ID ||
     localStorage.getItem("ga_measurement_id") ||
     ""
   );

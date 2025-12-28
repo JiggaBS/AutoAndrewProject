@@ -1,4 +1,4 @@
-import { useState, useEffect, forwardRef } from "react";
+import { useState, useEffect, useCallback, forwardRef } from "react";
 import { Star, Sparkles, ArrowLeftRight } from "lucide-react";
 import { Vehicle } from "@/data/sampleVehicles";
 import { Link } from "react-router-dom";
@@ -25,15 +25,15 @@ export const VehicleCard = forwardRef<HTMLElement, VehicleCardProps>(({
   const [isSaved, setIsSaved] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  const checkIfSaved = useCallback(async () => {
+    const saved = await isVehicleSaved(vehicle);
+    setIsSaved(saved);
+  }, [vehicle]);
+
   // Check if vehicle is saved when component mounts
   useEffect(() => {
     checkIfSaved();
-  }, [vehicle]);
-
-  const checkIfSaved = async () => {
-    const saved = await isVehicleSaved(vehicle);
-    setIsSaved(saved);
-  };
+  }, [checkIfSaved]);
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.preventDefault();

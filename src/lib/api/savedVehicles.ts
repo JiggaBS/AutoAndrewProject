@@ -14,13 +14,12 @@ export async function saveVehicle(vehicle: Vehicle): Promise<boolean> {
       return false;
     }
 
-    const result = await supabase
-      .from("saved_vehicles" as any)
+    const { error } = await supabase
+      .from("saved_vehicles")
       .insert({
         user_id: user.id,
-        vehicle_data: vehicle as any,
+        vehicle_data: vehicle as unknown as Record<string, unknown>,
       });
-    const { error } = result as { error: any };
 
     if (error) {
       // If it's a duplicate, still consider it successful
@@ -39,7 +38,7 @@ export async function saveVehicle(vehicle: Vehicle): Promise<boolean> {
       description: "Veicolo aggiunto ai preferiti",
     });
     return true;
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error saving vehicle:", error);
     toast({
       title: "Errore",
@@ -59,11 +58,11 @@ export async function unsaveVehicle(vehicle: Vehicle): Promise<boolean> {
     }
 
     const result = await supabase
-      .from("saved_vehicles" as any)
+      .from("saved_vehicles")
       .delete()
       .eq("user_id", user.id)
       .eq("vehicle_data->>ad_number", vehicle.ad_number.toString());
-    const { error } = result as { error: any };
+    const { error } = result;
 
     if (error) throw error;
 
@@ -72,7 +71,7 @@ export async function unsaveVehicle(vehicle: Vehicle): Promise<boolean> {
       description: "Veicolo rimosso dai preferiti",
     });
     return true;
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error unsaving vehicle:", error);
     toast({
       title: "Errore",
@@ -92,19 +91,19 @@ export async function isVehicleSaved(vehicle: Vehicle): Promise<boolean> {
     }
 
     const result = await supabase
-      .from("saved_vehicles" as any)
+      .from("saved_vehicles")
       .select("id")
       .eq("user_id", user.id)
       .eq("vehicle_data->>ad_number", vehicle.ad_number.toString())
       .maybeSingle();
-    const { data, error } = result as { data: { id: string } | null; error: any };
+    const { data, error } = result;
 
     if (error && error.code !== "PGRST116") { // PGRST116 = no rows returned
       throw error;
     }
 
     return !!data;
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error checking if vehicle is saved:", error);
     return false;
   }

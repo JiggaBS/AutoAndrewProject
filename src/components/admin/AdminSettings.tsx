@@ -26,12 +26,12 @@ export function AdminSettings() {
     try {
       // Fetch logo text visibility
       const logoResult = await supabase
-        .from("app_settings" as any)
+        .from("app_settings")
         .select("key, value")
         .eq("key", "logo_text_visible")
         .maybeSingle();
 
-      const { data: logoData, error: logoError } = logoResult as { data: { key: string; value: string } | null; error: any };
+      const { data: logoData, error: logoError } = logoResult;
 
       if (!logoError && logoData) {
         setLogoTextVisible(logoData.value === "true");
@@ -39,12 +39,12 @@ export function AdminSettings() {
 
       // Fetch publish button visibility
       const publishResult = await supabase
-        .from("app_settings" as any)
+        .from("app_settings")
         .select("key, value")
         .eq("key", "publish_button_visible")
         .maybeSingle();
 
-      const { data: publishData, error: publishError } = publishResult as { data: { key: string; value: string } | null; error: any };
+      const { data: publishData, error: publishError } = publishResult;
 
       if (!publishError && publishData) {
         setPublishButtonVisible(publishData.value === "true");
@@ -60,7 +60,7 @@ export function AdminSettings() {
     setSaving(true);
     try {
       const result = await supabase
-        .from("app_settings" as any)
+        .from("app_settings")
         .upsert(
           {
             key: "logo_text_visible",
@@ -69,7 +69,7 @@ export function AdminSettings() {
           { onConflict: "key" }
         );
 
-      const { error: logoError } = result as { error: any };
+      const { error: logoError } = result;
 
       if (logoError) {
         throw logoError;
@@ -79,7 +79,7 @@ export function AdminSettings() {
         title: "Impostazioni salvate",
         description: "Le impostazioni del sito sono state aggiornate",
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error saving settings:", error);
       toast({
         title: "Errore",
@@ -95,7 +95,7 @@ export function AdminSettings() {
     setLogoTextVisible(checked);
     try {
       const result = await supabase
-        .from("app_settings" as any)
+        .from("app_settings")
         .upsert(
           {
             key: "logo_text_visible",
@@ -104,7 +104,7 @@ export function AdminSettings() {
           { onConflict: "key" }
         );
 
-      const { error } = result as { error: any };
+      const { error } = result;
 
       if (error) throw error;
 
@@ -112,7 +112,7 @@ export function AdminSettings() {
         title: "Impostazione aggiornata",
         description: checked ? "Testo logo ora visibile" : "Testo logo ora nascosto",
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error updating logo text setting:", error);
       toast({
         title: "Errore",
@@ -127,7 +127,7 @@ export function AdminSettings() {
     setPublishButtonVisible(checked);
     try {
       const result = await supabase
-        .from("app_settings" as any)
+        .from("app_settings")
         .upsert(
           {
             key: "publish_button_visible",
@@ -136,7 +136,7 @@ export function AdminSettings() {
           { onConflict: "key" }
         );
 
-      const { error } = result as { error: any };
+      const { error } = result;
 
       if (error) throw error;
 
@@ -144,7 +144,7 @@ export function AdminSettings() {
         title: "Impostazione aggiornata",
         description: checked ? "Pulsante 'Pubblica annuncio' ora visibile" : "Pulsante 'Pubblica annuncio' ora nascosto",
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error updating publish button setting:", error);
       toast({
         title: "Errore",

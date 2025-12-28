@@ -353,12 +353,12 @@ export default function Valutiamo() {
       }
 
       // Check if the response indicates an error
-      if ((result as any).error) {
-        throw new Error((result as any).error);
+      if (result && typeof result === 'object' && 'error' in result) {
+        throw new Error(String(result.error));
       }
 
       // Get the tracking code from the result
-      const resultId = (result as any)?.id;
+      const resultId = result && typeof result === 'object' && 'id' in result ? result.id : null;
       const trackingCode = resultId ? String(resultId).substring(0, 8).toUpperCase() : null;
       
       if (!trackingCode) {
@@ -379,7 +379,7 @@ export default function Valutiamo() {
       form.reset();
       setUploadedImages([]);
       setShowEstimate(false);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Submit error:", error);
       toast({
         title: "Errore",

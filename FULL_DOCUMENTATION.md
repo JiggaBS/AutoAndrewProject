@@ -1,7 +1,7 @@
 # AutoGroup Romagna - Complete Documentation
 
-> **Version:** 2.1.0  
-> **Last Updated:** December 2024  
+> **Version:** 2.2.0  
+> **Last Updated:** January 2025  
 > **Platform:** Lovable + Supabase Cloud
 
 ---
@@ -54,9 +54,10 @@ AutoGroup Romagna is a professional **car dealership web application** designed 
 - **User Authentication** - Email/password and Google OAuth
 - **Customer Area** - View valuation requests, saved vehicles
 - **Vehicle Favorites** - Save vehicles to favorites
-- **Real-time Messaging** - Chat with admin about valuation requests
+- **Real-time Messaging** - Chat with admin about valuation requests with file attachments
 - **Real-time Notifications** - Bell icon with unread message counts
 - **Request Tracking** - Track status of valuation requests
+- **Message Attachments** - Upload and share documents, images, and files in messages
 
 #### Admin Features
 - **Admin Dashboard** - Full overview with statistics
@@ -101,6 +102,7 @@ AutoGroup Romagna is a professional **car dealership web application** designed 
 | **Supabase Database** | PostgreSQL database |
 | **Supabase Auth** | Authentication (Email, OAuth) |
 | **Supabase Edge Functions** | Serverless backend logic (Deno) |
+| **Supabase Storage** | File storage for message attachments |
 | **Supabase RLS** | Row Level Security policies |
 | **Supabase Realtime** | Real-time subscriptions |
 | **Resend** | Email notifications |
@@ -147,7 +149,14 @@ AutoGroup Romagna is a professional **car dealership web application** designed 
 │  │ - saved_vehicles│  │ - notify-client │  │                 │  │
 │  │ - activity_log  │  │                 │  │                 │  │
 │  │ - app_settings  │  │                 │  │                 │  │
+│  │                 │  │                 │  │                 │  │
 │  └─────────────────┘  └────────┬────────┘  └─────────────────┘  │
+│                                │                                 │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │              STORAGE (message-attachments)                  ││
+│  │  - Private bucket with RLS policies                         ││
+│  │  - File upload/download with signed URLs                    ││
+│  └─────────────────────────────────────────────────────────────┘│
 │                                │                                 │
 │  ┌─────────────────────────────────────────────────────────────┐│
 │  │                    REALTIME ENGINE                          ││
@@ -242,13 +251,16 @@ The app will be available at `http://localhost:8080`
 
 These secrets are configured in Lovable Cloud:
 
-| Secret | Description |
-|--------|-------------|
-| `MULTIGESTIONALE_API_KEY` | API key for vehicle inventory |
-| `RESEND_API_KEY` | API key for email notifications |
-| `SUPABASE_URL` | Auto-configured |
-| `SUPABASE_ANON_KEY` | Auto-configured |
-| `SUPABASE_SERVICE_ROLE_KEY` | Auto-configured |
+| Secret | Description | Required |
+|--------|-------------|----------|
+| `MULTIGESTIONALE_API_KEY` | API key for vehicle inventory | Optional |
+| `RESEND_API_KEY` | API key for email notifications | Optional |
+| `ALLOWED_ORIGINS` | Comma-separated list of allowed CORS origins (e.g., `https://yourdomain.com,https://www.yourdomain.com`) | ✅ **Required for production** |
+| `SUPABASE_URL` | Auto-configured | Auto |
+| `SUPABASE_ANON_KEY` | Auto-configured | Auto |
+| `SUPABASE_SERVICE_ROLE_KEY` | Auto-configured | Auto |
+| `ADMIN_EMAIL` | Admin notification email | Optional |
+| `DEALER_EMAIL` | Dealer notification email | Optional |
 
 ---
 
@@ -383,22 +395,42 @@ Send a message in a valuation thread. **This is the ONLY way to insert messages*
 SELECT send_valuation_message(
   'request-uuid',
   'Hello, your car is ready for pickup!',
-  NULL
+  NULL  -- or JSONB array of attachments
 );
 ```
+
+**Parameters:**
+- `p_request_id` (uuid): The valuation request ID
+- `p_body` (text): Message text (can be empty if attachments present)
+- `p_attachments` (jsonb, optional): Array of attachment metadata
 
 **Validation Rules:**
 - Caller must be authenticated
 - Caller must own the request OR be an admin
 - Users can only message on `pending` status requests
 - Admins can always message
-- Empty messages are rejected
+- Empty messages are rejected **unless attachments are present**
 - Max message length: 2000 characters
+
+**Attachment Format:**
+```json
+[
+  {
+    "id": "request/{request_id}/{timestamp}-{filename}",
+    "name": "document.pdf",
+    "url": "https://...signed-url...",
+    "type": "application/pdf",
+    "size": 123456,
+    "uploaded_at": "2025-01-27T12:00:00Z"
+  }
+]
+```
 
 **Side Effects:**
 - Updates `last_message_at` and `last_message_preview` on the request
+  - Preview shows "📎 Allegato" if message has attachments but no body
 - Increments `unread_count_admin` or `unread_count_user`
-- Logs activity to `activity_log`
+- Logs activity to `activity_log` with attachment metadata
 
 #### `mark_thread_read(request_id)`
 Mark all messages in a thread as read for the current user.
@@ -429,9 +461,15 @@ Automatically creates user profile and role on signup.
 ```sql
 -- Triggered on auth.users INSERT
 -- Creates:
--- 1. Row in user_profiles (with email and name from auth metadata)
+-- 1. Row in user_profiles (with email, name, surname, and phone from auth metadata)
 -- 2. Row in user_roles (with default 'user' role)
 ```
+
+**Metadata Extraction:**
+- `name`: Extracted from `raw_user_meta_data.name`, `raw_user_meta_data.full_name`, or email prefix
+- `surname`: Extracted from `raw_user_meta_data.surname`
+- `phone`: Extracted from `raw_user_meta_data.phone`
+- `email`: From `auth.users.email`
 
 ---
 
@@ -596,7 +634,7 @@ WHERE user_id = '<user-uuid>';
 
 ### Overview
 
-The messaging system allows real-time communication between customers and admins within valuation request threads.
+The messaging system allows real-time communication between customers and admins within valuation request threads, with support for file attachments.
 
 ### Architecture
 
@@ -604,18 +642,28 @@ The messaging system allows real-time communication between customers and admins
 ┌─────────────────┐      ┌─────────────────┐
 │  Customer UI    │      │    Admin UI     │
 │  (ChatThread)   │      │  (MessageThread)│
+│  + File Upload  │      │  + File Upload  │
 └────────┬────────┘      └────────┬────────┘
          │                        │
          ▼                        ▼
 ┌────────────────────────────────────────────┐
-│          send_valuation_message()          │
-│  (RPC function - validates & inserts)      │
+│     Supabase Storage (message-attachments)  │
+│     - File upload with RLS policies         │
+│     - Signed URLs for secure access         │
 └────────────────────┬───────────────────────┘
                      │
                      ▼
 ┌────────────────────────────────────────────┐
-│           valuation_messages               │
+│          send_valuation_message()           │
+│  (RPC function - validates & inserts)     │
+│  - Accepts body + attachments JSONB        │
+└────────────────────┬───────────────────────┘
+                     │
+                     ▼
+┌────────────────────────────────────────────┐
+│           valuation_messages                │
 │  (Table with RLS - read only via SELECT)   │
+│  - attachments column (JSONB)               │
 └────────────────────┬───────────────────────┘
                      │
                      ▼
@@ -631,9 +679,9 @@ The messaging system allows real-time communication between customers and admins
 |-----------|----------|---------|
 | `ChatThread` | `src/features/messages/components/ChatThread.tsx` | Customer chat UI |
 | `MessageThread` | `src/components/MessageThread.tsx` | Admin chat UI |
-| `MessageBubble` | `src/features/messages/components/MessageBubble.tsx` | Individual message display |
-| `Composer` | `src/features/messages/components/Composer.tsx` | Message input field |
-| `useMessages` | `src/features/messages/hooks/useMessages.ts` | Message fetching hook |
+| `MessageBubble` | `src/features/messages/components/MessageBubble.tsx` | Individual message display with attachments |
+| `Composer` | `src/features/messages/components/Composer.tsx` | Message input field with file upload |
+| `useMessages` | `src/features/messages/hooks/useMessages.ts` | Message fetching hook with attachment handling |
 
 ### Message Types
 
@@ -643,12 +691,60 @@ The messaging system allows real-time communication between customers and admins
 | `admin` | Message from admin |
 | `system` | Automated system message (status changes, etc.) |
 
+### File Attachments
+
+#### Supported File Types
+
+- **Documents:** PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX
+- **Images:** JPEG, PNG, GIF, WEBP
+- **Text:** TXT, CSV
+
+#### File Limits
+
+- **Max file size:** 10MB per file
+- **Max files per message:** 5 files
+- **Storage bucket:** `message-attachments` (private)
+
+#### Attachment Storage
+
+Files are stored in Supabase Storage with the following structure:
+```
+request/{request_id}/{timestamp}-{filename}
+```
+
+#### Attachment Metadata
+
+Attachments are stored as JSONB in the `valuation_messages.attachments` column:
+
+```json
+[
+  {
+    "id": "request/{request_id}/{timestamp}-document.pdf",
+    "name": "document.pdf",
+    "url": "https://...signed-url...",
+    "type": "application/pdf",
+    "size": 123456,
+    "uploaded_at": "2025-01-27T12:00:00Z"
+  }
+]
+```
+
+#### Security
+
+- **Private Storage:** Files stored in private bucket, not publicly accessible
+- **RLS Policies:** Users can only access attachments from their own requests
+- **Signed URLs:** Temporary signed URLs for file access (1 year expiry)
+- **Path-based Access:** Files organized by request ID for easy access control
+- **File Validation:** Server-side validation of file types and sizes
+
 ### Security Rules
 
 1. **Insert Blocked:** Direct INSERTs to `valuation_messages` are blocked by RLS
 2. **Must Use RPC:** All messages must go through `send_valuation_message()` function
 3. **Validation:** Function validates authentication, ownership, and status
 4. **Users Can Only Message on Pending:** Customers cannot message after request is closed
+5. **Empty Messages Allowed:** If attachments are present, message body can be empty
+6. **Storage Access:** Users can only upload/read files for their own requests (admins can access all)
 
 ---
 
@@ -1061,9 +1157,22 @@ trackEvent("vehicle_view", {
 
 Ensure all secrets are configured in Lovable Cloud:
 
-- `MULTIGESTIONALE_API_KEY`
-- `RESEND_API_KEY`
-- `VITE_GA_MEASUREMENT_ID` (optional)
+**Required:**
+- `ALLOWED_ORIGINS` - Comma-separated list of allowed CORS origins (e.g., `https://yourdomain.com,https://www.yourdomain.com`)
+
+**Optional:**
+- `MULTIGESTIONALE_API_KEY` - For vehicle inventory
+- `RESEND_API_KEY` - For email notifications
+- `ADMIN_EMAIL` - Admin notification email
+- `DEALER_EMAIL` - Dealer notification email
+- `VITE_GA_MEASUREMENT_ID` - Google Analytics (frontend env var)
+
+**Auto-configured:**
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+⚠️ **Important:** Without `ALLOWED_ORIGINS`, Edge Functions will reject all CORS requests in production.
 
 ### Custom Domain
 
@@ -1089,6 +1198,23 @@ All database tables have RLS enabled:
 | `activity_log` | Admin | Admin | ❌ | Admin |
 | `app_settings` | Admin | Admin | Admin | Admin |
 
+### RLS Performance Optimizations
+
+RLS policies have been optimized for performance:
+
+- **Auth Function Wrapping:** All `auth.uid()` calls wrapped with `(select auth.uid())` to prevent "Auth RLS Initialization Plan" warnings
+- **Policy Consolidation:** Multiple permissive policies consolidated into single policies where possible
+- **Helper Functions:** Use of helper functions like `has_role()` and `user_owns_valuation_request()` for consistent security checks
+
+### Storage Security (Message Attachments)
+
+The `message-attachments` storage bucket has RLS policies:
+
+- **Upload:** Users can upload to their own request folders; admins can upload to any folder
+- **Read:** Users can read files from their own requests; admins can read all files
+- **Delete:** Users can delete their own files (within 24 hours); admins can delete any file
+- **Path Validation:** Files must follow `request/{request_id}/{filename}` structure
+
 ### Message Security
 
 Messages can ONLY be inserted via the `send_valuation_message` function, which:
@@ -1097,16 +1223,43 @@ Messages can ONLY be inserted via the `send_valuation_message` function, which:
 - Prevents users from messaging on closed requests
 - Auto-updates unread counts
 - Logs activity
+- Validates attachment metadata
+
+### Authentication Security
+
+- **Session Storage:** Auth tokens stored in `sessionStorage` (not `localStorage`) for better XSS protection
+- **No Hardcoded Credentials:** All credentials must come from environment variables
+- **Production Validation:** Strict validation of environment variables in production builds
+
+### CORS Security
+
+- **No Wildcard Fallback:** Edge functions require `ALLOWED_ORIGINS` environment variable
+- **Explicit Rejection:** Invalid origins return `"null"` instead of allowing access
+- **CORS Headers:** Proper `Access-Control-Allow-Origin` headers with origin validation
 
 ### XSS Prevention
 
-HTML content is escaped in email templates and user inputs are sanitized.
+- **HTML Escaping:** HTML content is escaped in email templates
+- **Safe DOM Manipulation:** Replaced `innerHTML` with `createElement` and `textContent`
+- **User Input Sanitization:** All user inputs are sanitized before display
+
+### Security Headers
+
+Production deployment includes security headers (configured in `vercel.json`):
+
+- `X-Content-Type-Options: nosniff` - Prevents MIME sniffing
+- `X-Frame-Options: DENY` - Prevents clickjacking
+- `X-XSS-Protection: 1; mode=block` - XSS protection
+- `Referrer-Policy: strict-origin-when-cross-origin` - Controls referrer info
+- `Strict-Transport-Security` - Forces HTTPS
+- `Permissions-Policy` - Restricts browser features
 
 ### API Key Protection
 
 - Multigestionale API key stored as backend secret
 - Never exposed to frontend
 - Accessed only via Edge Functions
+- All Edge Functions require proper CORS configuration
 
 ---
 
@@ -1177,6 +1330,30 @@ Or run `full_migration.sql` for everything at once.
 1. Verify Supabase URL and anon key
 2. Check redirect URLs are configured correctly
 3. Ensure auto-confirm is enabled for development
+4. Note: Auth tokens use `sessionStorage` - users must log in again if browser tab closes
+
+#### File Attachments Not Uploading
+
+1. Check browser console for errors
+2. Verify `message-attachments` storage bucket exists
+3. Check RLS policies are correctly applied
+4. Ensure user has permission for the request
+5. Verify file size is under 10MB
+6. Check file type is in allowed MIME types list
+
+#### File Attachments Not Displaying
+
+1. Check that attachments JSON is properly formatted
+2. Verify signed URLs are being generated
+3. Check browser network tab for failed requests
+4. Ensure signed URL hasn't expired (1 year expiry)
+
+#### CORS Errors in Production
+
+1. Verify `ALLOWED_ORIGINS` secret is set in Supabase Dashboard
+2. Check that your domain is included in the comma-separated list
+3. Ensure no wildcard (`*`) is used
+4. Check Edge Function logs for CORS rejection details
 
 ### Debug Tools
 
@@ -1201,6 +1378,11 @@ console.log('User role:', data);
 - [x] Click-to-open request from notification
 - [x] Auto-open request from URL parameter
 - [x] Database migration export
+- [x] File attachments in messages (documents, images, files)
+- [x] Message attachments storage with RLS policies
+- [x] Security fixes (CORS, XSS, credential protection)
+- [x] RLS performance optimizations
+- [x] Production environment validation
 
 ### Short Term
 
@@ -1214,7 +1396,8 @@ console.log('User role:', data);
 - [ ] Vehicle comparison tool
 - [ ] Customer reviews system
 - [ ] Multi-language support (EN, DE)
-- [ ] File attachments in messages
+- [ ] Image preview in message bubbles
+- [ ] File thumbnails for documents
 
 ### Long Term
 
@@ -1247,6 +1430,33 @@ For questions or issues:
 ---
 
 ## Changelog
+
+### v2.2.0 (January 2025)
+- **Message Attachments:** Full file attachment support in messaging system
+  - Support for documents (PDF, Word, Excel, PowerPoint), images, and text files
+  - File upload UI with preview and validation
+  - Secure storage with RLS policies
+  - Signed URLs for private file access
+  - 10MB file size limit, 5 files per message
+- **Security Enhancements:**
+  - Removed hardcoded Supabase credentials
+  - Standardized auth storage to `sessionStorage` for better XSS protection
+  - Removed CORS wildcard fallback - requires `ALLOWED_ORIGINS` configuration
+  - Replaced `innerHTML` with safe DOM manipulation
+  - Added security headers (X-Content-Type-Options, X-Frame-Options, etc.)
+  - Production environment validation
+  - Email template XSS fixes
+- **Performance Improvements:**
+  - RLS policy optimizations (auth.uid() wrapping)
+  - Consolidated multiple permissive policies
+  - Improved query performance
+- **User Profile Updates:**
+  - User profile trigger now extracts surname and phone from auth metadata
+  - Better handling of OAuth user data
+- **Message Function Updates:**
+  - `send_valuation_message` now accepts attachments parameter
+  - Allows empty message body when attachments are present
+  - Enhanced message preview for attachments
 
 ### v2.1.0 (December 2024)
 - Real-time messaging system between customers and admins

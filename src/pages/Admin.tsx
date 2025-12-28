@@ -143,13 +143,7 @@ export default function Admin() {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  useEffect(() => {
-    if (user) {
-      checkAdminRole();
-    }
-  }, [user]);
-
-  const checkAdminRole = async () => {
+  const checkAdminRole = useCallback(async () => {
     setCheckingRole(true);
     try {
       const { data, error } = await supabase.rpc("has_role", {
@@ -167,51 +161,21 @@ export default function Admin() {
           variant: "destructive",
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Role check error:", error);
       setIsAdmin(false);
     } finally {
       setCheckingRole(false);
     }
-  };
-
-  // Realtime notifications
-  const handleNewMessage = useCallback(() => {
-    fetchRequests(); // Refresh to get updated unread counts
-  }, []);
-
-  const handleRequestUpdate = useCallback(() => {
-    fetchRequests(); // Refresh the requests list
-  }, []);
-
-  useRealtimeNotifications({
-    isAdmin: true,
-    userId: user?.id,
-    onNewMessage: handleNewMessage,
-    onRequestUpdate: handleRequestUpdate,
-  });
+  }, [user]);
 
   useEffect(() => {
-    if (isAdmin) {
-      fetchRequests();
-      fetchUsers();
-      fetchUnreadActivityCount();
+    if (user) {
+      checkAdminRole();
     }
-  }, [isAdmin]);
+  }, [user, checkAdminRole]);
 
-  useEffect(() => {
-    const requestId = new URLSearchParams(location.search).get("request");
-    if (requestId) {
-      setActiveTab("requests");
-      setAutoOpenRequestId(requestId);
-      navigate("/admin", { replace: true });
-      // Clear autoOpenRequestId after dialog has time to open
-      const timer = setTimeout(() => setAutoOpenRequestId(null), 500);
-      return () => clearTimeout(timer);
-    }
-  }, [location.search, navigate]);
-
-  const fetchUnreadActivityCount = async () => {
+  const fetchUnreadActivityCount = useCallback(async () => {
     try {
       const { count, error } = await supabase
         .from("activity_log")
@@ -223,7 +187,7 @@ export default function Admin() {
     } catch (error) {
       console.error("Error fetching unread count:", error);
     }
-  };
+  }, []);
 
   const markActivityAsRead = async () => {
     try {
@@ -239,7 +203,7 @@ export default function Admin() {
     }
   };
 
-  const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
     setLoadingRequests(true);
     try {
       // First verify admin role
@@ -285,19 +249,19 @@ export default function Admin() {
       if (data && data.length === 0 && count === 0) {
         console.log("No requests found in database");
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Fetch error:", error);
       toast({
         title: "Errore",
-        description: error.message || "Impossibile caricare le richieste",
+        description: error instanceof Error ? error.message : "Impossibile caricare le richieste",
         variant: "destructive",
       });
     } finally {
       setLoadingRequests(false);
     }
-  };
+  }, [user]);
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setLoadingUsers(true);
     try {
       interface ProfileData {
@@ -310,11 +274,11 @@ export default function Admin() {
       }
 
       const profilesResult = await supabase
-        .from("user_profiles" as any)
+        .from("user_profiles")
         .select("user_id, name, surname, phone, email, created_at")
         .order("created_at", { ascending: false });
 
-      const { data: profiles, error: profilesError } = profilesResult as { data: ProfileData[] | null; error: any };
+      const { data: profiles, error: profilesError } = profilesResult;
 
       if (profilesError) throw profilesError;
 
@@ -351,7 +315,7 @@ export default function Admin() {
       });
 
       setUsers(usersWithProfiles);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Fetch users error:", error);
       toast({
         title: "Errore",
@@ -361,7 +325,43 @@ export default function Admin() {
     } finally {
       setLoadingUsers(false);
     }
-  };
+  }, []);
+
+  // Now define the callbacks that use fetchRequests
+  const handleNewMessage = useCallback(() => {
+    fetchRequests(); // Refresh to get updated unread counts
+  }, [fetchRequests]);
+
+  const handleRequestUpdate = useCallback(() => {
+    fetchRequests(); // Refresh the requests list
+  }, [fetchRequests]);
+
+  useRealtimeNotifications({
+    isAdmin: true,
+    userId: user?.id,
+    onNewMessage: handleNewMessage,
+    onRequestUpdate: handleRequestUpdate,
+  });
+
+  useEffect(() => {
+    if (isAdmin) {
+      fetchRequests();
+      fetchUsers();
+      fetchUnreadActivityCount();
+    }
+  }, [isAdmin, fetchRequests, fetchUsers, fetchUnreadActivityCount]);
+
+  useEffect(() => {
+    const requestId = new URLSearchParams(location.search).get("request");
+    if (requestId) {
+      setActiveTab("requests");
+      setAutoOpenRequestId(requestId);
+      navigate("/admin", { replace: true });
+      // Clear autoOpenRequestId after dialog has time to open
+      const timer = setTimeout(() => setAutoOpenRequestId(null), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [location.search, navigate]);
 
   const filteredRequests = useMemo(() => {
     return requests.filter(req => {
@@ -388,18 +388,21 @@ export default function Admin() {
           case "today":
             if (reqDate.toDateString() !== now.toDateString()) return false;
             break;
-          case "week":
+          case "week": {
             const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
             if (reqDate < weekAgo) return false;
             break;
-          case "month":
+          }
+          case "month": {
             const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
             if (reqDate < monthAgo) return false;
             break;
-          case "quarter":
+          }
+          case "quarter": {
             const quarterAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
             if (reqDate < quarterAgo) return false;
             break;
+          }
         }
       }
 
@@ -432,7 +435,7 @@ export default function Admin() {
         title: "Stato aggiornato",
         description: `Richiesta segnata come "${statusLabels[newStatus]}"`,
       });
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Errore",
         description: "Impossibile aggiornare lo stato",
@@ -473,7 +476,7 @@ export default function Admin() {
         title: "Modifiche salvate",
         description: "I dati sono stati aggiornati",
       });
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Errore",
         description: "Impossibile salvare le modifiche",
@@ -555,7 +558,7 @@ export default function Admin() {
         title: "Ruolo aggiornato",
         description: `Utente ora è ${newRole === "admin" ? "Admin" : "Utente"}`,
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Update role error:", error);
       toast({
         title: "Errore",
@@ -589,7 +592,7 @@ export default function Admin() {
         title: "Ruolo rimosso",
         description: "Il ruolo dell'utente è stato rimosso",
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Remove role error:", error);
       toast({
         title: "Errore",
@@ -775,7 +778,7 @@ export default function Admin() {
                               title: "Debug Info",
                               description: `Found ${count || 0} requests. Check console for details.`,
                             });
-                          } catch (e: any) {
+                          } catch (e) {
                             console.error("Debug query error:", e);
                             toast({
                               title: "Debug Error",

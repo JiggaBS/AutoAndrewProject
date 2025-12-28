@@ -16,12 +16,18 @@ interface AnalyticsDashboardProps {
   requests: ValuationRequest[];
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+interface TooltipProps {
+  active?: boolean;
+  payload?: Array<{ name: string; value: number; color: string }>;
+  label?: string;
+}
+
+const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-card border border-border rounded-lg p-3 shadow-xl">
         <p className="text-sm font-medium text-foreground mb-1">{label}</p>
-        {payload.map((entry: any, index: number) => (
+        {payload.map((entry, index: number) => (
           <p key={index} className="text-xs" style={{ color: entry.color }}>
             {entry.name}: {entry.value}
           </p>

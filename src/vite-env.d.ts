@@ -16,8 +16,8 @@ interface ImportMeta {
 
 declare global {
   interface Window {
-    gtag?: (...args: any[]) => void;
-    dataLayer?: any[];
+    gtag?: (...args: unknown[]) => void;
+    dataLayer?: unknown[];
     __GA_MEASUREMENT_ID?: string;
   }
 }
