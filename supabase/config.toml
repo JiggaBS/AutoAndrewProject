@@ -1,0 +1,13 @@
+project_id = "igjrpjvqwylxbblpwxrx"
+
+[functions.public-config]
+verify_jwt = false
+
+[functions.submit-valuation]
+verify_jwt = false
+
+[functions.fetch-vehicles]
+verify_jwt = false
+
+[functions.notify-client]
+verify_jwt = false
