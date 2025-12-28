@@ -8,19 +8,35 @@ function getCorsHeaders(req: Request): Record<string, string> {
   const allowedOrigins = Deno.env.get("ALLOWED_ORIGINS")?.split(",").map(o => o.trim()) || [];
   const origin = req.headers.get("origin");
   
-  // In development, allow all origins if ALLOWED_ORIGINS is not set
-  // In production, only allow configured origins
-  const corsOrigin = allowedOrigins.length > 0 && origin && allowedOrigins.includes(origin)
-    ? origin
-    : allowedOrigins.length > 0
-    ? allowedOrigins[0] // Fallback to first allowed origin
-    : "*"; // Development fallback
+  // Security: Never use wildcard in production
+  // Only allow configured origins or fail
+  let corsOrigin: string | null = null;
+  
+  if (allowedOrigins.length > 0) {
+    // Check if origin is in allowed list
+    if (origin && allowedOrigins.includes(origin)) {
+      corsOrigin = origin;
+    } else if (allowedOrigins.length === 1) {
+      // Single allowed origin - use it even if origin header doesn't match
+      corsOrigin = allowedOrigins[0];
+    }
+  }
+  
+  // If no valid origin found, return minimal headers (will reject request)
+  if (!corsOrigin) {
+    return {
+      "Access-Control-Allow-Origin": "null", // Explicitly reject
+      "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    };
+  }
   
   return {
     "Access-Control-Allow-Origin": corsOrigin,
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Access-Control-Allow-Credentials": "true",
+    "Access-Control-Max-Age": "86400", // 24 hours
   };
 }
 

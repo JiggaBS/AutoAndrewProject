@@ -14,6 +14,7 @@ function requireEnv(key: string): string {
     if (import.meta.env.DEV) {
       console.error(`❌ ${errorMessage}`);
       if (typeof window !== "undefined") {
+        // Security: Use safe DOM manipulation instead of innerHTML
         const errorDiv = document.createElement("div");
         errorDiv.style.cssText = `
           position: fixed;
@@ -27,11 +28,24 @@ function requireEnv(key: string): string {
           font-family: system-ui, sans-serif;
           box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         `;
-        errorDiv.innerHTML = `
-          <strong>⚠️ Configuration Error</strong><br>
-          ${errorMessage}<br>
-          <small>Create a .env file in the project root with: ${key}=your-value</small>
-        `;
+        
+        const strong = document.createElement("strong");
+        strong.textContent = "⚠️ Configuration Error";
+        errorDiv.appendChild(strong);
+        
+        const br1 = document.createElement("br");
+        errorDiv.appendChild(br1);
+        
+        const errorText = document.createTextNode(errorMessage);
+        errorDiv.appendChild(errorText);
+        
+        const br2 = document.createElement("br");
+        errorDiv.appendChild(br2);
+        
+        const small = document.createElement("small");
+        small.textContent = `Create a .env file in the project root with: ${key}=your-value`;
+        errorDiv.appendChild(small);
+        
         document.body.appendChild(errorDiv);
       }
     }

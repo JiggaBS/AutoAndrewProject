@@ -6,27 +6,33 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_PUBLISHABLE_KEY =
   import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Fallbacks: these are *publishable* frontend values needed for the app to work in preview
-// even when Vite env injection is missing.
-const FALLBACK_SUPABASE_URL = "https://igjrpjvqwylxbblpwxrx.supabase.co";
-const FALLBACK_SUPABASE_PUBLISHABLE_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnanJwanZxd3lseGJibHB3eHJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY3MDMxMTAsImV4cCI6MjA4MjI3OTExMH0.MO4d9zm5SdG-pVrLPUYjB1lXN4vc5D8napA4ecGNazA";
-
-const safeUrl = SUPABASE_URL || FALLBACK_SUPABASE_URL;
-const safeKey = SUPABASE_PUBLISHABLE_KEY || FALLBACK_SUPABASE_PUBLISHABLE_KEY;
+// Security: No fallback credentials - fail fast in production
+// In development, show helpful error but don't use hardcoded values
+const isProduction = import.meta.env.PROD;
+const isDevelopment = import.meta.env.DEV;
 
 if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-  console.warn(
-    "Supabase env missing at build-time; using fallback public config so the app can run in preview."
-  );
+  const errorMessage = "Missing required Supabase environment variables: VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY (or VITE_SUPABASE_ANON_KEY)";
+  
+  if (isProduction) {
+    // In production, throw immediately - no fallbacks
+    throw new Error(`SECURITY ERROR: ${errorMessage}. The application cannot run without proper configuration.`);
+  } else {
+    // In development, show warning but still throw to prevent silent failures
+    console.error(`❌ ${errorMessage}`);
+    console.error("Please create a .env file with your Supabase credentials.");
+    throw new Error(errorMessage);
+  }
 }
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
-export const supabase = createClient<Database>(safeUrl, safeKey, {
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
-    storage: localStorage,
+    // Use sessionStorage for better XSS protection (tokens cleared on tab close)
+    storage: typeof window !== "undefined" ? window.sessionStorage : undefined,
     persistSession: true,
     autoRefreshToken: true,
+    detectSessionInUrl: true, // Enable PKCE flow detection
   },
 });
