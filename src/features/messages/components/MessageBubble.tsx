@@ -1,9 +1,10 @@
 import { cn } from '@/lib/utils';
 import { Message, MessageAttachment } from '../types';
-import { User, Shield, Bot, Copy, Check, Download, File, Image as ImageIcon, ExternalLink } from 'lucide-react';
+import { User, Shield, Bot, Copy, Check, Download, File, Image as ImageIcon, ExternalLink, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MessageBubbleProps {
   message: Message;
@@ -61,8 +62,72 @@ function getFileTypeIcon(type: string) {
 
 function AttachmentPreview({ attachment }: { attachment: MessageAttachment }) {
   const { language } = useLanguage();
+  const [isLoading, setIsLoading] = useState(false);
   const Icon = getFileTypeIcon(attachment.type);
   const isImage = attachment.type.startsWith('image/');
+
+  const handleOpenFile = async () => {
+    setIsLoading(true);
+    try {
+      // Extract file path from attachment.id (format: "request/{request_id}/{timestamp}-{filename}")
+      // or from the URL if id is not available
+      let filePath = attachment.id;
+      
+      // If id doesn't look like a path, try to extract from URL
+      if (!filePath || !filePath.includes('/')) {
+        // Try to extract path from URL
+        // URL format: https://...supabase.co/storage/v1/object/sign/message-attachments/request/...
+        const urlMatch = attachment.url.match(/message-attachments\/(.+)$/);
+        if (urlMatch) {
+          filePath = urlMatch[1];
+        } else {
+          // Last resort: use the stored URL directly
+          window.open(attachment.url, '_blank');
+          setIsLoading(false);
+          return;
+        }
+      }
+      
+      // Generate a fresh signed URL
+      const { data: signedUrlData, error: urlError } = await supabase.storage
+        .from('message-attachments')
+        .createSignedUrl(filePath, 3600); // 1 hour expiry
+
+      if (urlError) {
+        console.error('Error generating signed URL:', urlError);
+        // Fallback to stored URL if signed URL generation fails
+        window.open(attachment.url, '_blank');
+        setIsLoading(false);
+        return;
+      }
+
+      if (signedUrlData?.signedUrl) {
+        // For images, open in new tab for preview
+        // For other files, trigger download
+        if (isImage) {
+          window.open(signedUrlData.signedUrl, '_blank');
+        } else {
+          // Trigger download
+          const link = document.createElement('a');
+          link.href = signedUrlData.signedUrl;
+          link.download = attachment.name;
+          link.target = '_blank';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      } else {
+        // Fallback to stored URL
+        window.open(attachment.url, '_blank');
+      }
+    } catch (error) {
+      console.error('Error opening file:', error);
+      // Fallback to stored URL
+      window.open(attachment.url, '_blank');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="mt-2 p-3 rounded-lg bg-background/50 border border-border/50 flex items-center gap-3 group">
@@ -77,10 +142,13 @@ function AttachmentPreview({ attachment }: { attachment: MessageAttachment }) {
         variant="ghost"
         size="icon"
         className="h-8 w-8 shrink-0"
-        onClick={() => window.open(attachment.url, '_blank')}
-        title={language === 'it' ? 'Apri documento' : 'Open document'}
+        onClick={handleOpenFile}
+        disabled={isLoading}
+        title={language === 'it' ? (isImage ? 'Apri immagine' : 'Scarica documento') : (isImage ? 'Open image' : 'Download document')}
       >
-        {isImage ? (
+        {isLoading ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : isImage ? (
           <ExternalLink className="w-4 h-4" />
         ) : (
           <Download className="w-4 h-4" />
