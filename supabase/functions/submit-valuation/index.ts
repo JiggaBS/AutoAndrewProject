@@ -202,6 +202,12 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Errore salvataggio richiesta");
     }
 
+    // Validate that insertedData has an id
+    if (!insertedData.id) {
+      console.error("Database error: insertedData missing id", insertedData);
+      throw new Error("Errore salvataggio richiesta: ID non generato");
+    }
+
     // Format condition label
     const conditionLabels: Record<string, string> = {
       excellent: "Ottime condizioni",

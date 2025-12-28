@@ -345,8 +345,27 @@ export default function Valutiamo() {
 
       if (error) throw error;
 
+      // Validate result structure
+      if (!result) {
+        throw new Error(language === "it" 
+          ? "Risposta del server non valida. Riprova." 
+          : "Invalid server response. Please try again.");
+      }
+
+      // Check if the response indicates an error
+      if ((result as any).error) {
+        throw new Error((result as any).error);
+      }
+
       // Get the tracking code from the result
-      const trackingCode = result?.id ? result.id.substring(0, 8).toUpperCase() : null;
+      const resultId = (result as any)?.id;
+      const trackingCode = resultId ? String(resultId).substring(0, 8).toUpperCase() : null;
+      
+      if (!trackingCode) {
+        console.warn("No tracking code received from server:", result);
+        // Still show success but without tracking code
+      }
+      
       setSubmittedTrackingCode(trackingCode);
 
       toast({
