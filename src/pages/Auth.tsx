@@ -161,22 +161,26 @@ export default function Auth() {
           throw error;
         }
 
-        // Create user profile in the database
+        // Create or update user profile in the database
+        // Use upsert to handle case where trigger already created profile
         if (signUpData.user) {
           const result = await supabase
             .from("user_profiles" as any)
-            .insert({
+            .upsert({
               user_id: signUpData.user.id,
               name,
               surname,
               phone,
               email: email,
+              updated_at: new Date().toISOString(),
+            }, {
+              onConflict: 'user_id'
             });
 
           const { error: profileError } = result as { error: any };
 
           if (profileError) {
-            console.error("Error creating user profile:", profileError);
+            console.error("Error creating/updating user profile:", profileError);
             // Don't throw - profile can be created later, metadata is already saved
           }
         }

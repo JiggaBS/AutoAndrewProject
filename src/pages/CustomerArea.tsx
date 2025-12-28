@@ -232,6 +232,38 @@ export default function CustomerArea() {
       if (error && error.code !== 'PGRST116') throw error;
 
       if (data) {
+        // Check if profile is missing surname or phone, try to sync from user metadata
+        const metadata = user?.user_metadata || {};
+        const needsUpdate = (!data.surname && metadata.surname) || (!data.phone && metadata.phone);
+        
+        if (needsUpdate && user) {
+          // Update profile with missing data from metadata
+          const updateData: any = {};
+          if (!data.surname && metadata.surname) updateData.surname = metadata.surname;
+          if (!data.phone && metadata.phone) updateData.phone = metadata.phone;
+          
+          if (Object.keys(updateData).length > 0) {
+            updateData.updated_at = new Date().toISOString();
+            const { data: updatedData, error: updateError } = await supabase
+              .from("user_profiles")
+              .update(updateData)
+              .eq("user_id", userId)
+              .select()
+              .single();
+            
+            if (!updateError && updatedData) {
+              setProfile(updatedData);
+              setFormData({
+                name: updatedData.name || "",
+                surname: updatedData.surname || "",
+                phone: updatedData.phone || "",
+                email: updatedData.email || user?.email || "",
+              });
+              return;
+            }
+          }
+        }
+        
         setProfile(data);
         setFormData({
           name: data.name || "",
@@ -240,6 +272,35 @@ export default function CustomerArea() {
           email: data.email || user?.email || "",
         });
       } else {
+        // No profile exists, try to create from metadata
+        if (user) {
+          const metadata = user.user_metadata || {};
+          const createData = {
+            user_id: userId,
+            name: metadata.name || metadata.full_name?.split(' ')[0] || user.email?.split('@')[0] || "",
+            surname: metadata.surname || metadata.full_name?.split(' ').slice(1).join(' ') || "",
+            phone: metadata.phone || "",
+            email: user.email || "",
+          };
+          
+          const { data: newProfile, error: createError } = await supabase
+            .from("user_profiles")
+            .insert(createData)
+            .select()
+            .single();
+          
+          if (!createError && newProfile) {
+            setProfile(newProfile);
+            setFormData({
+              name: newProfile.name || "",
+              surname: newProfile.surname || "",
+              phone: newProfile.phone || "",
+              email: newProfile.email || "",
+            });
+            return;
+          }
+        }
+        
         setFormData({
           name: "",
           surname: "",
