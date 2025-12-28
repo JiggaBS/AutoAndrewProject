@@ -56,8 +56,6 @@ export function VehicleCompare({
                   src={vehicle.images[0]}
                   alt={vehicle.title}
                   className="w-14 h-10 rounded-lg object-cover border-2 border-border"
-                  crossOrigin="anonymous"
-                  referrerPolicy="no-referrer"
                 />
                 <button
                   onClick={() => onRemoveVehicle(vehicle.ad_number)}
@@ -95,8 +93,6 @@ export function VehicleCompare({
                             src={vehicle.images[0]}
                             alt={vehicle.title}
                             className="w-16 h-12 rounded object-cover"
-                            crossOrigin="anonymous"
-                            referrerPolicy="no-referrer"
                           />
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-sm text-foreground truncate">
@@ -184,8 +180,6 @@ function CompareTable({
               src={vehicle.images[0]}
               alt={vehicle.title}
               className="w-full aspect-[4/3] object-cover rounded-lg mb-3"
-              crossOrigin="anonymous"
-              referrerPolicy="no-referrer"
             />
             <h3 className="font-semibold text-foreground">
               {vehicle.make} {vehicle.model}

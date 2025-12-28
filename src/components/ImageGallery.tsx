@@ -104,8 +104,6 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
             isImageLoading ? "opacity-0" : "opacity-100"
           )}
           onLoad={() => setIsImageLoading(false)}
-          crossOrigin="anonymous"
-          referrerPolicy="no-referrer"
         />
 
         {/* Gradient Overlay */}
@@ -161,8 +159,6 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
               src={image}
               alt={`${title} - Miniatura ${index + 1}`}
               className="w-full h-full object-cover"
-              crossOrigin="anonymous"
-              referrerPolicy="no-referrer"
             />
             {currentIndex === index && (
               <div className="absolute inset-0 bg-primary/10" />
@@ -245,8 +241,6 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
                 transform: `scale(${zoom}) rotate(${rotation}deg)`,
               }}
               draggable={false}
-              crossOrigin="anonymous"
-              referrerPolicy="no-referrer"
             />
           </div>
 
@@ -280,8 +274,6 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
                   src={image}
                   alt={`Miniatura ${index + 1}`}
                   className="w-full h-full object-cover"
-                  crossOrigin="anonymous"
-                  referrerPolicy="no-referrer"
                 />
               </button>
             ))}
