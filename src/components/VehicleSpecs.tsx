@@ -8,6 +8,9 @@ import {
   Shield,
   Leaf,
   Droplets,
+  Users,
+  DoorOpen,
+  Weight,
 } from "lucide-react";
 import { Vehicle } from "@/data/sampleVehicles";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -72,7 +75,8 @@ export function VehicleSpecs({ vehicle }: VehicleSpecsProps) {
       </div>
 
       {/* Additional Specs */}
-      {(vehicle.emissions_class || vehicle.combined_consumption || vehicle.warranty) && (
+      {(vehicle.emissions_class || vehicle.combined_consumption || vehicle.warranty || 
+        vehicle.num_seats || vehicle.owners_count || vehicle.doors_count || vehicle.weight) && (
         <div className="mt-6 pt-4 border-t border-border">
           <h4 className="font-medium text-foreground mb-3">{t("specs.additionalDetails")}</h4>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -106,6 +110,50 @@ export function VehicleSpecs({ vehicle }: VehicleSpecsProps) {
                 </div>
                 <p className="font-medium text-foreground text-sm pl-6">
                   {vehicle.warranty} {t("specs.months")}
+                </p>
+              </div>
+            )}
+            {vehicle.num_seats && (
+              <div className="spec-item flex-col items-start gap-1">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Users className="w-4 h-4" />
+                  <span className="text-xs">{t("specs.numSeats")}</span>
+                </div>
+                <p className="font-medium text-foreground text-sm pl-6">
+                  {vehicle.num_seats}
+                </p>
+              </div>
+            )}
+            {vehicle.owners_count !== undefined && vehicle.owners_count !== null && (
+              <div className="spec-item flex-col items-start gap-1">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <User className="w-4 h-4" />
+                  <span className="text-xs">{t("specs.ownersCount")}</span>
+                </div>
+                <p className="font-medium text-foreground text-sm pl-6">
+                  {vehicle.owners_count}
+                </p>
+              </div>
+            )}
+            {vehicle.doors_count && (
+              <div className="spec-item flex-col items-start gap-1">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <DoorOpen className="w-4 h-4" />
+                  <span className="text-xs">{t("specs.doorsCount")}</span>
+                </div>
+                <p className="font-medium text-foreground text-sm pl-6">
+                  {vehicle.doors_count}
+                </p>
+              </div>
+            )}
+            {vehicle.weight && (
+              <div className="spec-item flex-col items-start gap-1">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Weight className="w-4 h-4" />
+                  <span className="text-xs">{t("specs.weight")}</span>
+                </div>
+                <p className="font-medium text-foreground text-sm pl-6">
+                  {vehicle.weight} {t("specs.kg")}
                 </p>
               </div>
             )}

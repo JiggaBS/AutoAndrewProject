@@ -31,6 +31,10 @@ export interface Vehicle {
   combined_consumption?: string;
   emissions_class?: string;
   warranty?: number;
+  num_seats?: number;
+  owners_count?: number;
+  doors_count?: number;
+  weight?: number;
 }
 
 export const sampleVehicles: Vehicle[] = [
@@ -73,6 +77,10 @@ export const sampleVehicles: Vehicle[] = [
     combined_consumption: "5,7 l/100 km",
     emissions_class: "Euro 6d",
     warranty: 12,
+    num_seats: 5,
+    owners_count: 1,
+    doors_count: 5,
+    weight: 1450,
   },
   {
     ad_number: 43152,
@@ -112,6 +120,10 @@ export const sampleVehicles: Vehicle[] = [
     combined_consumption: "6,5 l/100 km",
     emissions_class: "Euro 6d",
     warranty: 24,
+    num_seats: 5,
+    owners_count: 2,
+    doors_count: 5,
+    weight: 1650,
   },
   {
     ad_number: 43153,

@@ -10,6 +10,12 @@ function getCorsHeaders(req: Request): Record<string, string> {
   // Only allow configured origins or fail
   let corsOrigin: string | null = null;
   
+  // Allow localhost for development (when ALLOWED_ORIGINS is not set or empty)
+  const isLocalhost = origin && (
+    origin.startsWith("http://localhost:") || 
+    origin.startsWith("http://127.0.0.1:")
+  );
+  
   if (allowedOrigins.length > 0) {
     // Check if origin is in allowed list
     if (origin && allowedOrigins.includes(origin)) {
@@ -17,6 +23,16 @@ function getCorsHeaders(req: Request): Record<string, string> {
     } else if (allowedOrigins.length === 1) {
       // Single allowed origin - use it even if origin header doesn't match
       corsOrigin = allowedOrigins[0];
+    } else if (isLocalhost) {
+      // Allow localhost if explicitly in allowed list
+      if (allowedOrigins.some(o => o.includes("localhost") || o.includes("127.0.0.1"))) {
+        corsOrigin = origin;
+      }
+    }
+  } else {
+    // No ALLOWED_ORIGINS configured - allow localhost for development
+    if (isLocalhost) {
+      corsOrigin = origin;
     }
   }
   
@@ -71,6 +87,10 @@ interface Vehicle {
   combined_consumption?: string;
   emissions_class?: string;
   warranty?: number;
+  num_seats?: number;
+  owners_count?: number;
+  doors_count?: number;
+  weight?: number;
 }
 
 function stripCDATA(text: string): string {
@@ -84,6 +104,12 @@ function getTagContent(xml: string, tagName: string): string {
   if (!match) return '';
   // Strip CDATA and clean the content
   return stripCDATA(match[1].trim());
+}
+
+function parseIntOrUndefined(value: string): number | undefined {
+  if (!value || value.trim() === '') return undefined;
+  const parsed = parseInt(value);
+  return isNaN(parsed) ? undefined : parsed;
 }
 
 function getImagesArray(elementXml: string): string[] {
@@ -208,6 +234,10 @@ function parseXmlToVehicles(xmlText: string): Vehicle[] {
       combined_consumption: getTagContent(elementXml, 'combined_consumption'),
       emissions_class: getTagContent(elementXml, 'emissions_class'),
       warranty: parseInt(getTagContent(elementXml, 'warranty')) || 0,
+      num_seats: parseIntOrUndefined(getTagContent(elementXml, 'num_seats')),
+      owners_count: parseIntOrUndefined(getTagContent(elementXml, 'owners_count')),
+      doors_count: parseIntOrUndefined(getTagContent(elementXml, 'doors_count')),
+      weight: parseIntOrUndefined(getTagContent(elementXml, 'weight')),
     };
 
     if (vehicle.ad_number > 0) vehicles.push(vehicle);

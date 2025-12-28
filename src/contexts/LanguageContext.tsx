@@ -636,6 +636,11 @@ const translations: Record<Language, Record<string, string>> = {
     "specs.combinedConsumption": "Consumo combinato",
     "specs.warranty": "Garanzia",
     "specs.months": "mesi",
+    "specs.numSeats": "Numero posti",
+    "specs.ownersCount": "Proprietari precedenti",
+    "specs.doorsCount": "Numero porte",
+    "specs.weight": "Peso",
+    "specs.kg": "kg",
 
     // Dealer Card
     "dealer.googleReviews": "Recensioni Google",
@@ -1275,6 +1280,11 @@ const translations: Record<Language, Record<string, string>> = {
     "specs.combinedConsumption": "Combined consumption",
     "specs.warranty": "Warranty",
     "specs.months": "months",
+    "specs.numSeats": "Number of seats",
+    "specs.ownersCount": "Previous owners",
+    "specs.doorsCount": "Number of doors",
+    "specs.weight": "Weight",
+    "specs.kg": "kg",
 
     // Dealer Card
     "dealer.googleReviews": "Google Reviews",
