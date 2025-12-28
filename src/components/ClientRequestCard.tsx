@@ -160,23 +160,30 @@ export function ClientRequestCard({ request, autoOpen }: ClientRequestCardProps)
 
       {/* Detail Dialog */}
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0">
-          <DialogHeader className="p-6 pb-0">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-xl bg-primary/10">
-                  <Car className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <DialogTitle className="text-xl font-bold">{request.make} {request.model}</DialogTitle>
-                  <DialogDescription className="text-sm text-muted-foreground">
-                    {language === "it" ? "Anno" : "Year"} {request.year} • ID: {request.id.slice(0, 8).toUpperCase()}
-                  </DialogDescription>
-                </div>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0 [&>button]:hidden">
+          <DialogHeader className="p-6 pb-0 relative">
+            <button
+              onClick={() => setDetailOpen(false)}
+              className="absolute right-4 top-4 z-50 p-2 rounded-full bg-muted/80 hover:bg-muted opacity-80 ring-offset-background transition-all hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
+            >
+              <X className="h-5 w-5" />
+              <span className="sr-only">Close</span>
+            </button>
+            <div className="flex items-start gap-3 pr-12">
+              <div className="p-3 rounded-xl bg-primary/10">
+                <Car className="w-6 h-6 text-primary" />
               </div>
-              <Badge className={`${statusColors[request.status]} px-3 py-1`}>
-                {statusLabels[request.status]}
-              </Badge>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <DialogTitle className="text-xl font-bold">{request.make} {request.model}</DialogTitle>
+                  <Badge className={`${statusColors[request.status]} px-3 py-1 shrink-0`}>
+                    {statusLabels[request.status]}
+                  </Badge>
+                </div>
+                <DialogDescription className="text-sm text-muted-foreground">
+                  {language === "it" ? "Anno" : "Year"} {request.year} • ID: {request.id.slice(0, 8).toUpperCase()}
+                </DialogDescription>
+              </div>
             </div>
           </DialogHeader>
 
