@@ -28,18 +28,6 @@ export function useMessages(requestId: string) {
   const uploadFiles = async (files: File[]): Promise<MessageAttachment[]> => {
     const attachments: MessageAttachment[] = [];
 
-    // Check if bucket exists
-    const { data: buckets, error: bucketError } = await supabase.storage.listBuckets();
-    if (bucketError) {
-      console.error('Bucket list error:', bucketError);
-      throw new Error('Impossibile accedere allo storage. Verifica la configurazione.');
-    }
-
-    const bucketExists = buckets?.some(b => b.id === 'message-attachments');
-    if (!bucketExists) {
-      throw new Error('Il bucket di storage non esiste. Esegui la migrazione del database.');
-    }
-
     for (const file of files) {
       // Generate unique file path: request/{requestId}/{timestamp}-{filename}
       const timestamp = Date.now();
@@ -59,12 +47,18 @@ export function useMessages(requestId: string) {
         
         // Provide more specific error messages
         let errorMessage = `Impossibile caricare ${file.name}`;
-        if (uploadError.message.includes('new row violates row-level security policy')) {
-          errorMessage = 'Non hai i permessi per caricare file. Verifica di essere autenticato.';
-        } else if (uploadError.message.includes('Bucket not found')) {
-          errorMessage = 'Il bucket di storage non esiste. Contatta l\'amministratore.';
-        } else if (uploadError.message.includes('The resource already exists')) {
-          errorMessage = `Il file ${file.name} esiste già.`;
+        const errorMsg = uploadError.message.toLowerCase();
+        
+        if (errorMsg.includes('bucket not found') || errorMsg.includes('does not exist')) {
+          errorMessage = 'Il bucket di storage non esiste. Esegui la migrazione del database.';
+        } else if (errorMsg.includes('row-level security') || errorMsg.includes('policy')) {
+          errorMessage = 'Non hai i permessi per caricare file. Verifica di essere autenticato e di avere accesso a questa richiesta.';
+        } else if (errorMsg.includes('already exists') || errorMsg.includes('duplicate')) {
+          errorMessage = `Il file ${file.name} esiste già. Prova con un nome diverso.`;
+        } else if (errorMsg.includes('file size') || errorMsg.includes('too large')) {
+          errorMessage = `Il file ${file.name} è troppo grande. Dimensione massima: 10MB.`;
+        } else if (errorMsg.includes('mime type') || errorMsg.includes('content type')) {
+          errorMessage = `Tipo di file non supportato per ${file.name}.`;
         } else {
           errorMessage = `${errorMessage}: ${uploadError.message}`;
         }
@@ -83,7 +77,32 @@ export function useMessages(requestId: string) {
 
       if (urlError) {
         console.error('Signed URL error:', urlError);
-        // Fallback to public URL if signed URL fails
+        // For private buckets, we still need a URL - try to get public URL as fallback
+        // but it won't work for private buckets, so we'll use the path and generate URL later
+        const { data: urlData } = supabase.storage
+          .from('message-attachments')
+          .getPublicUrl(filePath);
+        
+        // Store the path - we can generate signed URL when displaying
+        attachments.push({
+          id: uploadData.path,
+          name: file.name,
+          url: urlData.publicUrl, // May not work for private bucket, but better than nothing
+          type: file.type,
+          size: file.size,
+          uploaded_at: new Date().toISOString(),
+        });
+      } else if (signedUrlData?.signedUrl) {
+        attachments.push({
+          id: uploadData.path,
+          name: file.name,
+          url: signedUrlData.signedUrl,
+          type: file.type,
+          size: file.size,
+          uploaded_at: new Date().toISOString(),
+        });
+      } else {
+        // Fallback if signed URL generation returns no URL
         const { data: urlData } = supabase.storage
           .from('message-attachments')
           .getPublicUrl(filePath);
@@ -92,15 +111,6 @@ export function useMessages(requestId: string) {
           id: uploadData.path,
           name: file.name,
           url: urlData.publicUrl,
-          type: file.type,
-          size: file.size,
-          uploaded_at: new Date().toISOString(),
-        });
-      } else {
-        attachments.push({
-          id: uploadData.path,
-          name: file.name,
-          url: signedUrlData?.signedUrl || '',
           type: file.type,
           size: file.size,
           uploaded_at: new Date().toISOString(),
@@ -122,11 +132,18 @@ export function useMessages(requestId: string) {
           const attachments = await uploadFiles(files);
           attachmentsJson = attachments as unknown as Json;
         } catch (error) {
+          // Log full error for debugging
+          console.error('File upload error:', error);
+          const errorMessage = error instanceof Error ? error.message : 'Impossibile caricare i file.';
+          
+          // Show toast with specific error
           toast({
             title: 'Errore upload',
-            description: error instanceof Error ? error.message : 'Impossibile caricare i file.',
+            description: errorMessage,
             variant: 'destructive',
           });
+          
+          // Re-throw to prevent message from being sent
           throw error;
         }
       }
