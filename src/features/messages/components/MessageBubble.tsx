@@ -1,10 +1,11 @@
 import { cn } from '@/lib/utils';
 import { Message, MessageAttachment } from '../types';
-import { User, Shield, Bot, Copy, Check, Download, File, Image as ImageIcon, ExternalLink, Loader2 } from 'lucide-react';
+import { User, Shield, Bot, Copy, Check, Download, File, Image as ImageIcon, ExternalLink, Loader2, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
+import { Dialog, DialogContent, DialogDescription } from '@/components/ui/dialog';
 
 interface MessageBubbleProps {
   message: Message;
@@ -65,8 +66,11 @@ function AttachmentPreview({ attachment }: { attachment: MessageAttachment }) {
   const [isLoading, setIsLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageError, setImageError] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const Icon = getFileTypeIcon(attachment.type);
   const isImage = attachment.type.startsWith('image/');
+  const isPdf = attachment.type === 'application/pdf';
 
   const generateSignedUrl = async (forPreview = false): Promise<string | null> => {
     try {
@@ -112,15 +116,21 @@ function AttachmentPreview({ attachment }: { attachment: MessageAttachment }) {
       if (!signedUrl) {
         // Fallback: try to use stored URL
         console.warn('Could not generate signed URL, using stored URL');
-        window.open(attachment.url, '_blank');
+        if (isImage || isPdf) {
+          setPreviewUrl(attachment.url);
+          setIsPreviewOpen(true);
+        } else {
+          window.open(attachment.url, '_blank');
+        }
         setIsLoading(false);
         return;
       }
 
-      // For images, open in new tab for preview
+      // For images and PDFs, open in modal preview
       // For other files, trigger download
-      if (isImage) {
-        window.open(signedUrl, '_blank');
+      if (isImage || isPdf) {
+        setPreviewUrl(signedUrl);
+        setIsPreviewOpen(true);
       } else {
         // Trigger download
         const link = document.createElement('a');
@@ -133,8 +143,13 @@ function AttachmentPreview({ attachment }: { attachment: MessageAttachment }) {
       }
     } catch (error) {
       console.error('Error opening file:', error);
-      // Fallback to stored URL
-      window.open(attachment.url, '_blank');
+      // Fallback: try to open in modal if image/pdf, otherwise new window
+      if (isImage || isPdf) {
+        setPreviewUrl(attachment.url);
+        setIsPreviewOpen(true);
+      } else {
+        window.open(attachment.url, '_blank');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -154,25 +169,49 @@ function AttachmentPreview({ attachment }: { attachment: MessageAttachment }) {
   // For images, show thumbnail preview
   if (isImage) {
     return (
-      <div className="mt-2 space-y-2">
-        {imageUrl ? (
-          <div className="relative group/image">
-            <img
-              src={imageUrl}
-              alt={attachment.name}
-              className="max-w-[300px] max-h-[300px] rounded-lg border border-border object-cover cursor-pointer hover:opacity-90 transition-opacity"
-              onClick={handleOpenFile}
-              onError={() => setImageError(true)}
-            />
-            <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-colors rounded-lg flex items-center justify-center opacity-0 group-hover/image:opacity-100">
+      <>
+        <div className="mt-2 space-y-2">
+          {imageUrl ? (
+            <div className="relative group/image">
+              <img
+                src={imageUrl}
+                alt={attachment.name}
+                className="max-w-[300px] max-h-[300px] rounded-lg border border-border object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                onClick={handleOpenFile}
+                onError={() => setImageError(true)}
+              />
+              <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-colors rounded-lg flex items-center justify-center opacity-0 group-hover/image:opacity-100">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 bg-background/80 hover:bg-background"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenFile();
+                  }}
+                  disabled={isLoading}
+                  title={language === 'it' ? 'Apri immagine' : 'Open image'}
+                >
+                  {isLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <ExternalLink className="w-4 h-4" />
+                  )}
+                </Button>
+              </div>
+            </div>
+          ) : imageError ? (
+            <div className="p-3 rounded-lg bg-background/50 border border-border/50 flex items-center gap-3">
+              <Icon className="w-5 h-5 text-muted-foreground" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{attachment.name}</p>
+                <p className="text-xs text-muted-foreground">{formatFileSize(attachment.size)}</p>
+              </div>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 bg-background/80 hover:bg-background"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleOpenFile();
-                }}
+                className="h-8 w-8 shrink-0"
+                onClick={handleOpenFile}
                 disabled={isLoading}
                 title={language === 'it' ? 'Apri immagine' : 'Open image'}
               >
@@ -183,67 +222,136 @@ function AttachmentPreview({ attachment }: { attachment: MessageAttachment }) {
                 )}
               </Button>
             </div>
-          </div>
-        ) : imageError ? (
-          <div className="p-3 rounded-lg bg-background/50 border border-border/50 flex items-center gap-3">
-            <Icon className="w-5 h-5 text-muted-foreground" />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{attachment.name}</p>
-              <p className="text-xs text-muted-foreground">{formatFileSize(attachment.size)}</p>
+          ) : (
+            <div className="p-3 rounded-lg bg-background/50 border border-border/50 flex items-center gap-3">
+              <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{attachment.name}</p>
+                <p className="text-xs text-muted-foreground">{formatFileSize(attachment.size)}</p>
+              </div>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 shrink-0"
-              onClick={handleOpenFile}
-              disabled={isLoading}
-              title={language === 'it' ? 'Apri immagine' : 'Open image'}
+          )}
+        </div>
+
+        {/* Image Preview Modal */}
+        <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+          <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black/95 border-none">
+            <DialogDescription className="sr-only">
+              {language === 'it' ? 'Anteprima immagine' : 'Image preview'}
+            </DialogDescription>
+            <button
+              onClick={() => setIsPreviewOpen(false)}
+              className="absolute top-4 right-4 z-50 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+              aria-label={language === 'it' ? 'Chiudi' : 'Close'}
             >
-              {isLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <ExternalLink className="w-4 h-4" />
-              )}
-            </Button>
-          </div>
-        ) : (
-          <div className="p-3 rounded-lg bg-background/50 border border-border/50 flex items-center gap-3">
-            <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{attachment.name}</p>
-              <p className="text-xs text-muted-foreground">{formatFileSize(attachment.size)}</p>
-            </div>
-          </div>
-        )}
-      </div>
+              <X className="w-5 h-5 text-white" />
+            </button>
+            {previewUrl && (
+              <div className="flex items-center justify-center p-4 min-h-[50vh]">
+                <img
+                  src={previewUrl}
+                  alt={attachment.name}
+                  className="max-w-full max-h-[90vh] object-contain"
+                  onError={() => {
+                    console.error('Error loading image in preview');
+                    setIsPreviewOpen(false);
+                  }}
+                />
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+      </>
     );
   }
 
   // For non-image files, show file card
   return (
-    <div className="mt-2 p-3 rounded-lg bg-background/50 border border-border/50 flex items-center gap-3 group">
-      <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
-        <Icon className="w-5 h-5 text-muted-foreground" />
+    <>
+      <div className="mt-2 p-3 rounded-lg bg-background/50 border border-border/50 flex items-center gap-3 group">
+        <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
+          <Icon className="w-5 h-5 text-muted-foreground" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium truncate">{attachment.name}</p>
+          <p className="text-xs text-muted-foreground">{formatFileSize(attachment.size)}</p>
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 shrink-0"
+          onClick={handleOpenFile}
+          disabled={isLoading}
+          title={
+            isPdf
+              ? language === 'it' ? 'Anteprima documento' : 'Preview document'
+              : language === 'it' ? 'Scarica documento' : 'Download document'
+          }
+        >
+          {isLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : isPdf ? (
+            <ExternalLink className="w-4 h-4" />
+          ) : (
+            <Download className="w-4 h-4" />
+          )}
+        </Button>
       </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">{attachment.name}</p>
-        <p className="text-xs text-muted-foreground">{formatFileSize(attachment.size)}</p>
-      </div>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-8 w-8 shrink-0"
-        onClick={handleOpenFile}
-        disabled={isLoading}
-        title={language === 'it' ? 'Scarica documento' : 'Download document'}
-      >
-        {isLoading ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
-        ) : (
-          <Download className="w-4 h-4" />
-        )}
-      </Button>
-    </div>
+
+      {/* Document Preview Modal (for PDFs) */}
+      {isPdf && (
+        <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+          <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-background border">
+            <DialogDescription className="sr-only">
+              {language === 'it' ? 'Anteprima documento' : 'Document preview'}
+            </DialogDescription>
+            <div className="flex items-center justify-between p-4 border-b">
+              <h3 className="text-lg font-semibold truncate flex-1 mr-4">{attachment.name}</h3>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={async () => {
+                    if (!previewUrl) return;
+                    const link = document.createElement('a');
+                    link.href = previewUrl;
+                    link.download = attachment.name;
+                    link.target = '_blank';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
+                  disabled={!previewUrl}
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  {language === 'it' ? 'Scarica' : 'Download'}
+                </Button>
+                <button
+                  onClick={() => setIsPreviewOpen(false)}
+                  className="p-2 rounded-full hover:bg-muted transition-colors"
+                  aria-label={language === 'it' ? 'Chiudi' : 'Close'}
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+            {previewUrl && (
+              <div className="flex items-center justify-center p-4 min-h-[50vh] bg-muted/30">
+                <iframe
+                  src={previewUrl}
+                  className="w-full h-[80vh] border-0 rounded-lg"
+                  title={attachment.name}
+                  onError={() => {
+                    console.error('Error loading PDF in preview');
+                    setIsPreviewOpen(false);
+                  }}
+                />
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   );
 }
 
