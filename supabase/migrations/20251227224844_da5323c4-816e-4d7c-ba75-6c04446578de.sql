@@ -170,8 +170,8 @@ BEGIN
     END IF;
   END IF;
   
-  -- Validate body
-  IF length(trim(p_body)) = 0 THEN
+  -- Validate body - allow empty if attachments are present
+  IF length(trim(p_body)) = 0 AND (p_attachments IS NULL OR p_attachments = '[]'::jsonb) THEN
     RAISE EXCEPTION 'EMPTY_MESSAGE';
   END IF;
   
