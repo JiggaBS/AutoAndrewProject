@@ -7,6 +7,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Prevent FOUC by hiding content until styles load -->
+    <style>
+      /* Critical CSS to prevent FOUC */
+      html { visibility: hidden; opacity: 0; }
+      html.loaded { visibility: visible; opacity: 1; transition: opacity 0.3s; }
+      body { margin: 0; padding: 0; }
+      #root { min-height: 100vh; }
+    </style>
     <title>AutoAndrew - Trova la tua Auto Perfetta</title>
     <meta name="description" content="Vendita di auto usate selezionate e garantite. Scopri il nostro parco auto e trova il veicolo ideale per te." />
 

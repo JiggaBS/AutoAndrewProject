@@ -137,10 +137,11 @@ export function NotificationBell({ isAdmin, userId, userEmail }: NotificationBel
         () => refreshFromDb()
       )
       .subscribe((status) => {
-        // Only log errors, not successful subscriptions (to reduce console noise)
-        if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") {
+        // Only log errors in development mode to reduce console noise in production
+        // Polling fallback ensures reliability even if realtime fails
+        if (import.meta.env.DEV && (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED")) {
           // eslint-disable-next-line no-console
-          console.warn("[NotificationBell] realtime status:", status, "- falling back to polling");
+          console.debug("[NotificationBell] realtime status:", status, "- falling back to polling");
         }
         // Successful subscription is silent - polling fallback ensures reliability
       });

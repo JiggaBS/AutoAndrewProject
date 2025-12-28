@@ -7,6 +7,17 @@ import { initSentry } from "./lib/sentry";
 // Initialize Sentry before rendering the app
 initSentry();
 
+// Mark HTML as loaded to prevent FOUC
+// Use requestAnimationFrame to ensure DOM is ready
+requestAnimationFrame(() => {
+  document.documentElement.classList.add("loaded");
+});
+
+// Fallback: ensure page is visible even if CSS fails to load
+setTimeout(() => {
+  document.documentElement.classList.add("loaded");
+}, 100);
+
 const rootElement = document.getElementById("root");
 if (!rootElement) {
   throw new Error("Root element not found");
