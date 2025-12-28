@@ -28,6 +28,18 @@ export function useMessages(requestId: string) {
   const uploadFiles = async (files: File[]): Promise<MessageAttachment[]> => {
     const attachments: MessageAttachment[] = [];
 
+    // Check if bucket exists
+    const { data: buckets, error: bucketError } = await supabase.storage.listBuckets();
+    if (bucketError) {
+      console.error('Bucket list error:', bucketError);
+      throw new Error('Impossibile accedere allo storage. Verifica la configurazione.');
+    }
+
+    const bucketExists = buckets?.some(b => b.id === 'message-attachments');
+    if (!bucketExists) {
+      throw new Error('Il bucket di storage non esiste. Esegui la migrazione del database.');
+    }
+
     for (const file of files) {
       // Generate unique file path: request/{requestId}/{timestamp}-{filename}
       const timestamp = Date.now();
@@ -44,27 +56,56 @@ export function useMessages(requestId: string) {
 
       if (uploadError) {
         console.error('Upload error:', uploadError);
-        throw new Error(`Failed to upload ${file.name}: ${uploadError.message}`);
+        
+        // Provide more specific error messages
+        let errorMessage = `Impossibile caricare ${file.name}`;
+        if (uploadError.message.includes('new row violates row-level security policy')) {
+          errorMessage = 'Non hai i permessi per caricare file. Verifica di essere autenticato.';
+        } else if (uploadError.message.includes('Bucket not found')) {
+          errorMessage = 'Il bucket di storage non esiste. Contatta l\'amministratore.';
+        } else if (uploadError.message.includes('The resource already exists')) {
+          errorMessage = `Il file ${file.name} esiste già.`;
+        } else {
+          errorMessage = `${errorMessage}: ${uploadError.message}`;
+        }
+        
+        throw new Error(errorMessage);
       }
 
-      // Get public URL (signed URL for private bucket)
-      const { data: urlData } = supabase.storage
-        .from('message-attachments')
-        .getPublicUrl(filePath);
+      if (!uploadData) {
+        throw new Error(`Upload fallito per ${file.name}: nessun dato restituito`);
+      }
 
       // For private buckets, we need to generate a signed URL
-      const { data: signedUrlData } = await supabase.storage
+      const { data: signedUrlData, error: urlError } = await supabase.storage
         .from('message-attachments')
         .createSignedUrl(filePath, 31536000); // 1 year expiry
 
-      attachments.push({
-        id: uploadData.path,
-        name: file.name,
-        url: signedUrlData?.signedUrl || urlData.publicUrl,
-        type: file.type,
-        size: file.size,
-        uploaded_at: new Date().toISOString(),
-      });
+      if (urlError) {
+        console.error('Signed URL error:', urlError);
+        // Fallback to public URL if signed URL fails
+        const { data: urlData } = supabase.storage
+          .from('message-attachments')
+          .getPublicUrl(filePath);
+        
+        attachments.push({
+          id: uploadData.path,
+          name: file.name,
+          url: urlData.publicUrl,
+          type: file.type,
+          size: file.size,
+          uploaded_at: new Date().toISOString(),
+        });
+      } else {
+        attachments.push({
+          id: uploadData.path,
+          name: file.name,
+          url: signedUrlData?.signedUrl || '',
+          type: file.type,
+          size: file.size,
+          uploaded_at: new Date().toISOString(),
+        });
+      }
     }
 
     return attachments;
@@ -124,10 +165,22 @@ export function useMessages(requestId: string) {
           description: 'Non puoi inviare messaggi in questo stato.',
           variant: 'destructive',
         });
+      } else if (error.message.includes('bucket')) {
+        toast({
+          title: 'Errore Storage',
+          description: error.message,
+          variant: 'destructive',
+        });
+      } else if (error.message.includes('permessi') || error.message.includes('permessi')) {
+        toast({
+          title: 'Errore Permessi',
+          description: error.message,
+          variant: 'destructive',
+        });
       } else {
         toast({
           title: 'Errore',
-          description: 'Impossibile inviare il messaggio.',
+          description: error.message || 'Impossibile inviare il messaggio.',
           variant: 'destructive',
         });
       }
