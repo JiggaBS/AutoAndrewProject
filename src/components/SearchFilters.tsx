@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Search, RotateCcw, X } from "lucide-react";
+import { Search, RotateCcw, X, Car, FileText, Calendar, Euro, Zap, Gauge, Palette, Fuel, Settings, Leaf, DoorOpen, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { VehicleTypeSelector } from "./VehicleTypeSelector";
@@ -283,7 +283,8 @@ export function SearchFilters({
             value={filters.make || undefined}
             onValueChange={value => handleFilterChange("make", value)}
           >
-            <SelectTrigger className={`w-full bg-card ${filters.make ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+            <SelectTrigger className={`relative w-full bg-card ${filters.make ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+              <Car className="absolute left-3 h-4 w-4 text-muted-foreground" />
               <SelectValue placeholder={t("filters.brand")} />
             </SelectTrigger>
             <SelectContent className="bg-popover z-50">
@@ -308,7 +309,8 @@ export function SearchFilters({
         {/* Model - Always visible */}
         <div className="relative">
           <Select key={`model-select-${filters.model || 'empty'}`} value={filters.model || undefined} onValueChange={value => handleFilterChange("model", value)} disabled={!filters.make || availableModels.length === 0}>
-            <SelectTrigger className={`w-full bg-card ${filters.model ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+            <SelectTrigger className={`relative w-full bg-card ${filters.model ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+              <FileText className="absolute left-3 h-4 w-4 text-muted-foreground" />
               <SelectValue placeholder={filters.make ? t("filters.model") : t("filters.selectBrand")} />
             </SelectTrigger>
             <SelectContent className="bg-popover z-50">
@@ -333,7 +335,8 @@ export function SearchFilters({
         {/* Body Type - Mobile only (visible), Desktop visible in main row */}
         <div className="md:hidden relative">
               <Select key={`bodyType-select-${filters.bodyType || 'empty'}`} value={filters.bodyType || undefined} onValueChange={value => handleFilterChange("bodyType", value)}>
-            <SelectTrigger className={`w-full bg-card ${filters.bodyType ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+            <SelectTrigger className={`relative w-full bg-card ${filters.bodyType ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+              <Car className="absolute left-3 h-4 w-4 text-muted-foreground" />
               <SelectValue placeholder={t("filters.bodyType")} />
             </SelectTrigger>
             <SelectContent className="bg-popover z-50">
@@ -361,7 +364,8 @@ export function SearchFilters({
         {/* Body Type - Desktop only */}
         <div className="hidden md:block relative">
               <Select key={`bodyType-select-${filters.bodyType || 'empty'}`} value={filters.bodyType || undefined} onValueChange={value => handleFilterChange("bodyType", value)}>
-            <SelectTrigger className={`w-full bg-card ${filters.bodyType ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+            <SelectTrigger className={`relative w-full bg-card ${filters.bodyType ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+              <Car className="absolute left-3 h-4 w-4 text-muted-foreground" />
               <SelectValue placeholder={t("filters.bodyType")} />
             </SelectTrigger>
             <SelectContent className="bg-popover z-50">
@@ -389,7 +393,8 @@ export function SearchFilters({
         {/* Color - Mobile only (visible), Desktop visible in main row */}
         <div className="md:hidden relative">
               <Select key={`color-select-${filters.color || 'empty'}`} value={filters.color || undefined} onValueChange={value => handleFilterChange("color", value)}>
-            <SelectTrigger className={`w-full bg-card ${filters.color ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+            <SelectTrigger className={`relative w-full bg-card ${filters.color ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+              <Palette className="absolute left-3 h-4 w-4 text-muted-foreground" />
               <SelectValue placeholder={t("filters.color")} />
             </SelectTrigger>
             <SelectContent className="bg-popover z-50">
@@ -414,7 +419,8 @@ export function SearchFilters({
         {/* Year From - Desktop only */}
         <div className="hidden md:block relative">
           <Select value={filters.yearFrom || undefined} onValueChange={value => handleFilterChange("yearFrom", value)}>
-            <SelectTrigger className={`w-full bg-card ${filters.yearFrom ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+            <SelectTrigger className={`relative w-full bg-card ${filters.yearFrom ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+              <Calendar className="absolute left-3 h-4 w-4 text-muted-foreground" />
               <SelectValue placeholder={t("filters.yearFrom")} />
             </SelectTrigger>
             <SelectContent className="bg-popover z-50">
@@ -439,7 +445,8 @@ export function SearchFilters({
         {/* Price Min - Desktop only */}
         <div className="hidden md:block relative">
           <Select value={filters.priceMin || undefined} onValueChange={value => handleFilterChange("priceMin", value)}>
-            <SelectTrigger className={`w-full bg-card ${filters.priceMin ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+            <SelectTrigger className={`relative w-full bg-card ${filters.priceMin ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+              <Euro className="absolute left-3 h-4 w-4 text-muted-foreground" />
               <SelectValue placeholder={t("filters.priceFrom")} />
             </SelectTrigger>
             <SelectContent className="bg-popover z-50">
@@ -467,7 +474,8 @@ export function SearchFilters({
         {/* Price Max */}
         <div className="relative">
           <Select value={filters.priceMax || undefined} onValueChange={value => handleFilterChange("priceMax", value)}>
-            <SelectTrigger className={`w-full bg-card ${filters.priceMax ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+            <SelectTrigger className={`relative w-full bg-card ${filters.priceMax ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+              <Euro className="absolute left-3 h-4 w-4 text-muted-foreground" />
               <SelectValue placeholder={t("filters.priceTo")} />
             </SelectTrigger>
             <SelectContent className="bg-popover z-50">
@@ -492,7 +500,8 @@ export function SearchFilters({
         {/* Power Min */}
         <div className="relative">
           <Select value={filters.powerMin || undefined} onValueChange={value => handleFilterChange("powerMin", value)}>
-            <SelectTrigger className={`w-full bg-card ${filters.powerMin ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+            <SelectTrigger className={`relative w-full bg-card ${filters.powerMin ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+              <Zap className="absolute left-3 h-4 w-4 text-muted-foreground" />
               <SelectValue placeholder={t("filters.powerFrom")} />
             </SelectTrigger>
             <SelectContent className="bg-popover z-50">
@@ -517,7 +526,8 @@ export function SearchFilters({
         {/* Power Max */}
         <div className="relative">
           <Select value={filters.powerMax || undefined} onValueChange={value => handleFilterChange("powerMax", value)}>
-            <SelectTrigger className={`w-full bg-card ${filters.powerMax ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+            <SelectTrigger className={`relative w-full bg-card ${filters.powerMax ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+              <Zap className="absolute left-3 h-4 w-4 text-muted-foreground" />
               <SelectValue placeholder={t("filters.powerTo")} />
             </SelectTrigger>
             <SelectContent className="bg-popover z-50">
@@ -542,7 +552,8 @@ export function SearchFilters({
         {/* Mileage Max */}
         <div className="relative">
           <Select value={filters.mileageMax || undefined} onValueChange={value => handleFilterChange("mileageMax", value)}>
-            <SelectTrigger className={`w-full bg-card ${filters.mileageMax ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+            <SelectTrigger className={`relative w-full bg-card ${filters.mileageMax ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+              <Activity className="absolute left-3 h-4 w-4 text-muted-foreground" />
               <SelectValue placeholder={t("filters.maxKm")} />
             </SelectTrigger>
             <SelectContent className="bg-popover z-50">
@@ -567,7 +578,8 @@ export function SearchFilters({
         {/* Color - Desktop */}
         <div className="relative">
               <Select key={`color-select-${filters.color || 'empty'}`} value={filters.color || undefined} onValueChange={value => handleFilterChange("color", value)}>
-            <SelectTrigger className={`w-full bg-card ${filters.color ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+            <SelectTrigger className={`relative w-full bg-card ${filters.color ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+              <Palette className="absolute left-3 h-4 w-4 text-muted-foreground" />
               <SelectValue placeholder={t("filters.color")} />
             </SelectTrigger>
             <SelectContent className="bg-popover z-50">
@@ -655,7 +667,8 @@ export function SearchFilters({
             {/* Year From - Mobile only (in advanced), Desktop visible in main */}
             <div className="md:hidden relative">
               <Select key={`yearFrom-select-${filters.yearFrom || 'empty'}`} value={filters.yearFrom || undefined} onValueChange={value => handleFilterChange("yearFrom", value)}>
-                <SelectTrigger className={`w-full bg-card ${filters.yearFrom ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+                <SelectTrigger className={`relative w-full bg-card ${filters.yearFrom ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+                  <Calendar className="absolute left-3 h-4 w-4 text-muted-foreground" />
                   <SelectValue placeholder={t("filters.yearFrom")} />
                 </SelectTrigger>
                 <SelectContent className="bg-popover z-50">
@@ -681,7 +694,8 @@ export function SearchFilters({
             {/* Price Min - Mobile only (in advanced), Desktop visible in main */}
             <div className="md:hidden relative">
               <Select key={`priceMin-select-${filters.priceMin || 'empty'}`} value={filters.priceMin || undefined} onValueChange={value => handleFilterChange("priceMin", value)}>
-                <SelectTrigger className={`w-full bg-card ${filters.priceMin ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+                <SelectTrigger className={`relative w-full bg-card ${filters.priceMin ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+                  <Euro className="absolute left-3 h-4 w-4 text-muted-foreground" />
                   <SelectValue placeholder={t("filters.priceFrom")} />
                 </SelectTrigger>
                 <SelectContent className="bg-popover z-50">
@@ -707,7 +721,8 @@ export function SearchFilters({
             {/* Price Max - Mobile only (in advanced), Desktop visible in main */}
             <div className="md:hidden relative">
               <Select key={`priceMax-select-${filters.priceMax || 'empty'}`} value={filters.priceMax || undefined} onValueChange={value => handleFilterChange("priceMax", value)}>
-                <SelectTrigger className={`w-full bg-card ${filters.priceMax ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+                <SelectTrigger className={`relative w-full bg-card ${filters.priceMax ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+                  <Euro className="absolute left-3 h-4 w-4 text-muted-foreground" />
                   <SelectValue placeholder={t("filters.priceTo")} />
                 </SelectTrigger>
                 <SelectContent className="bg-popover z-50">
@@ -733,7 +748,8 @@ export function SearchFilters({
             {/* Power Min - Mobile only (in advanced), Desktop visible in main */}
             <div className="md:hidden relative">
               <Select key={`powerMin-select-${filters.powerMin || 'empty'}`} value={filters.powerMin || undefined} onValueChange={value => handleFilterChange("powerMin", value)}>
-                <SelectTrigger className={`w-full bg-card ${filters.powerMin ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+                <SelectTrigger className={`relative w-full bg-card ${filters.powerMin ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+                  <Zap className="absolute left-3 h-4 w-4 text-muted-foreground" />
                   <SelectValue placeholder={t("filters.powerFrom")} />
                 </SelectTrigger>
                 <SelectContent className="bg-popover z-50">
@@ -759,7 +775,8 @@ export function SearchFilters({
             {/* Power Max - Mobile only (in advanced), Desktop visible in main */}
             <div className="md:hidden relative">
               <Select key={`powerMax-select-${filters.powerMax || 'empty'}`} value={filters.powerMax || undefined} onValueChange={value => handleFilterChange("powerMax", value)}>
-                <SelectTrigger className={`w-full bg-card ${filters.powerMax ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+                <SelectTrigger className={`relative w-full bg-card ${filters.powerMax ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+                  <Zap className="absolute left-3 h-4 w-4 text-muted-foreground" />
                   <SelectValue placeholder={t("filters.powerTo")} />
                 </SelectTrigger>
                 <SelectContent className="bg-popover z-50">
@@ -785,7 +802,8 @@ export function SearchFilters({
             {/* Mileage Max - Mobile only (in advanced), Desktop visible in main */}
             <div className="md:hidden relative">
               <Select key={`mileageMax-select-${filters.mileageMax || 'empty'}`} value={filters.mileageMax || undefined} onValueChange={value => handleFilterChange("mileageMax", value)}>
-                <SelectTrigger className={`w-full bg-card ${filters.mileageMax ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+                <SelectTrigger className={`relative w-full bg-card ${filters.mileageMax ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+                  <Activity className="absolute left-3 h-4 w-4 text-muted-foreground" />
                   <SelectValue placeholder={t("filters.maxKm")} />
                 </SelectTrigger>
                 <SelectContent className="bg-popover z-50">
@@ -811,7 +829,8 @@ export function SearchFilters({
             {/* Fuel Type - Always in advanced */}
             <div className="relative">
               <Select key={`fuelType-select-${filters.fuelType || 'empty'}`} value={filters.fuelType || undefined} onValueChange={value => handleFilterChange("fuelType", value)}>
-                <SelectTrigger className={`w-full bg-card ${filters.fuelType ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+                <SelectTrigger className={`relative w-full bg-card ${filters.fuelType ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+                  <Fuel className="absolute left-3 h-4 w-4 text-muted-foreground" />
                   <SelectValue placeholder={t("filters.fuel")} />
                 </SelectTrigger>
             <SelectContent className="bg-popover z-50">
@@ -836,7 +855,8 @@ export function SearchFilters({
             {/* Gearbox - Always in advanced */}
             <div className="relative">
               <Select key={`gearbox-select-${filters.gearbox || 'empty'}`} value={filters.gearbox || undefined} onValueChange={value => handleFilterChange("gearbox", value)}>
-                <SelectTrigger className={`w-full bg-card ${filters.gearbox ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+                <SelectTrigger className={`relative w-full bg-card ${filters.gearbox ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+                  <Settings className="absolute left-3 h-4 w-4 text-muted-foreground" />
                   <SelectValue placeholder={t("filters.gearbox")} />
                 </SelectTrigger>
             <SelectContent className="bg-popover z-50">
@@ -878,7 +898,8 @@ export function SearchFilters({
             {/* Emissions Class - Always in advanced */}
             <div className="relative">
               <Select key={`emissionsClass-select-${filters.emissionsClass || 'empty'}`} value={filters.emissionsClass || undefined} onValueChange={value => handleFilterChange("emissionsClass", value)}>
-                <SelectTrigger className={`w-full bg-card ${filters.emissionsClass ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+                <SelectTrigger className={`relative w-full bg-card ${filters.emissionsClass ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+                  <Leaf className="absolute left-3 h-4 w-4 text-muted-foreground" />
                   <SelectValue placeholder={t("filters.euroClass")} />
                 </SelectTrigger>
             <SelectContent className="bg-popover z-50">
@@ -903,7 +924,8 @@ export function SearchFilters({
             {/* Doors - Always in advanced */}
             <div className="relative">
               <Select key={`doors-select-${filters.doors || 'empty'}`} value={filters.doors || undefined} onValueChange={value => handleFilterChange("doors", value)}>
-                <SelectTrigger className={`w-full bg-card ${filters.doors ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+                <SelectTrigger className={`relative w-full bg-card ${filters.doors ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+                  <DoorOpen className="absolute left-3 h-4 w-4 text-muted-foreground" />
                   <SelectValue placeholder={t("filters.doors")} />
                 </SelectTrigger>
             <SelectContent className="bg-popover z-50">
@@ -931,7 +953,8 @@ export function SearchFilters({
             {/* Engine Displacement Min - Always in advanced */}
             <div className="relative">
               <Select key={`engineDisplacementMin-select-${filters.engineDisplacementMin || 'empty'}`} value={filters.engineDisplacementMin || undefined} onValueChange={value => handleFilterChange("engineDisplacementMin", value)}>
-                <SelectTrigger className={`w-full bg-card ${filters.engineDisplacementMin ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+                <SelectTrigger className={`relative w-full bg-card ${filters.engineDisplacementMin ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+                  <Gauge className="absolute left-3 h-4 w-4 text-muted-foreground" />
                   <SelectValue placeholder={t("filters.engineFrom")} />
                 </SelectTrigger>
             <SelectContent className="bg-popover z-50">
@@ -956,7 +979,8 @@ export function SearchFilters({
             {/* Engine Displacement Max - Always in advanced */}
             <div className="relative">
               <Select key={`engineDisplacementMax-select-${filters.engineDisplacementMax || 'empty'}`} value={filters.engineDisplacementMax || undefined} onValueChange={value => handleFilterChange("engineDisplacementMax", value)}>
-                <SelectTrigger className={`w-full bg-card ${filters.engineDisplacementMax ? 'pr-10 [&>svg]:hidden' : 'pr-3'}`}>
+                <SelectTrigger className={`relative w-full bg-card ${filters.engineDisplacementMax ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+                  <Gauge className="absolute left-3 h-4 w-4 text-muted-foreground" />
                   <SelectValue placeholder={t("filters.engineTo")} />
                 </SelectTrigger>
             <SelectContent className="bg-popover z-50">
