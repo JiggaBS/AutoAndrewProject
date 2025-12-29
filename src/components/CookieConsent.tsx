@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { X, Settings, Cookie } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type CookiePreferences = {
   necessary: boolean;
@@ -13,6 +14,7 @@ const COOKIE_CONSENT_KEY = "cookie_consent";
 const COOKIE_PREFERENCES_KEY = "cookie_preferences";
 
 export const CookieConsent = () => {
+  const { t } = useLanguage();
   const [showBanner, setShowBanner] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [preferences, setPreferences] = useState<CookiePreferences>({
@@ -80,7 +82,7 @@ export const CookieConsent = () => {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
                 <Settings className="w-5 h-5" />
-                Impostazioni Cookie
+                {t("cookies.settings.title")}
               </h3>
               <Button
                 variant="ghost"
@@ -95,9 +97,9 @@ export const CookieConsent = () => {
               {/* Necessary */}
               <div className="flex items-start justify-between p-4 bg-secondary/50 rounded-lg">
                 <div className="flex-1">
-                  <h4 className="font-medium text-foreground">Cookie Necessari</h4>
+                  <h4 className="font-medium text-foreground">{t("cookies.necessary.title")}</h4>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Essenziali per il funzionamento del sito. Non possono essere disattivati.
+                    {t("cookies.necessary.desc")}
                   </p>
                 </div>
                 <div className="ml-4">
@@ -110,9 +112,9 @@ export const CookieConsent = () => {
               {/* Analytics */}
               <div className="flex items-start justify-between p-4 bg-secondary/50 rounded-lg">
                 <div className="flex-1">
-                  <h4 className="font-medium text-foreground">Cookie Analitici</h4>
+                  <h4 className="font-medium text-foreground">{t("cookies.analytics.title")}</h4>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Ci aiutano a capire come utilizzi il sito per migliorare l'esperienza.
+                    {t("cookies.analytics.desc")}
                   </p>
                 </div>
                 <button
@@ -132,9 +134,9 @@ export const CookieConsent = () => {
               {/* Marketing */}
               <div className="flex items-start justify-between p-4 bg-secondary/50 rounded-lg">
                 <div className="flex-1">
-                  <h4 className="font-medium text-foreground">Cookie di Marketing</h4>
+                  <h4 className="font-medium text-foreground">{t("cookies.marketing.title")}</h4>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Utilizzati per mostrarti annunci pertinenti ai tuoi interessi.
+                    {t("cookies.marketing.desc")}
                   </p>
                 </div>
                 <button
@@ -154,10 +156,10 @@ export const CookieConsent = () => {
 
             <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-border">
               <Button variant="outline" onClick={acceptNecessary}>
-                Solo Necessari
+                {t("cookies.acceptNecessary")}
               </Button>
               <Button onClick={savePreferences}>
-                Salva Preferenze
+                {t("cookies.save")}
               </Button>
             </div>
           </div>
@@ -170,19 +172,17 @@ export const CookieConsent = () => {
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-foreground mb-2">
-                  Questo sito utilizza i cookie 🍪
+                  {t("cookies.title")}
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  Utilizziamo cookie e tecnologie simili per migliorare la tua esperienza di navigazione, 
-                  analizzare il traffico del sito e personalizzare i contenuti. Puoi accettare tutti i cookie, 
-                  solo quelli necessari, oppure personalizzare le tue preferenze.
-                  Per saperne di più, consulta la nostra{" "}
+                  {t("cookies.description")}{" "}
+                  {t("cookies.learnMore")}{" "}
                   <Link to="/cookie-policy" className="text-primary hover:underline">
-                    Cookie Policy
+                    {t("footer.cookies")}
                   </Link>{" "}
-                  e la{" "}
+                  {t("cookies.and")}{" "}
                   <Link to="/privacy-policy" className="text-primary hover:underline">
-                    Privacy Policy
+                    {t("footer.privacy")}
                   </Link>.
                 </p>
               </div>
@@ -195,17 +195,17 @@ export const CookieConsent = () => {
                 className="order-3 sm:order-1"
               >
                 <Settings className="w-4 h-4 mr-2" />
-                Personalizza
+                {t("cookies.customize")}
               </Button>
               <Button
                 variant="outline"
                 onClick={acceptNecessary}
                 className="order-2"
               >
-                Solo Necessari
+                {t("cookies.acceptNecessary")}
               </Button>
               <Button onClick={acceptAll} className="order-1 sm:order-3">
-                Accetta Tutti
+                {t("cookies.acceptAll")}
               </Button>
             </div>
           </div>

@@ -403,7 +403,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Cookie Consent
     "cookies.title": "Questo sito utilizza i cookie 🍪",
     "cookies.description":
-      "Utilizziamo cookie e tecnologie simili per migliorare la tua esperienza di navigazione, analizzare il traffico del sito e personalizzare i contenuti.",
+      "Utilizziamo cookie e tecnologie simili per migliorare la tua esperienza di navigazione, analizzare il traffico del sito e personalizzare i contenuti. Puoi accettare tutti i cookie, solo quelli necessari, oppure personalizzare le tue preferenze.",
     "cookies.learnMore": "Per saperne di più, consulta la nostra",
     "cookies.and": "e la",
     "cookies.acceptAll": "Accetta Tutti",
@@ -1047,7 +1047,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Cookie Consent
     "cookies.title": "This site uses cookies 🍪",
     "cookies.description":
-      "We use cookies and similar technologies to improve your browsing experience, analyze site traffic, and personalize content.",
+      "We use cookies and similar technologies to improve your browsing experience, analyze site traffic, and personalize content. You can accept all cookies, only necessary ones, or customize your preferences.",
     "cookies.learnMore": "To learn more, see our",
     "cookies.and": "and",
     "cookies.acceptAll": "Accept All",
