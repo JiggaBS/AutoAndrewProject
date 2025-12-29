@@ -241,14 +241,40 @@ export default function CustomerArea() {
       if (error && error.code !== 'PGRST116') throw error;
 
       if (data) {
+        // Check if name contains full name (has spaces) but surname is empty - fix Google auth issue
+        const nameHasSpaces = data.name && data.name.trim().includes(' ');
+        const needsNameSplit = nameHasSpaces && !data.surname;
+        
         // Check if profile is missing surname or phone, try to sync from user metadata
         const metadata = user?.user_metadata || {};
-        const needsUpdate = (!data.surname && metadata.surname) || (!data.phone && metadata.phone);
+        const needsUpdate = needsNameSplit || (!data.surname && metadata.surname) || (!data.phone && metadata.phone);
         
         if (needsUpdate && user) {
-          // Update profile with missing data from metadata
+          // Update profile with missing data from metadata or split name
           const updateData: Record<string, string> = {};
-          if (!data.surname && metadata.surname) updateData.surname = metadata.surname;
+          
+          // If name contains full name but surname is empty, split it
+          if (needsNameSplit && data.name) {
+            const nameParts = data.name.trim().split(/\s+/);
+            if (nameParts.length > 1) {
+              updateData.name = nameParts[0];
+              updateData.surname = nameParts.slice(1).join(' ');
+            }
+          }
+          
+          // Try to get surname from metadata if still missing
+          if (!updateData.surname && !data.surname && metadata.surname) {
+            updateData.surname = metadata.surname;
+          }
+          
+          // Try to get surname from metadata full_name if still missing
+          if (!updateData.surname && !data.surname && metadata.full_name) {
+            const fullNameParts = metadata.full_name.trim().split(/\s+/);
+            if (fullNameParts.length > 1) {
+              updateData.surname = fullNameParts.slice(1).join(' ');
+            }
+          }
+          
           if (!data.phone && metadata.phone) updateData.phone = metadata.phone;
           
           if (Object.keys(updateData).length > 0) {
