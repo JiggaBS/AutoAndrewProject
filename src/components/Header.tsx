@@ -330,9 +330,36 @@ export const Header = forwardRef<HTMLElement>((props, ref) => {
                     </div>
                   </>
                 ) : (
-                  <Button variant="outline" size="sm" className="flex-1" asChild>
-                    <Link to="/auth" onClick={() => setIsMenuOpen(false)}>{t("nav.login")}</Link>
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      className={cn(
+                        "flex-1 font-semibold transition-all h-10 text-sm rounded-lg border border-border/50",
+                        location.pathname === "/auth" && !location.search.includes("mode=signup")
+                          ? "bg-card text-foreground shadow-sm"
+                          : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"
+                      )}
+                      asChild
+                    >
+                      <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
+                        {t("auth.login.button")}
+                      </Link>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className={cn(
+                        "flex-1 font-semibold transition-all h-10 text-sm rounded-lg border border-border/50",
+                        location.pathname === "/auth" && location.search.includes("mode=signup")
+                          ? "bg-card text-foreground shadow-sm"
+                          : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"
+                      )}
+                      asChild
+                    >
+                      <Link to="/auth?mode=signup" onClick={() => setIsMenuOpen(false)}>
+                        {t("auth.signup.button")}
+                      </Link>
+                    </Button>
+                  </div>
                 )}
               </div>
             </div>

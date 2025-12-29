@@ -60,6 +60,17 @@ export default function Auth() {
       setCheckingAuth(false);
       // Clear the hash from URL
       window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      return;
+    }
+
+    // Check URL search params for mode (only if not in password recovery)
+    const mode = searchParams.get('mode');
+    if (mode === 'signup') {
+      setActiveTab("signup");
+      setIsSignUp(true);
+    } else {
+      setActiveTab("login");
+      setIsSignUp(false);
     }
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -110,7 +121,7 @@ export default function Auth() {
     }
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, searchParams]);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
