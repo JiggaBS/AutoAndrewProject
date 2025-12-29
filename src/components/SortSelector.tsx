@@ -36,7 +36,7 @@ export function SortSelector({ currentSort, onSortChange, resultCount }: SortSel
   const current = sortOptions.find(s => s.value === currentSort) || sortOptions[0];
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-4 mb-6">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-4">
       <p className="text-muted-foreground text-sm hidden">
         <span className="text-foreground font-semibold">{resultCount}</span> {t("listings.results")}
       </p>

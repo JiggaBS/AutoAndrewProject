@@ -449,19 +449,17 @@ const Listings = forwardRef<HTMLDivElement>((props, ref) => {
         </div>
       ) : (
         <>
-          <div className="container">
-            <SortSelector 
-              currentSort={currentSort} 
-              onSortChange={handleSortChange} 
-              resultCount={sortedVehicles.length} 
-            />
-          </div>
           <VehicleGrid 
             vehicles={paginatedVehicles} 
             title={getGridTitle()}
             showCompare={true}
             compareVehicles={selectedVehicles}
             onToggleCompare={handleToggleCompare}
+            sortProps={{
+              currentSort: currentSort,
+              onSortChange: handleSortChange,
+              resultCount: sortedVehicles.length
+            }}
           />
 
           {totalPages > 1 && (
