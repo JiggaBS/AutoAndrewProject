@@ -86,7 +86,7 @@ const Contatti = () => {
         </div>
 
         {/* Main Content */}
-        <section className="py-8">
+        <section id="contatti" className="py-8 scroll-mt-24">
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-2 gap-12">
               

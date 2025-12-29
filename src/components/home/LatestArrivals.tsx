@@ -4,7 +4,7 @@ import { Vehicle } from "@/data/sampleVehicles";
 import { VehicleCard } from "@/components/VehicleCard";
 import { VehicleCardSkeleton } from "@/components/VehicleCardSkeleton";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface LatestArrivalsProps {
@@ -18,20 +18,34 @@ export const LatestArrivals = forwardRef<HTMLElement, LatestArrivalsProps>(({ ve
   const latestVehicles = vehicles.slice(0, 8);
 
   return (
-    <section ref={ref} className="py-16 md:py-24">
-      <div className="container">
-        {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
+    <section ref={ref} className="py-20 md:py-28 relative">
+      {/* Subtle background accent */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/[0.02] to-transparent pointer-events-none" />
+      
+      <div className="container relative">
+        {/* Section Header - Enhanced */}
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-12">
           <div>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground relative">
+            {/* Section Badge */}
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
+              <Sparkles className="w-4 h-4" />
+              {t("arrivals.badge") || "Nuovi Arrivi"}
+            </span>
+            
+            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-foreground tracking-tight">
               {t("arrivals.title")}
-              <span className="absolute -bottom-2 left-0 w-16 h-1 bg-primary rounded-full" />
             </h2>
-            <p className="text-muted-foreground mt-4">
+            <p className="text-muted-foreground text-base md:text-lg mt-3 max-w-lg">
               {t("arrivals.subtitle")}
             </p>
           </div>
-          <Button asChild variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground self-start sm:self-auto">
+          
+          <Button 
+            asChild 
+            variant="outline" 
+            size="default"
+            className="border-primary text-primary hover:bg-primary hover:text-primary-foreground self-start sm:self-auto h-10 px-4 font-semibold transition-all focus-visible:ring-2 focus-visible:ring-primary"
+          >
             <Link to="/listings">
               {t("arrivals.viewAll")}
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -41,13 +55,13 @@ export const LatestArrivals = forwardRef<HTMLElement, LatestArrivalsProps>(({ ve
 
         {/* Vehicle Grid with Skeleton Loading */}
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             {[...Array(8)].map((_, i) => (
               <VehicleCardSkeleton key={i} />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             {latestVehicles.map((vehicle, index) => (
               <VehicleCard key={vehicle.ad_number || index} vehicle={vehicle} index={index} />
             ))}

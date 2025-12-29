@@ -64,7 +64,7 @@ const statusColors: Record<string, string> = {
 };
 
 export function ClientRequestCard({ request, autoOpen }: ClientRequestCardProps) {
-  const { language } = useLanguage();
+  const { language, translateFuelType } = useLanguage();
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [autoOpened, setAutoOpened] = useState(false);
@@ -131,7 +131,7 @@ export function ClientRequestCard({ request, autoOpen }: ClientRequestCardProps)
                 <Fuel className="w-3 h-3 text-muted-foreground" />
                 <span className="text-[10px] text-muted-foreground">{language === "it" ? "Carb." : "Fuel"}</span>
               </div>
-              <p className="font-semibold text-xs">{request.fuel_type}</p>
+              <p className="font-semibold text-xs">{translateFuelType(request.fuel_type)}</p>
             </div>
             <div className="p-2 rounded-lg bg-muted/50 text-center">
               <div className="flex items-center justify-center gap-1 mb-0.5">
@@ -202,7 +202,7 @@ export function ClientRequestCard({ request, autoOpen }: ClientRequestCardProps)
                   <Fuel className="w-4 h-4 text-muted-foreground" />
                   <span className="text-xs text-muted-foreground">{language === "it" ? "Carburante" : "Fuel"}</span>
                 </div>
-                <p className="font-bold">{request.fuel_type}</p>
+                <p className="font-bold">{translateFuelType(request.fuel_type)}</p>
               </div>
               <div className="p-3 rounded-xl bg-muted/50">
                 <div className="flex items-center gap-2 mb-1">

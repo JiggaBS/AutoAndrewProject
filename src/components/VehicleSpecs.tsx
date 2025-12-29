@@ -11,6 +11,7 @@ import {
   Users,
   DoorOpen,
   Weight,
+  Car,
 } from "lucide-react";
 import { Vehicle } from "@/data/sampleVehicles";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -19,8 +20,31 @@ interface VehicleSpecsProps {
   vehicle: Vehicle;
 }
 
+// Helper function to detect if a value is a drive type (trazione)
+function isDriveType(value: string | undefined): boolean {
+  if (!value) return false;
+  const driveTypes = [
+    "anteriore",
+    "posteriore",
+    "integrale",
+    "front",
+    "rear",
+    "all-wheel",
+    "awd",
+    "4wd",
+    "fwd",
+    "rwd",
+  ];
+  const lowerValue = value.toLowerCase().trim();
+  return driveTypes.some((type) => lowerValue.includes(type));
+}
+
 export function VehicleSpecs({ vehicle }: VehicleSpecsProps) {
-  const { t } = useLanguage();
+  const { t, translateFuelType } = useLanguage();
+
+  // Check if transmission_type is actually a drive type
+  const transmissionValue = vehicle.transmission_type || vehicle.gearbox;
+  const isTransmissionDriveType = isDriveType(vehicle.transmission_type);
 
   const specs = [
     {
@@ -29,9 +53,9 @@ export function VehicleSpecs({ vehicle }: VehicleSpecsProps) {
       value: `${vehicle.mileage} km`,
     },
     {
-      icon: Settings,
-      label: t("specs.transmission"),
-      value: vehicle.transmission_type || vehicle.gearbox,
+      icon: isTransmissionDriveType ? Car : Settings,
+      label: isTransmissionDriveType ? t("specs.driveType") : t("specs.transmission"),
+      value: transmissionValue,
     },
     {
       icon: Calendar,
@@ -41,7 +65,7 @@ export function VehicleSpecs({ vehicle }: VehicleSpecsProps) {
     {
       icon: Fuel,
       label: t("specs.fuel"),
-      value: vehicle.fuel_type,
+      value: translateFuelType(vehicle.fuel_type),
     },
     {
       icon: Zap,
@@ -49,9 +73,9 @@ export function VehicleSpecs({ vehicle }: VehicleSpecsProps) {
       value: `${vehicle.power_kw} kW (${vehicle.power_cv} CV)`,
     },
     {
-      icon: User,
-      label: t("specs.seller"),
-      value: t("specs.dealer"),
+      icon: Settings,
+      label: t("specs.gearbox"),
+      value: vehicle.gearbox || vehicle.transmission_type,
     },
   ];
 

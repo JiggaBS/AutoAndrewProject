@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RequestDetailDialog } from "./RequestDetailDialog";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ValuationRequest {
   id: string;
@@ -47,6 +48,8 @@ const statusLabels: Record<string, string> = {
 };
 
 export function MobileRequestCard({ request, onUpdateStatus, onUpdateRequest }: MobileRequestCardProps) {
+  const { translateFuelType } = useLanguage();
+  
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString("it-IT", {
       day: "2-digit",
@@ -77,7 +80,7 @@ export function MobileRequestCard({ request, onUpdateStatus, onUpdateRequest }: 
             <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
               <span>{request.year}</span>
               <span>•</span>
-              <span>{request.fuel_type}</span>
+              <span>{translateFuelType(request.fuel_type)}</span>
               <span>•</span>
               <span className="flex items-center gap-0.5">
                 <Gauge className="w-3 h-3" />

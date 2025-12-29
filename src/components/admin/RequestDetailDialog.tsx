@@ -40,6 +40,7 @@ import {
   FileText
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ValuationRequest {
   id: string;
@@ -92,6 +93,7 @@ const statusLabels: Record<string, string> = {
 };
 
 export function RequestDetailDialog({ request, onUpdateStatus, onUpdateRequest, autoOpen }: RequestDetailDialogProps) {
+  const { translateFuelType } = useLanguage();
   const [finalOffer, setFinalOffer] = useState<string>(request.final_offer?.toString() || "");
   const [appointmentDate, setAppointmentDate] = useState<string>(
     request.appointment_date ? new Date(request.appointment_date).toISOString().slice(0, 16) : ""
@@ -374,7 +376,7 @@ export function RequestDetailDialog({ request, onUpdateStatus, onUpdateRequest, 
                   <Fuel className="w-3.5 h-3.5" />
                   <span className="text-xs">Carburante</span>
                 </div>
-                <p className="text-base sm:text-lg font-bold truncate">{request.fuel_type}</p>
+                <p className="text-base sm:text-lg font-bold truncate">{translateFuelType(request.fuel_type)}</p>
               </div>
               <div className="p-3 sm:p-4 rounded-xl bg-secondary/50 border border-border">
                 <div className="flex items-center gap-1.5 text-muted-foreground mb-2">

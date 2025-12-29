@@ -182,14 +182,20 @@ export const Header = forwardRef<HTMLElement>((props, ref) => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-sm border-b border-border shadow-sm dark:shadow-none">
+    <header 
+      ref={ref}
+      className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border/80 shadow-sm dark:shadow-none"
+    >
       <div className="container">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-[72px]">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <Car className="w-8 h-8 text-primary" />
+          <Link 
+            to="/" 
+            className="flex items-center gap-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card rounded-md px-1"
+          >
+            <Car className="w-9 h-9 text-primary" />
             {isLogoTextVisible && (
-              <span className="text-xl font-bold text-foreground">AutoAndrew</span>
+              <span className="text-xl font-bold text-foreground tracking-tight">AutoAndrew</span>
             )}
           </Link>
 
@@ -200,29 +206,30 @@ export const Header = forwardRef<HTMLElement>((props, ref) => {
                 key={link.label}
                 to={link.to}
                 className={cn(
-                  "relative px-4 py-2 text-sm font-medium transition-colors rounded-md",
+                  "relative px-4 py-2.5 text-[15px] font-medium transition-all duration-200 rounded-lg",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card",
                   isActive(link.to)
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/50",
+                    ? "text-primary bg-primary/10"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/60",
                 )}
               >
                 {link.label}
                 {isActive(link.to) && (
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-primary rounded-full" />
+                  <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full" />
                 )}
               </Link>
             ))}
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             {/* Language Switcher */}
             <LanguageSwitcher />
             
             {/* Theme Toggle */}
             <button
               onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-              className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+              className="p-2.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card"
               aria-label="Toggle theme"
             >
               {resolvedTheme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -238,19 +245,23 @@ export const Header = forwardRef<HTMLElement>((props, ref) => {
             )}
             
             {isPublishButtonVisible && (
-              <Button variant="outline" size="sm" className="hidden sm:flex">
+              <Button variant="outline" size="sm" className="hidden sm:flex h-10">
                 Pubblica annuncio
               </Button>
             )}
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="hidden sm:flex">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="hidden sm:flex h-10 focus-visible:ring-2 focus-visible:ring-primary"
+                  >
                     <User className="w-4 h-4 mr-2" />
                     {t("nav.dashboard")}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent align="end" className="w-48">
                   {isAdmin && (
                     <>
                       <DropdownMenuItem asChild>
@@ -276,13 +287,22 @@ export const Header = forwardRef<HTMLElement>((props, ref) => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button variant="outline" size="sm" className="hidden sm:flex" asChild>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="hidden sm:flex h-10" 
+                asChild
+              >
                 <Link to="/auth">{t("nav.login")}</Link>
               </Button>
             )}
 
             {/* Mobile Menu Toggle */}
-            <button className="md:hidden p-2" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <button 
+              className="md:hidden p-2.5 rounded-lg hover:bg-secondary/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" 
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            >
               {isMenuOpen ? <X className="w-6 h-6 text-foreground" /> : <Menu className="w-6 h-6 text-foreground" />}
             </button>
           </div>
@@ -290,26 +310,29 @@ export const Header = forwardRef<HTMLElement>((props, ref) => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <nav className="md:hidden py-4 border-t border-border animate-fade-in">
+          <nav className="md:hidden py-4 border-t border-border/60 animate-fade-in">
             <div className="flex flex-col gap-1">
               {navLinks.map((link) => (
                 <Link
                   key={link.label}
                   to={link.to}
                   className={cn(
-                    "text-sm font-medium px-3 py-2.5 rounded-md transition-colors",
-                    isActive(link.to) ? "text-primary bg-primary/10" : "text-foreground hover:bg-secondary",
+                    "text-[15px] font-medium px-4 py-3 rounded-lg transition-colors",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset",
+                    isActive(link.to) 
+                      ? "text-primary bg-primary/10" 
+                      : "text-foreground hover:bg-secondary/60",
                   )}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {link.label}
                 </Link>
               ))}
-              <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-border">
+              <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-border/60">
                 {user ? (
                   <>
                     {isAdmin && (
-                      <Button size="sm" className="w-full" asChild>
+                      <Button size="sm" className="w-full h-11" asChild>
                         <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
                           <Shield className="w-4 h-4 mr-2" />
                           {t("nav.admin")}
@@ -317,13 +340,13 @@ export const Header = forwardRef<HTMLElement>((props, ref) => {
                       </Button>
                     )}
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm" className="flex-1" asChild>
+                      <Button variant="outline" size="sm" className="flex-1 h-11" asChild>
                         <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
                           <User className="w-4 h-4 mr-2" />
                           {t("nav.dashboard")}
                         </Link>
                       </Button>
-                      <Button size="sm" variant="outline" className="flex-1" onClick={handleLogout}>
+                      <Button size="sm" variant="outline" className="flex-1 h-11" onClick={handleLogout}>
                         <LogOut className="w-4 h-4 mr-2" />
                         {t("nav.logout")}
                       </Button>
@@ -334,7 +357,8 @@ export const Header = forwardRef<HTMLElement>((props, ref) => {
                     <Button
                       variant="ghost"
                       className={cn(
-                        "flex-1 font-semibold transition-all h-10 text-sm rounded-lg border border-border/50",
+                        "flex-1 font-semibold transition-all h-11 text-[15px] rounded-lg border border-border/50",
+                        "focus-visible:ring-2 focus-visible:ring-primary",
                         location.pathname === "/auth" && !location.search.includes("mode=signup")
                           ? "bg-card text-foreground shadow-sm"
                           : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"
@@ -348,7 +372,8 @@ export const Header = forwardRef<HTMLElement>((props, ref) => {
                     <Button
                       variant="ghost"
                       className={cn(
-                        "flex-1 font-semibold transition-all h-10 text-sm rounded-lg border border-border/50",
+                        "flex-1 font-semibold transition-all h-11 text-[15px] rounded-lg border border-border/50",
+                        "focus-visible:ring-2 focus-visible:ring-primary",
                         location.pathname === "/auth" && location.search.includes("mode=signup")
                           ? "bg-card text-foreground shadow-sm"
                           : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"

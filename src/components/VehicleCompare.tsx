@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface VehicleCompareProps {
   vehicles: Vehicle[];
@@ -21,6 +22,7 @@ export function VehicleCompare({
   onRemoveVehicle,
   onClear,
 }: VehicleCompareProps) {
+  const { translateFuelType } = useLanguage();
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
 
@@ -134,7 +136,7 @@ export function VehicleCompare({
                     Confronto Veicoli
                   </DialogTitle>
                 </DialogHeader>
-                <CompareTable vehicles={selectedVehicles} formatPrice={formatPrice} />
+                <CompareTable vehicles={selectedVehicles} formatPrice={formatPrice} translateFuelType={translateFuelType} />
               </DialogContent>
             </Dialog>
 
@@ -151,15 +153,17 @@ export function VehicleCompare({
 function CompareTable({
   vehicles,
   formatPrice,
+  translateFuelType,
 }: {
   vehicles: Vehicle[];
   formatPrice: (price: number) => string;
+  translateFuelType: (fuelType: string | undefined) => string;
 }) {
   const specs = [
     { key: "price", label: "Prezzo", render: (v: Vehicle) => formatPrice(v.price) },
     { key: "year", label: "Immatricolazione", render: (v: Vehicle) => v.first_registration_date },
     { key: "mileage", label: "Chilometraggio", render: (v: Vehicle) => `${v.mileage} km` },
-    { key: "fuel", label: "Alimentazione", render: (v: Vehicle) => v.fuel_type },
+    { key: "fuel", label: "Alimentazione", render: (v: Vehicle) => translateFuelType(v.fuel_type) },
     { key: "power", label: "Potenza", render: (v: Vehicle) => `${v.power_cv} CV (${v.power_kw} kW)` },
     { key: "gearbox", label: "Cambio", render: (v: Vehicle) => v.gearbox },
     { key: "color", label: "Colore", render: (v: Vehicle) => `${v.color} ${v.color_type}` },

@@ -6,6 +6,7 @@ interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
   t: (key: string) => string;
+  translateFuelType: (fuelType: string | undefined) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -47,6 +48,7 @@ const translations: Record<Language, Record<string, string>> = {
     "services.warranty.desc": "Protezione completa fino a 36 mesi per la tua tranquillità.",
 
     // Latest Arrivals
+    "arrivals.badge": "Novità",
     "arrivals.title": "Ultimi Arrivi",
     "arrivals.subtitle": "Scopri i veicoli appena aggiunti al nostro inventario",
     "arrivals.viewAll": "Vedi Tutti gli Annunci",
@@ -121,6 +123,10 @@ const translations: Record<Language, Record<string, string>> = {
     "fuel.electric": "Elettrico",
     "fuel.lpg": "GPL",
     "fuel.methane": "Metano",
+    "fuel.electric/diesel": "Ibrido Elettrico/Diesel",
+    "fuel.electric/petrol": "Ibrido Elettrico/Benzina",
+    "fuel.elettrica/diesel": "Ibrido Elettrico/Diesel",
+    "fuel.elettrica/benzina": "Ibrido Elettrico/Benzina",
 
     // Valuation Page
     "valuation.title": "Richiedi una valutazione",
@@ -477,6 +483,7 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Trust Section
     "trust.mainTitle": "Perché Sceglierci",
+    "trust.badge": "I Nostri Vantaggi",
     "trust.warranty.title": "Garanzia 12 Mesi",
     "trust.warranty.desc": "Tutti i veicoli sono coperti da garanzia",
     "trust.certified.title": "Auto Certificate",
@@ -491,7 +498,7 @@ const translations: Record<Language, Record<string, string>> = {
     "trust.stat.support": "Assistenza",
 
     // Testimonials Section
-    "testimonials.badge": "Recensioni Clienti",
+    "testimonials.badge": "Le Opinioni",
     "testimonials.mainTitle": "Cosa dicono i nostri clienti",
     "testimonials.basedOn": "su 5 basato su",
     "testimonials.reviews": "recensioni",
@@ -629,6 +636,8 @@ const translations: Record<Language, Record<string, string>> = {
     // Vehicle Specs
     "specs.mileage": "Chilometraggio",
     "specs.transmission": "Tipo di cambio",
+    "specs.gearbox": "Cambio",
+    "specs.driveType": "Trazione",
     "specs.year": "Anno",
     "specs.fuel": "Carburante",
     "specs.power": "Potenza",
@@ -696,6 +705,7 @@ const translations: Record<Language, Record<string, string>> = {
     "services.warranty.desc": "Complete protection up to 36 months for your peace of mind.",
 
     // Latest Arrivals
+    "arrivals.badge": "New In",
     "arrivals.title": "Latest Arrivals",
     "arrivals.subtitle": "Discover vehicles just added to our inventory",
     "arrivals.viewAll": "View All Listings",
@@ -770,6 +780,10 @@ const translations: Record<Language, Record<string, string>> = {
     "fuel.electric": "Electric",
     "fuel.lpg": "LPG",
     "fuel.methane": "CNG",
+    "fuel.electric/diesel": "Diesel Hybrid",
+    "fuel.electric/petrol": "Petrol Hybrid",
+    "fuel.elettrica/diesel": "Diesel Hybrid",
+    "fuel.elettrica/benzina": "Petrol Hybrid",
 
     // Valuation Page
     "valuation.title": "Get Your Car Valued",
@@ -1124,6 +1138,7 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Trust Section
     "trust.mainTitle": "Why Choose Us",
+    "trust.badge": "Our Advantages",
     "trust.warranty.title": "12-Month Warranty",
     "trust.warranty.desc": "All vehicles are covered by warranty",
     "trust.certified.title": "Certified Cars",
@@ -1138,7 +1153,7 @@ const translations: Record<Language, Record<string, string>> = {
     "trust.stat.support": "Support",
 
     // Testimonials Section
-    "testimonials.badge": "Customer Reviews",
+    "testimonials.badge": "Reviews",
     "testimonials.mainTitle": "What our customers say",
     "testimonials.basedOn": "out of 5 based on",
     "testimonials.reviews": "reviews",
@@ -1276,6 +1291,8 @@ const translations: Record<Language, Record<string, string>> = {
     // Vehicle Specs
     "specs.mileage": "Mileage",
     "specs.transmission": "Transmission",
+    "specs.gearbox": "Gearbox",
+    "specs.driveType": "Drive Type",
     "specs.year": "Year",
     "specs.fuel": "Fuel",
     "specs.power": "Power",
@@ -1336,7 +1353,62 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     return translations[language][key] || key;
   };
 
-  return <LanguageContext.Provider value={{ language, setLanguage, t }}>{children}</LanguageContext.Provider>;
+  const translateFuelType = (fuelType: string | undefined): string => {
+    if (!fuelType) return "";
+    
+    // Normalize the fuel type to lowercase for matching
+    const normalized = fuelType.toLowerCase().trim();
+    
+    // Check for exact translation key matches
+    const translationKey = `fuel.${normalized}`;
+    if (translations[language][translationKey]) {
+      return translations[language][translationKey];
+    }
+    
+    // Handle hybrid variants with slash
+    if (normalized.includes("/")) {
+      const parts = normalized.split("/").map(p => p.trim());
+      
+      // Elettrica/Diesel or Electric/Diesel
+      if ((parts[0] === "elettrica" || parts[0] === "electric") && parts[1] === "diesel") {
+        return t("fuel.elettrica/diesel");
+      }
+      
+      // Elettrica/Benzina or Electric/Petrol
+      if ((parts[0] === "elettrica" || parts[0] === "electric") && (parts[1] === "benzina" || parts[1] === "petrol")) {
+        return t("fuel.elettrica/benzina");
+      }
+    }
+    
+    // Map common Italian fuel types to translation keys
+    const fuelTypeMap: Record<string, string> = {
+      "benzina": "fuel.petrol",
+      "diesel": "fuel.diesel",
+      "ibrido": "fuel.hybrid",
+      "ibrida": "fuel.hybrid",
+      "elettrico": "fuel.electric",
+      "elettrica": "fuel.electric",
+      "gpl": "fuel.lpg",
+      "metano": "fuel.methane",
+      "petrol": "fuel.petrol",
+      "gasoline": "fuel.petrol",
+      "hybrid": "fuel.hybrid",
+      "electric": "fuel.electric",
+      "lpg": "fuel.lpg",
+      "cng": "fuel.methane",
+      "methane": "fuel.methane",
+    };
+    
+    const key = fuelTypeMap[normalized];
+    if (key) {
+      return t(key);
+    }
+    
+    // If no translation found, return original
+    return fuelType;
+  };
+
+  return <LanguageContext.Provider value={{ language, setLanguage, t, translateFuelType }}>{children}</LanguageContext.Provider>;
 };
 
 export const useLanguage = () => {
