@@ -91,6 +91,7 @@ interface Vehicle {
   owners_count?: number;
   doors_count?: number;
   weight?: number;
+  cubic_capacity?: number; // Engine displacement in cubic centimeters (cc)
 }
 
 function stripCDATA(text: string): string {
@@ -238,6 +239,7 @@ function parseXmlToVehicles(xmlText: string): Vehicle[] {
       owners_count: parseIntOrUndefined(getTagContent(elementXml, 'owners_count')),
       doors_count: parseIntOrUndefined(getTagContent(elementXml, 'doors_count')),
       weight: parseIntOrUndefined(getTagContent(elementXml, 'weight')),
+      cubic_capacity: parseIntOrUndefined(getTagContent(elementXml, 'cubic_capacity')),
     };
 
     if (vehicle.ad_number > 0) vehicles.push(vehicle);

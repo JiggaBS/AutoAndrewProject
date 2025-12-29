@@ -29,6 +29,8 @@ export interface FilterState {
   powerMin: string;
   powerMax: string;
   doors: string;
+  engineDisplacementMin: string; // in liters (e.g., "1.3", "2.0")
+  engineDisplacementMax: string; // in liters
 }
 
 const defaultFilters: FilterState = {
@@ -47,6 +49,8 @@ const defaultFilters: FilterState = {
   powerMin: "",
   powerMax: "",
   doors: "",
+  engineDisplacementMin: "",
+  engineDisplacementMax: "",
 };
 
 export function SearchFilters({
@@ -89,6 +93,36 @@ export function SearchFilters({
     { key: "400", value: `${t("filters.upTo")} 400 CV` },
     { key: "500", value: `${t("filters.upTo")} 500 CV` },
     { key: "9999", value: t("filters.any") },
+  ];
+
+  const engineDisplacementMinRanges = [
+    { key: "0", value: t("filters.any") },
+    { key: "1.0", value: `${t("filters.from")} 1.0L` },
+    { key: "1.2", value: `${t("filters.from")} 1.2L` },
+    { key: "1.3", value: `${t("filters.from")} 1.3L` },
+    { key: "1.4", value: `${t("filters.from")} 1.4L` },
+    { key: "1.5", value: `${t("filters.from")} 1.5L` },
+    { key: "1.6", value: `${t("filters.from")} 1.6L` },
+    { key: "1.8", value: `${t("filters.from")} 1.8L` },
+    { key: "2.0", value: `${t("filters.from")} 2.0L` },
+    { key: "2.5", value: `${t("filters.from")} 2.5L` },
+    { key: "3.0", value: `${t("filters.from")} 3.0L` },
+    { key: "4.0", value: `${t("filters.from")} 4.0L` },
+  ];
+
+  const engineDisplacementMaxRanges = [
+    { key: "1.0", value: `${t("filters.upTo")} 1.0L` },
+    { key: "1.2", value: `${t("filters.upTo")} 1.2L` },
+    { key: "1.3", value: `${t("filters.upTo")} 1.3L` },
+    { key: "1.4", value: `${t("filters.upTo")} 1.4L` },
+    { key: "1.5", value: `${t("filters.upTo")} 1.5L` },
+    { key: "1.6", value: `${t("filters.upTo")} 1.6L` },
+    { key: "1.8", value: `${t("filters.upTo")} 1.8L` },
+    { key: "2.0", value: `${t("filters.upTo")} 2.0L` },
+    { key: "2.5", value: `${t("filters.upTo")} 2.5L` },
+    { key: "3.0", value: `${t("filters.upTo")} 3.0L` },
+    { key: "4.0", value: `${t("filters.upTo")} 4.0L` },
+    { key: "999", value: t("filters.any") },
   ];
 
   // Extract unique makes from vehicles
@@ -356,6 +390,44 @@ export function SearchFilters({
             {resultCount.toLocaleString(language === "it" ? "it-IT" : "en-US")} {t("filters.results")}
           </Button>
         </div>
+      </div>
+
+      {/* Third Row of Main Filters - Engine Displacement */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-3">
+        {/* Engine Displacement Min */}
+        <Select value={filters.engineDisplacementMin || undefined} onValueChange={value => handleFilterChange("engineDisplacementMin", value === "_clear" ? "" : value)}>
+          <SelectTrigger className="w-full bg-card">
+            <SelectValue placeholder={t("filters.engineFrom")} />
+          </SelectTrigger>
+          <SelectContent className="bg-popover z-50">
+            <SelectItem value="_clear" className="text-muted-foreground">{t("filters.removeFilter")}</SelectItem>
+            {engineDisplacementMinRanges.map(range => (
+              <SelectItem key={range.key} value={range.key}>
+                {range.value}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Engine Displacement Max */}
+        <Select value={filters.engineDisplacementMax || undefined} onValueChange={value => handleFilterChange("engineDisplacementMax", value === "_clear" ? "" : value)}>
+          <SelectTrigger className="w-full bg-card">
+            <SelectValue placeholder={t("filters.engineTo")} />
+          </SelectTrigger>
+          <SelectContent className="bg-popover z-50">
+            <SelectItem value="_clear" className="text-muted-foreground">{t("filters.removeFilter")}</SelectItem>
+            {engineDisplacementMaxRanges.map(range => (
+              <SelectItem key={range.key} value={range.key}>
+                {range.value}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Empty space for alignment */}
+        <div></div>
+        <div></div>
+        <div></div>
       </div>
 
       {/* More Filters Toggle - Centered */}

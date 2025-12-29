@@ -35,6 +35,7 @@ export interface Vehicle {
   owners_count?: number;
   doors_count?: number;
   weight?: number;
+  cubic_capacity?: number; // Engine displacement in cubic centimeters (cc)
 }
 
 export const sampleVehicles: Vehicle[] = [

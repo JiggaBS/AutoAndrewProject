@@ -208,6 +208,48 @@ const Listings = forwardRef<HTMLDivElement>((props, ref) => {
       });
     }
 
+    // Filter by engine displacement (convert cc to liters)
+    if (activeFilters.engineDisplacementMin || activeFilters.engineDisplacementMax) {
+      const minDisplacementLiters = activeFilters.engineDisplacementMin 
+        ? parseFloat(activeFilters.engineDisplacementMin) 
+        : 0;
+      const maxDisplacementLiters = activeFilters.engineDisplacementMax 
+        ? parseFloat(activeFilters.engineDisplacementMax) 
+        : 999;
+      
+      // Helper function to extract engine displacement from version or use cubic_capacity
+      const getEngineDisplacementLiters = (vehicle: Vehicle): number | null => {
+        // First try cubic_capacity from API
+        if (vehicle.cubic_capacity) {
+          return vehicle.cubic_capacity / 1000; // Convert cc to liters
+        }
+        
+        // Fallback: try to extract from version field (e.g., "2.0 B3 Core", "1.4 eHybrid")
+        if (vehicle.version) {
+          // Match patterns like "1.3", "2.0", "1.4", etc. at the start of version
+          const versionMatch = vehicle.version.match(/^(\d+\.\d+)\s*[LT]?/i);
+          if (versionMatch) {
+            return parseFloat(versionMatch[1]);
+          }
+          // Also try patterns like "1.3L", "2.0T", etc.
+          const literMatch = vehicle.version.match(/(\d+\.\d+)\s*[LT]/i);
+          if (literMatch) {
+            return parseFloat(literMatch[1]);
+          }
+        }
+        
+        return null;
+      };
+      
+      result = result.filter((v) => {
+        const displacementLiters = getEngineDisplacementLiters(v);
+        // If we can't determine engine size, exclude the vehicle from this filter
+        if (displacementLiters === null) return false;
+        return displacementLiters >= minDisplacementLiters && 
+               displacementLiters <= maxDisplacementLiters;
+      });
+    }
+
     return result;
   }, [selectedBodyType, activeFilters, allVehicles]);
 
