@@ -64,6 +64,7 @@ export function SearchFilters({
   const [vehicleType, setVehicleType] = useState("car");
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
   const [showMoreFilters, setShowMoreFilters] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
 
   const mileageRanges = [
     { key: "10000", value: `${t("filters.upTo")} 10.000 km` },
@@ -233,13 +234,35 @@ export function SearchFilters({
   };
 
   const handleReset = () => {
-    setFilters(defaultFilters);
+    // Create a fresh copy of defaultFilters to ensure React detects the change
+    const resetFilters: FilterState = {
+      vehicleType: "car",
+      make: "",
+      model: "",
+      priceMin: "",
+      priceMax: "",
+      yearFrom: "",
+      fuelType: "",
+      gearbox: "",
+      mileageMax: "",
+      condition: "",
+      emissionsClass: "",
+      color: "",
+      powerMin: "",
+      powerMax: "",
+      doors: "",
+      engineDisplacementMin: "",
+      engineDisplacementMax: "",
+      bodyType: "",
+    };
+    setFilters(resetFilters);
     setVehicleType("car");
-    onSearch(defaultFilters);
+    setResetKey(prev => prev + 1); // Force remount of Select components
+    onSearch(resetFilters);
   };
 
   return (
-    <div className="filter-section max-w-5xl mx-auto animate-fade-in">
+    <div className="filter-section max-w-5xl mx-auto animate-fade-in" key={resetKey}>
       {/* Title */}
       <h2 className="text-lg font-medium text-foreground mb-4 text-center md:text-left">
         {t("filters.title")}
@@ -448,17 +471,40 @@ export function SearchFilters({
         </Select>
       </div>
 
-      {/* Desktop Search Button Row */}
-      <div className="hidden md:block mb-3">
-        <Button onClick={() => onSearch(filters)} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium">
-          <Search className="w-4 h-4 mr-2" />
-          {resultCount.toLocaleString(language === "it" ? "it-IT" : "en-US")} {t("filters.results")}
-        </Button>
-      </div>
-
-      {/* More Filters Toggle - Centered */}
+      {/* Desktop Search Button, Reset, and Advanced Search - Same row */}
       <Collapsible open={showMoreFilters} onOpenChange={setShowMoreFilters} className="w-full">
-        <div className="flex justify-center mb-3">
+        <div className="hidden md:flex justify-between items-center gap-2 mb-3">
+          {/* Left side: Risultati and Resetta filtri buttons */}
+          <div className="flex gap-2">
+            <Button onClick={() => onSearch(filters)} className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium">
+              <Search className="w-4 h-4 mr-2" />
+              {resultCount.toLocaleString(language === "it" ? "it-IT" : "en-US")} {t("filters.results")}
+            </Button>
+            <Button onClick={handleReset} variant="outline" className="text-muted-foreground hover:text-foreground">
+              <RotateCcw className="w-4 h-4 mr-2" />
+              {t("listings.filters.reset")}
+            </Button>
+          </div>
+          {/* Right side: RICERCA AVANZATA button */}
+          <CollapsibleTrigger asChild>
+            <button
+              className="flex items-center justify-center gap-1.5 text-primary text-xs font-medium hover:opacity-80 transition-opacity py-1"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="4" y1="6" x2="20" y2="6" />
+                <line x1="4" y1="12" x2="20" y2="12" />
+                <line x1="4" y1="18" x2="20" y2="18" />
+                <circle cx="8" cy="6" r="2" fill="currentColor" />
+                <circle cx="16" cy="12" r="2" fill="currentColor" />
+                <circle cx="10" cy="18" r="2" fill="currentColor" />
+              </svg>
+              {showMoreFilters ? t("filters.closeAdvanced") : t("filters.advancedSearch")}
+            </button>
+          </CollapsibleTrigger>
+        </div>
+        
+        {/* Mobile: More Filters Toggle - Centered */}
+        <div className="flex md:hidden justify-center mb-3">
           <CollapsibleTrigger asChild>
             <button
               className="flex items-center justify-center gap-1.5 text-primary text-xs font-medium hover:opacity-80 transition-opacity py-1"
@@ -699,11 +745,15 @@ export function SearchFilters({
         </CollapsibleContent>
       </Collapsible>
 
-      {/* Mobile Search Button */}
-      <div className="md:hidden">
-        <Button onClick={() => onSearch(filters)} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium">
+      {/* Mobile Search Button and Reset */}
+      <div className="md:hidden flex gap-2">
+        <Button onClick={() => onSearch(filters)} className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-medium">
           <Search className="w-4 h-4 mr-2" />
           {resultCount.toLocaleString(language === "it" ? "it-IT" : "en-US")} {t("filters.results")}
+        </Button>
+        <Button onClick={handleReset} variant="outline" className="text-muted-foreground hover:text-foreground">
+          <RotateCcw className="w-4 h-4 mr-2" />
+          {t("listings.filters.reset")}
         </Button>
       </div>
     </div>

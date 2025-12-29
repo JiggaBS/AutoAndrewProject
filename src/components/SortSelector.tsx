@@ -36,14 +36,14 @@ export function SortSelector({ currentSort, onSortChange, resultCount }: SortSel
   const current = sortOptions.find(s => s.value === currentSort) || sortOptions[0];
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-      <p className="text-muted-foreground text-sm">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-4 mb-6">
+      <p className="text-muted-foreground text-sm hidden">
         <span className="text-foreground font-semibold">{resultCount}</span> {t("listings.results")}
       </p>
       
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="w-full sm:w-auto justify-between gap-2">
+          <Button variant="outline" className="w-full sm:w-auto justify-between gap-2 ml-auto">
             <ArrowUpDown className="w-4 h-4" />
             <span className="flex-1 text-left">{t(current.labelKey)}</span>
           </Button>
