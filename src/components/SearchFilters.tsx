@@ -31,6 +31,7 @@ export interface FilterState {
   doors: string;
   engineDisplacementMin: string; // in liters (e.g., "1.3", "2.0")
   engineDisplacementMax: string; // in liters
+  bodyType: string; // body type/carrozeria
 }
 
 const defaultFilters: FilterState = {
@@ -51,6 +52,7 @@ const defaultFilters: FilterState = {
   doors: "",
   engineDisplacementMin: "",
   engineDisplacementMax: "",
+  bodyType: "",
 };
 
 export function SearchFilters({
@@ -243,9 +245,10 @@ export function SearchFilters({
         {t("filters.title")}
       </h2>
 
-      {/* Main Filters Row - Always visible */}
+      {/* Main Filters Row - Mobile: Only Marca, Modello, Tipo Di carrozeria, Colore */}
+      {/* Desktop: All main filters */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-3">
-        {/* Make */}
+        {/* Make - Always visible */}
         <Select value={filters.make || undefined} onValueChange={value => handleFilterChange("make", value === "_clear" ? "" : value)}>
           <SelectTrigger className="w-full bg-card">
             <SelectValue placeholder={t("filters.brand")} />
@@ -260,7 +263,7 @@ export function SearchFilters({
           </SelectContent>
         </Select>
 
-        {/* Model */}
+        {/* Model - Always visible */}
         <Select value={filters.model || undefined} onValueChange={value => handleFilterChange("model", value === "_clear" ? "" : value)} disabled={!filters.make || availableModels.length === 0}>
           <SelectTrigger className="w-full bg-card">
             <SelectValue placeholder={filters.make ? t("filters.model") : t("filters.selectBrand")} />
@@ -275,36 +278,100 @@ export function SearchFilters({
           </SelectContent>
         </Select>
 
-        {/* Year From */}
-        <Select value={filters.yearFrom || undefined} onValueChange={value => handleFilterChange("yearFrom", value === "_clear" ? "" : value)}>
-          <SelectTrigger className="w-full bg-card">
-            <SelectValue placeholder={t("filters.yearFrom")} />
-          </SelectTrigger>
-          <SelectContent className="bg-popover z-50">
-            <SelectItem value="_clear" className="text-muted-foreground">{t("filters.removeFilter")}</SelectItem>
-            {years.map(year => (
-              <SelectItem key={year.key} value={year.key.toString()}>
-                {year.value}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {/* Body Type - Mobile only (visible), Desktop visible in main row */}
+        <div className="md:hidden">
+          <Select value={filters.bodyType || undefined} onValueChange={value => handleFilterChange("bodyType", value === "_clear" ? "" : value)}>
+            <SelectTrigger className="w-full bg-card">
+              <SelectValue placeholder={t("filters.bodyType")} />
+            </SelectTrigger>
+            <SelectContent className="bg-popover z-50">
+              <SelectItem value="_clear" className="text-muted-foreground">{t("filters.removeFilter")}</SelectItem>
+              <SelectItem value="city_car">{t("body.cityCar")}</SelectItem>
+              <SelectItem value="suv">{t("body.suv")}</SelectItem>
+              <SelectItem value="van">{t("body.van")}</SelectItem>
+              <SelectItem value="cabrio">{t("body.cabrio")}</SelectItem>
+              <SelectItem value="monovolume">{t("body.monovolume")}</SelectItem>
+              <SelectItem value="berlina">{t("body.berlina")}</SelectItem>
+              <SelectItem value="station_wagon">{t("body.stationWagon")}</SelectItem>
+              <SelectItem value="coupe">{t("body.coupe")}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-        {/* Price Min */}
-        <Select value={filters.priceMin || undefined} onValueChange={value => handleFilterChange("priceMin", value === "_clear" ? "" : value)}>
-          <SelectTrigger className="w-full bg-card">
-            <SelectValue placeholder={t("filters.priceFrom")} />
-          </SelectTrigger>
-          <SelectContent className="bg-popover z-50">
-            <SelectItem value="_clear" className="text-muted-foreground">{t("filters.removeFilter")}</SelectItem>
-            {priceMinRanges.map(range => (
-              <SelectItem key={range.key} value={range.key.toString()}>
-                {range.value}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {/* Body Type - Desktop only */}
+        <div className="hidden md:block">
+          <Select value={filters.bodyType || undefined} onValueChange={value => handleFilterChange("bodyType", value === "_clear" ? "" : value)}>
+            <SelectTrigger className="w-full bg-card">
+              <SelectValue placeholder={t("filters.bodyType")} />
+            </SelectTrigger>
+            <SelectContent className="bg-popover z-50">
+              <SelectItem value="_clear" className="text-muted-foreground">{t("filters.removeFilter")}</SelectItem>
+              <SelectItem value="city_car">{t("body.cityCar")}</SelectItem>
+              <SelectItem value="suv">{t("body.suv")}</SelectItem>
+              <SelectItem value="van">{t("body.van")}</SelectItem>
+              <SelectItem value="cabrio">{t("body.cabrio")}</SelectItem>
+              <SelectItem value="monovolume">{t("body.monovolume")}</SelectItem>
+              <SelectItem value="berlina">{t("body.berlina")}</SelectItem>
+              <SelectItem value="station_wagon">{t("body.stationWagon")}</SelectItem>
+              <SelectItem value="coupe">{t("body.coupe")}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
+        {/* Color - Mobile only (visible), Desktop visible in main row */}
+        <div className="md:hidden">
+          <Select value={filters.color || undefined} onValueChange={value => handleFilterChange("color", value === "_clear" ? "" : value)}>
+            <SelectTrigger className="w-full bg-card">
+              <SelectValue placeholder={t("filters.color")} />
+            </SelectTrigger>
+            <SelectContent className="bg-popover z-50">
+              <SelectItem value="_clear" className="text-muted-foreground">{t("filters.removeFilter")}</SelectItem>
+              {availableColors.map(color => (
+                <SelectItem key={color} value={color}>
+                  {color}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Year From - Desktop only */}
+        <div className="hidden md:block">
+          <Select value={filters.yearFrom || undefined} onValueChange={value => handleFilterChange("yearFrom", value === "_clear" ? "" : value)}>
+            <SelectTrigger className="w-full bg-card">
+              <SelectValue placeholder={t("filters.yearFrom")} />
+            </SelectTrigger>
+            <SelectContent className="bg-popover z-50">
+              <SelectItem value="_clear" className="text-muted-foreground">{t("filters.removeFilter")}</SelectItem>
+              {years.map(year => (
+                <SelectItem key={year.key} value={year.key.toString()}>
+                  {year.value}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Price Min - Desktop only */}
+        <div className="hidden md:block">
+          <Select value={filters.priceMin || undefined} onValueChange={value => handleFilterChange("priceMin", value === "_clear" ? "" : value)}>
+            <SelectTrigger className="w-full bg-card">
+              <SelectValue placeholder={t("filters.priceFrom")} />
+            </SelectTrigger>
+            <SelectContent className="bg-popover z-50">
+              <SelectItem value="_clear" className="text-muted-foreground">{t("filters.removeFilter")}</SelectItem>
+              {priceMinRanges.map(range => (
+                <SelectItem key={range.key} value={range.key.toString()}>
+                  {range.value}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Second Row of Main Filters - Desktop only */}
+      <div className="hidden md:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-3">
         {/* Price Max */}
         <Select value={filters.priceMax || undefined} onValueChange={value => handleFilterChange("priceMax", value === "_clear" ? "" : value)}>
           <SelectTrigger className="w-full bg-card">
@@ -319,10 +386,7 @@ export function SearchFilters({
             ))}
           </SelectContent>
         </Select>
-      </div>
 
-      {/* Second Row of Main Filters */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-3">
         {/* Power Min */}
         <Select value={filters.powerMin || undefined} onValueChange={value => handleFilterChange("powerMin", value === "_clear" ? "" : value)}>
           <SelectTrigger className="w-full bg-card">
@@ -368,7 +432,7 @@ export function SearchFilters({
           </SelectContent>
         </Select>
 
-        {/* Color */}
+        {/* Color - Desktop */}
         <Select value={filters.color || undefined} onValueChange={value => handleFilterChange("color", value === "_clear" ? "" : value)}>
           <SelectTrigger className="w-full bg-card">
             <SelectValue placeholder={t("filters.color")} />
@@ -382,52 +446,14 @@ export function SearchFilters({
             ))}
           </SelectContent>
         </Select>
-
-        {/* Search Button - Desktop */}
-        <div className="hidden md:block">
-          <Button onClick={() => onSearch(filters)} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium">
-            <Search className="w-4 h-4 mr-2" />
-            {resultCount.toLocaleString(language === "it" ? "it-IT" : "en-US")} {t("filters.results")}
-          </Button>
-        </div>
       </div>
 
-      {/* Third Row of Main Filters - Engine Displacement */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-3">
-        {/* Engine Displacement Min */}
-        <Select value={filters.engineDisplacementMin || undefined} onValueChange={value => handleFilterChange("engineDisplacementMin", value === "_clear" ? "" : value)}>
-          <SelectTrigger className="w-full bg-card">
-            <SelectValue placeholder={t("filters.engineFrom")} />
-          </SelectTrigger>
-          <SelectContent className="bg-popover z-50">
-            <SelectItem value="_clear" className="text-muted-foreground">{t("filters.removeFilter")}</SelectItem>
-            {engineDisplacementMinRanges.map(range => (
-              <SelectItem key={range.key} value={range.key}>
-                {range.value}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* Engine Displacement Max */}
-        <Select value={filters.engineDisplacementMax || undefined} onValueChange={value => handleFilterChange("engineDisplacementMax", value === "_clear" ? "" : value)}>
-          <SelectTrigger className="w-full bg-card">
-            <SelectValue placeholder={t("filters.engineTo")} />
-          </SelectTrigger>
-          <SelectContent className="bg-popover z-50">
-            <SelectItem value="_clear" className="text-muted-foreground">{t("filters.removeFilter")}</SelectItem>
-            {engineDisplacementMaxRanges.map(range => (
-              <SelectItem key={range.key} value={range.key}>
-                {range.value}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* Empty space for alignment */}
-        <div></div>
-        <div></div>
-        <div></div>
+      {/* Desktop Search Button Row */}
+      <div className="hidden md:block mb-3">
+        <Button onClick={() => onSearch(filters)} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium">
+          <Search className="w-4 h-4 mr-2" />
+          {resultCount.toLocaleString(language === "it" ? "it-IT" : "en-US")} {t("filters.results")}
+        </Button>
       </div>
 
       {/* More Filters Toggle - Centered */}
@@ -450,8 +476,112 @@ export function SearchFilters({
           </CollapsibleTrigger>
         </div>
         <CollapsibleContent>
+          {/* Mobile: All filters except Marca, Modello, Tipo Di carrozeria, Colore */}
+          {/* Desktop: Only advanced filters (unchanged) */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-3">
-            {/* Fuel Type */}
+            {/* Year From - Mobile only (in advanced), Desktop visible in main */}
+            <div className="md:hidden">
+              <Select value={filters.yearFrom || undefined} onValueChange={value => handleFilterChange("yearFrom", value === "_clear" ? "" : value)}>
+                <SelectTrigger className="w-full bg-card">
+                  <SelectValue placeholder={t("filters.yearFrom")} />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="_clear" className="text-muted-foreground">{t("filters.removeFilter")}</SelectItem>
+                  {years.map(year => (
+                    <SelectItem key={year.key} value={year.key.toString()}>
+                      {year.value}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Price Min - Mobile only (in advanced), Desktop visible in main */}
+            <div className="md:hidden">
+              <Select value={filters.priceMin || undefined} onValueChange={value => handleFilterChange("priceMin", value === "_clear" ? "" : value)}>
+                <SelectTrigger className="w-full bg-card">
+                  <SelectValue placeholder={t("filters.priceFrom")} />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="_clear" className="text-muted-foreground">{t("filters.removeFilter")}</SelectItem>
+                  {priceMinRanges.map(range => (
+                    <SelectItem key={range.key} value={range.key.toString()}>
+                      {range.value}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Price Max - Mobile only (in advanced), Desktop visible in main */}
+            <div className="md:hidden">
+              <Select value={filters.priceMax || undefined} onValueChange={value => handleFilterChange("priceMax", value === "_clear" ? "" : value)}>
+                <SelectTrigger className="w-full bg-card">
+                  <SelectValue placeholder={t("filters.priceTo")} />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="_clear" className="text-muted-foreground">{t("filters.removeFilter")}</SelectItem>
+                  {priceMaxRanges.map(range => (
+                    <SelectItem key={range.key} value={range.key.toString()}>
+                      {range.value}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Power Min - Mobile only (in advanced), Desktop visible in main */}
+            <div className="md:hidden">
+              <Select value={filters.powerMin || undefined} onValueChange={value => handleFilterChange("powerMin", value === "_clear" ? "" : value)}>
+                <SelectTrigger className="w-full bg-card">
+                  <SelectValue placeholder={t("filters.powerFrom")} />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="_clear" className="text-muted-foreground">{t("filters.removeFilter")}</SelectItem>
+                  {powerMinRanges.map(range => (
+                    <SelectItem key={range.key} value={range.key}>
+                      {range.value}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Power Max - Mobile only (in advanced), Desktop visible in main */}
+            <div className="md:hidden">
+              <Select value={filters.powerMax || undefined} onValueChange={value => handleFilterChange("powerMax", value === "_clear" ? "" : value)}>
+                <SelectTrigger className="w-full bg-card">
+                  <SelectValue placeholder={t("filters.powerTo")} />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="_clear" className="text-muted-foreground">{t("filters.removeFilter")}</SelectItem>
+                  {powerMaxRanges.map(range => (
+                    <SelectItem key={range.key} value={range.key}>
+                      {range.value}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Mileage Max - Mobile only (in advanced), Desktop visible in main */}
+            <div className="md:hidden">
+              <Select value={filters.mileageMax || undefined} onValueChange={value => handleFilterChange("mileageMax", value === "_clear" ? "" : value)}>
+                <SelectTrigger className="w-full bg-card">
+                  <SelectValue placeholder={t("filters.maxKm")} />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="_clear" className="text-muted-foreground">{t("filters.removeFilter")}</SelectItem>
+                  {mileageRanges.map(range => (
+                    <SelectItem key={range.key} value={range.key}>
+                      {range.value}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Fuel Type - Always in advanced */}
             <Select value={filters.fuelType || undefined} onValueChange={value => handleFilterChange("fuelType", value === "_clear" ? "" : value)}>
               <SelectTrigger className="w-full bg-card">
                 <SelectValue placeholder={t("filters.fuel")} />
@@ -466,7 +596,7 @@ export function SearchFilters({
               </SelectContent>
             </Select>
 
-            {/* Gearbox */}
+            {/* Gearbox - Always in advanced */}
             <Select value={filters.gearbox || undefined} onValueChange={value => handleFilterChange("gearbox", value === "_clear" ? "" : value)}>
               <SelectTrigger className="w-full bg-card">
                 <SelectValue placeholder={t("filters.gearbox")} />
@@ -481,22 +611,24 @@ export function SearchFilters({
               </SelectContent>
             </Select>
 
-            {/* Condition */}
-            <Select value={filters.condition || undefined} onValueChange={value => handleFilterChange("condition", value === "_clear" ? "" : value)}>
-              <SelectTrigger className="w-full bg-card">
-                <SelectValue placeholder={t("filters.condition")} />
-              </SelectTrigger>
-              <SelectContent className="bg-popover z-50">
-                <SelectItem value="_clear" className="text-muted-foreground">{t("filters.removeFilter")}</SelectItem>
-                {availableConditions.map(condition => (
-                  <SelectItem key={condition} value={condition}>
-                    {condition}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {/* Condition - Hidden (not used) */}
+            <div className="hidden">
+              <Select value={filters.condition || undefined} onValueChange={value => handleFilterChange("condition", value === "_clear" ? "" : value)}>
+                <SelectTrigger className="w-full bg-card">
+                  <SelectValue placeholder={t("filters.condition")} />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="_clear" className="text-muted-foreground">{t("filters.removeFilter")}</SelectItem>
+                  {availableConditions.map(condition => (
+                    <SelectItem key={condition} value={condition}>
+                      {condition}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-            {/* Emissions Class */}
+            {/* Emissions Class - Always in advanced */}
             <Select value={filters.emissionsClass || undefined} onValueChange={value => handleFilterChange("emissionsClass", value === "_clear" ? "" : value)}>
               <SelectTrigger className="w-full bg-card">
                 <SelectValue placeholder={t("filters.euroClass")} />
@@ -511,7 +643,7 @@ export function SearchFilters({
               </SelectContent>
             </Select>
 
-            {/* Doors */}
+            {/* Doors - Always in advanced */}
             <Select value={filters.doors || undefined} onValueChange={value => handleFilterChange("doors", value === "_clear" ? "" : value)}>
               <SelectTrigger className="w-full bg-card">
                 <SelectValue placeholder={t("filters.doors")} />
@@ -525,6 +657,44 @@ export function SearchFilters({
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          {/* Second Row of Advanced Filters */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-3">
+            {/* Engine Displacement Min - Always in advanced */}
+            <Select value={filters.engineDisplacementMin || undefined} onValueChange={value => handleFilterChange("engineDisplacementMin", value === "_clear" ? "" : value)}>
+              <SelectTrigger className="w-full bg-card">
+                <SelectValue placeholder={t("filters.engineFrom")} />
+              </SelectTrigger>
+              <SelectContent className="bg-popover z-50">
+                <SelectItem value="_clear" className="text-muted-foreground">{t("filters.removeFilter")}</SelectItem>
+                {engineDisplacementMinRanges.map(range => (
+                  <SelectItem key={range.key} value={range.key}>
+                    {range.value}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Engine Displacement Max - Always in advanced */}
+            <Select value={filters.engineDisplacementMax || undefined} onValueChange={value => handleFilterChange("engineDisplacementMax", value === "_clear" ? "" : value)}>
+              <SelectTrigger className="w-full bg-card">
+                <SelectValue placeholder={t("filters.engineTo")} />
+              </SelectTrigger>
+              <SelectContent className="bg-popover z-50">
+                <SelectItem value="_clear" className="text-muted-foreground">{t("filters.removeFilter")}</SelectItem>
+                {engineDisplacementMaxRanges.map(range => (
+                  <SelectItem key={range.key} value={range.key}>
+                    {range.value}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Empty space for alignment */}
+            <div></div>
+            <div></div>
+            <div></div>
           </div>
         </CollapsibleContent>
       </Collapsible>

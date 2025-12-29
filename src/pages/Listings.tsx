@@ -100,9 +100,10 @@ const Listings = forwardRef<HTMLDivElement>((props, ref) => {
   const filteredVehicles = useMemo(() => {
     let result = allVehicles;
 
-    // Filter by body type
-    if (selectedBodyType) {
-      const categories = bodyTypeToCategoryMap[selectedBodyType] || [];
+    // Filter by body type (from BodyTypeSelector or mobile filter)
+    const bodyTypeToFilter = selectedBodyType || activeFilters.bodyType;
+    if (bodyTypeToFilter) {
+      const categories = bodyTypeToCategoryMap[bodyTypeToFilter] || [];
       result = result.filter((v) =>
         categories.some((cat) =>
           v.vehicle_category?.toLowerCase().includes(cat.toLowerCase())
