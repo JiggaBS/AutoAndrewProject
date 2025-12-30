@@ -607,25 +607,27 @@ export function SearchFilters({
         <div className="hidden md:flex items-center gap-2 mb-3 relative">
           {/* Left side: empty space */}
           <div className="flex-1"></div>
-          {/* Center: RICERCA AVANZATA button */}
-          <div className="flex-1 flex justify-center">
-            <CollapsibleTrigger asChild>
-              <button
-                className="flex items-center justify-center gap-1.5 text-primary text-xs font-medium hover:opacity-80 transition-opacity py-1"
-              >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="4" y1="6" x2="20" y2="6" />
-                  <line x1="4" y1="12" x2="20" y2="12" />
-                  <line x1="4" y1="18" x2="20" y2="18" />
-                  <circle cx="8" cy="6" r="2" fill="currentColor" />
-                  <circle cx="16" cy="12" r="2" fill="currentColor" />
-                  <circle cx="10" cy="18" r="2" fill="currentColor" />
-                </svg>
-                {showMoreFilters ? t("filters.closeAdvanced") : t("filters.advancedSearch")}
-              </button>
-            </CollapsibleTrigger>
-          </div>
-          {/* Right side: Risultati and Resetta filtri buttons - Always takes space to keep center button centered */}
+          {/* Center: RICERCA AVANZATA button - Only shown when advanced search is closed */}
+          {!showMoreFilters && (
+            <div className="flex-1 flex justify-center">
+              <CollapsibleTrigger asChild>
+                <button
+                  className="flex items-center justify-center gap-1.5 text-primary text-xs font-medium hover:opacity-80 transition-opacity py-1"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="4" y1="6" x2="20" y2="6" />
+                    <line x1="4" y1="12" x2="20" y2="12" />
+                    <line x1="4" y1="18" x2="20" y2="18" />
+                    <circle cx="8" cy="6" r="2" fill="currentColor" />
+                    <circle cx="16" cy="12" r="2" fill="currentColor" />
+                    <circle cx="10" cy="18" r="2" fill="currentColor" />
+                  </svg>
+                  {t("filters.advancedSearch")}
+                </button>
+              </CollapsibleTrigger>
+            </div>
+          )}
+          {/* Right side: Risultati and Resetta filtri buttons - Only shown when advanced search is closed */}
           <div className="flex-1 flex justify-end gap-2">
             {!showMoreFilters && (
               <>
@@ -1008,16 +1010,39 @@ export function SearchFilters({
             <div></div>
           </div>
           
-          {/* Desktop: Risultati and Resetta filtri buttons - Shown when advanced search is open */}
-          <div className="hidden md:flex justify-end gap-2 mt-3">
-            <Button onClick={() => onSearch(filters)} className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium">
-              <Search className="w-4 h-4 mr-2" />
-              {resultCount.toLocaleString(language === "it" ? "it-IT" : "en-US")} {t("filters.results")}
-            </Button>
-            <Button onClick={handleReset} variant="outline" className="text-muted-foreground hover:text-foreground">
-              <RotateCcw className="w-4 h-4 mr-2" />
-              {t("listings.filters.reset")}
-            </Button>
+          {/* Desktop: RICERCA AVANZATA, Risultati and Resetta filtri buttons - Shown when advanced search is open */}
+          <div className="hidden md:flex items-center gap-2 mt-3 relative">
+            {/* Left side: empty space */}
+            <div className="flex-1"></div>
+            {/* Center: CHIUDI RICERCA AVANZATA button */}
+            <div className="flex-1 flex justify-center">
+              <CollapsibleTrigger asChild>
+                <button
+                  className="flex items-center justify-center gap-1.5 text-primary text-xs font-medium hover:opacity-80 transition-opacity py-1"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="4" y1="6" x2="20" y2="6" />
+                    <line x1="4" y1="12" x2="20" y2="12" />
+                    <line x1="4" y1="18" x2="20" y2="18" />
+                    <circle cx="8" cy="6" r="2" fill="currentColor" />
+                    <circle cx="16" cy="12" r="2" fill="currentColor" />
+                    <circle cx="10" cy="18" r="2" fill="currentColor" />
+                  </svg>
+                  {t("filters.closeAdvanced")}
+                </button>
+              </CollapsibleTrigger>
+            </div>
+            {/* Right side: Risultati and Resetta filtri buttons */}
+            <div className="flex-1 flex justify-end gap-2">
+              <Button onClick={() => onSearch(filters)} className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium">
+                <Search className="w-4 h-4 mr-2" />
+                {resultCount.toLocaleString(language === "it" ? "it-IT" : "en-US")} {t("filters.results")}
+              </Button>
+              <Button onClick={handleReset} variant="outline" className="text-muted-foreground hover:text-foreground">
+                <RotateCcw className="w-4 h-4 mr-2" />
+                {t("listings.filters.reset")}
+              </Button>
+            </div>
           </div>
         </CollapsibleContent>
       </Collapsible>
