@@ -40,9 +40,9 @@ export const HeroSection = forwardRef<HTMLElement>((props, ref) => {
       <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/70 to-background/20 dark:block hidden" />
       <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-background/30 dark:block hidden" />
       
-      {/* Light mode overlay - lighter for better visibility */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent dark:hidden" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent dark:hidden" />
+      {/* Light mode overlay - darker for better text contrast on mobile */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/20 dark:hidden" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent dark:hidden" />
 
       {/* Animated Accent Lines */}
       <div className="absolute top-1/4 left-0 w-1 h-40 bg-gradient-to-b from-transparent via-primary to-transparent opacity-70" />
