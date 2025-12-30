@@ -159,7 +159,7 @@ export const HeroSection = forwardRef<HTMLElement>((props, ref) => {
       <div className="absolute bottom-10 left-0 right-0 flex justify-center z-10">
         <button
           onClick={scrollToContent}
-          className="flex flex-col items-center gap-2 text-slate-400 hover:text-white dark:text-muted-foreground dark:hover:text-foreground transition-colors cursor-pointer opacity-0 animate-fade-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg p-2"
+          className="flex flex-col items-center gap-2 text-white/90 hover:text-white dark:text-muted-foreground dark:hover:text-foreground transition-colors cursor-pointer opacity-0 animate-fade-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg p-2"
           style={{ animationDelay: "700ms", animationFillMode: "forwards" }}
           aria-label="Scroll to content"
         >
