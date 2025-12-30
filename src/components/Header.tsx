@@ -33,6 +33,7 @@ export const Header = forwardRef<HTMLElement>((props, ref) => {
     { to: "/", label: t("nav.home"), icon: Home },
     { to: "/listings", label: t("nav.listings") },
     { to: "/valutiamo", label: t("nav.valutiamo") },
+    { to: "/faq", label: t("nav.faq") },
     { to: "/contatti", label: t("nav.contact") },
   ];
 

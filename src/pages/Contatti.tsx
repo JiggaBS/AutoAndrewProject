@@ -225,7 +225,7 @@ const Contatti = () => {
                             <FormItem>
                               <FormLabel>{t("contact.form.name")} *</FormLabel>
                               <FormControl>
-                                <Input placeholder={language === "it" ? "Mario Rossi" : "John Doe"} {...field} />
+                                <Input placeholder={language === "it" ? "Nome Cognome" : "Name Surname"} {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
