@@ -923,61 +923,6 @@ export function SearchFilters({
               )}
             </div>
 
-            {/* Doors - Always in advanced */}
-            <div className="relative">
-              <Select key={`doors-select-${filters.doors || 'empty'}`} value={filters.doors || undefined} onValueChange={value => handleFilterChange("doors", value)}>
-                <SelectTrigger className={`relative w-full bg-card ${filters.doors ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
-                  <DoorOpen className="absolute left-3 h-4 w-4 text-muted-foreground" />
-                  <SelectValue placeholder={t("filters.doors")} />
-                </SelectTrigger>
-            <SelectContent className="bg-popover z-50">
-              {availableDoors.map(doors => (
-                    <SelectItem key={doors} value={doors}>
-                      {doors} {language === "it" ? "porte" : "doors"}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {filters.doors && (
-                <button
-                  onClick={(e) => handleClearFilter("doors", e)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1 z-10"
-                  aria-label={t("filters.removeFilter")}
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Second Row of Advanced Filters */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-3">
-            {/* Engine Displacement Min - Always in advanced */}
-            <div className="relative">
-              <Select key={`engineDisplacementMin-select-${filters.engineDisplacementMin || 'empty'}`} value={filters.engineDisplacementMin || undefined} onValueChange={value => handleFilterChange("engineDisplacementMin", value)}>
-                <SelectTrigger className={`relative w-full bg-card ${filters.engineDisplacementMin ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
-                  <Gauge className="absolute left-3 h-4 w-4 text-muted-foreground" />
-                  <SelectValue placeholder={t("filters.engineFrom")} />
-                </SelectTrigger>
-            <SelectContent className="bg-popover z-50">
-              {engineDisplacementMinRanges.map(range => (
-                    <SelectItem key={range.key} value={range.key}>
-                      {range.value}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {filters.engineDisplacementMin && (
-                <button
-                  onClick={(e) => handleClearFilter("engineDisplacementMin", e)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1 z-10"
-                  aria-label={t("filters.removeFilter")}
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              )}
-            </div>
-
             {/* Engine Displacement Max - Always in advanced */}
             <div className="relative">
               <Select key={`engineDisplacementMax-select-${filters.engineDisplacementMax || 'empty'}`} value={filters.engineDisplacementMax || undefined} onValueChange={value => handleFilterChange("engineDisplacementMax", value)}>
@@ -1004,10 +949,60 @@ export function SearchFilters({
               )}
             </div>
 
-            {/* Empty space for alignment */}
-            <div></div>
-            <div></div>
-            <div></div>
+            {/* Engine Displacement Min - Always in advanced */}
+            <div className="relative">
+              <Select key={`engineDisplacementMin-select-${filters.engineDisplacementMin || 'empty'}`} value={filters.engineDisplacementMin || undefined} onValueChange={value => handleFilterChange("engineDisplacementMin", value)}>
+                <SelectTrigger className={`relative w-full bg-card ${filters.engineDisplacementMin ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+                  <Gauge className="absolute left-3 h-4 w-4 text-muted-foreground" />
+                  <SelectValue placeholder={t("filters.engineFrom")} />
+                </SelectTrigger>
+            <SelectContent className="bg-popover z-50">
+              {engineDisplacementMinRanges.map(range => (
+                    <SelectItem key={range.key} value={range.key}>
+                      {range.value}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {filters.engineDisplacementMin && (
+                <button
+                  onClick={(e) => handleClearFilter("engineDisplacementMin", e)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1 z-10"
+                  aria-label={t("filters.removeFilter")}
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Second Row of Advanced Filters - N° Porte alone */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-3">
+            {/* Doors - Always in advanced */}
+            <div className="relative">
+              <Select key={`doors-select-${filters.doors || 'empty'}`} value={filters.doors || undefined} onValueChange={value => handleFilterChange("doors", value)}>
+                <SelectTrigger className={`relative w-full bg-card ${filters.doors ? 'pr-10 [&>svg:last-child]:hidden' : 'pr-3'} pl-9`}>
+                  <DoorOpen className="absolute left-3 h-4 w-4 text-muted-foreground" />
+                  <SelectValue placeholder={t("filters.doors")} />
+                </SelectTrigger>
+            <SelectContent className="bg-popover z-50">
+              {availableDoors.map(doors => (
+                    <SelectItem key={doors} value={doors}>
+                      {doors} {language === "it" ? "porte" : "doors"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {filters.doors && (
+                <button
+                  onClick={(e) => handleClearFilter("doors", e)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1 z-10"
+                  aria-label={t("filters.removeFilter")}
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
           </div>
           
           {/* Desktop: RICERCA AVANZATA, Risultati and Resetta filtri buttons - Shown when advanced search is open */}
