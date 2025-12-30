@@ -31,11 +31,11 @@ export const WhatsAppButton = forwardRef<HTMLAnchorElement, WhatsAppButtonProps>
       target="_blank"
       rel="noopener noreferrer"
       onClick={handleClick}
-      className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-[#25D366] hover:bg-[#20BA5C] text-white px-4 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group"
+      className="fixed bottom-6 right-6 z-50 flex items-center justify-center bg-[#25D366] hover:bg-[#20BA5C] text-white w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group hover:w-auto hover:h-auto hover:px-4 hover:py-3"
       aria-label="Contattaci su WhatsApp"
     >
-      <MessageCircle className="w-6 h-6" />
-      <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 whitespace-nowrap">
+      <MessageCircle className="w-6 h-6 flex-shrink-0" />
+      <span className="hidden group-hover:inline-block max-w-xs overflow-hidden transition-all duration-300 whitespace-nowrap ml-2">
         Chatta con noi
       </span>
     </a>
