@@ -41,8 +41,8 @@ export function ChatThread({
     }
   }, [requestId, unreadCount, markAsRead]);
 
-  const handleSendMessage = (body: string, files?: File[]) => {
-    sendMessage({ body, files });
+  const handleSendMessage = (body: string) => {
+    sendMessage({ body });
   };
 
   return (
@@ -68,7 +68,6 @@ export function ChatThread({
         isSending={isSending}
         status={requestStatus}
         isAdmin={isAdmin}
-        requestId={requestId}
       />
     </div>
   );

@@ -13,7 +13,7 @@ CREATE POLICY "Users can upload message attachments"
 ON storage.objects FOR INSERT
 TO authenticated
 WITH CHECK (
-  bucket_id = 'message-attachments'
+  bucket_id = 'chat-attachments'
   AND (string_to_array(name, '/'))[1] = 'request'
   AND public.user_owns_valuation_request((string_to_array(name, '/'))[2]::uuid)
 );
@@ -25,7 +25,7 @@ CREATE POLICY "Users can read their message attachments"
 ON storage.objects FOR SELECT
 TO authenticated
 USING (
-  bucket_id = 'message-attachments'
+  bucket_id = 'chat-attachments'
   AND (string_to_array(name, '/'))[1] = 'request'
   AND public.user_owns_valuation_request((string_to_array(name, '/'))[2]::uuid)
 );

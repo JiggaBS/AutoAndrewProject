@@ -1,11 +1,12 @@
 -- Create storage bucket for message attachments
 -- This bucket will store documents and files sent in messages
+-- NOTE: Updated to use 'chat-attachments' to match code expectations
 
 -- Create the bucket if it doesn't exist
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES (
-  'message-attachments',
-  'message-attachments',
+  'chat-attachments',
+  'chat-attachments',
   false, -- Private bucket - requires authentication
   10485760, -- 10MB limit per file
   ARRAY[
@@ -35,7 +36,7 @@ CREATE POLICY "Users can upload message attachments"
 ON storage.objects FOR INSERT
 TO authenticated
 WITH CHECK (
-  bucket_id = 'message-attachments'
+  bucket_id = 'chat-attachments'
   AND (string_to_array(name, '/'))[1] = 'request'
   AND public.user_owns_valuation_request((string_to_array(name, '/'))[2]::uuid)
 );
@@ -45,7 +46,7 @@ CREATE POLICY "Admins can upload message attachments"
 ON storage.objects FOR INSERT
 TO authenticated
 WITH CHECK (
-  bucket_id = 'message-attachments'
+  bucket_id = 'chat-attachments'
   AND EXISTS (
     SELECT 1 FROM public.user_roles
     WHERE user_id = auth.uid()
@@ -60,7 +61,7 @@ CREATE POLICY "Users can read their message attachments"
 ON storage.objects FOR SELECT
 TO authenticated
 USING (
-  bucket_id = 'message-attachments'
+  bucket_id = 'chat-attachments'
   AND (string_to_array(name, '/'))[1] = 'request'
   AND public.user_owns_valuation_request((string_to_array(name, '/'))[2]::uuid)
 );
@@ -70,7 +71,7 @@ CREATE POLICY "Admins can read all message attachments"
 ON storage.objects FOR SELECT
 TO authenticated
 USING (
-  bucket_id = 'message-attachments'
+  bucket_id = 'chat-attachments'
   AND EXISTS (
     SELECT 1 FROM public.user_roles
     WHERE user_id = auth.uid()
@@ -83,7 +84,7 @@ CREATE POLICY "Users can delete their own attachments"
 ON storage.objects FOR DELETE
 TO authenticated
 USING (
-  bucket_id = 'message-attachments'
+  bucket_id = 'chat-attachments'
   AND owner = auth.uid()
   AND created_at > now() - interval '24 hours'
 );
@@ -93,7 +94,7 @@ CREATE POLICY "Admins can delete any attachment"
 ON storage.objects FOR DELETE
 TO authenticated
 USING (
-  bucket_id = 'message-attachments'
+  bucket_id = 'chat-attachments'
   AND EXISTS (
     SELECT 1 FROM public.user_roles
     WHERE user_id = auth.uid()

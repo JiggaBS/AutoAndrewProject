@@ -53,9 +53,6 @@ export function MessageList({ messages, isLoading, isAdmin, clientName }: Messag
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
   const previousMessagesLength = useRef(messages.length);
 
-  // Filter out any invalid messages (safety check)
-  const validMessages = messages.filter((msg) => msg && msg.id && msg.body !== undefined);
-
   // Check if user is near bottom of scroll
   const handleScroll = () => {
     if (!containerRef.current) return;
@@ -67,18 +64,18 @@ export function MessageList({ messages, isLoading, isAdmin, clientName }: Messag
 
   // Auto-scroll to bottom when new messages arrive (if near bottom)
   useEffect(() => {
-    if (validMessages.length > previousMessagesLength.current && shouldAutoScroll) {
+    if (messages.length > previousMessagesLength.current && shouldAutoScroll) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-    previousMessagesLength.current = validMessages.length;
-  }, [validMessages.length, shouldAutoScroll]);
+    previousMessagesLength.current = messages.length;
+  }, [messages.length, shouldAutoScroll]);
 
   // Initial scroll to bottom
   useEffect(() => {
-    if (!isLoading && validMessages.length > 0) {
+    if (!isLoading && messages.length > 0) {
       messagesEndRef.current?.scrollIntoView();
     }
-  }, [isLoading, validMessages.length]);
+  }, [isLoading]);
 
   if (isLoading) {
     return (
@@ -107,7 +104,7 @@ export function MessageList({ messages, isLoading, isAdmin, clientName }: Messag
     );
   }
 
-  if (validMessages.length === 0) {
+  if (messages.length === 0) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
         <div className="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mb-4">
@@ -129,7 +126,7 @@ export function MessageList({ messages, isLoading, isAdmin, clientName }: Messag
     );
   }
 
-  const groupedMessages = groupMessagesByDate(validMessages);
+  const groupedMessages = groupMessagesByDate(messages);
 
   return (
     <div

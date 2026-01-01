@@ -1,21 +1,12 @@
 // Message types for the messaging system
 
-export interface MessageAttachment {
-  id: string;
-  name: string;
-  url: string;
-  type: string;
-  size: number;
-  uploaded_at: string;
-}
-
 export interface Message {
   id: string;
   request_id: string;
   sender_user_id: string | null;
   sender_type: 'admin' | 'user' | 'system';
   body: string;
-  attachments: MessageAttachment[] | null;
+  attachments: unknown | null;
   created_at: string;
   read_at: string | null;
 }
