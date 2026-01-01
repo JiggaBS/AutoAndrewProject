@@ -855,7 +855,7 @@ export default function CustomerArea() {
                         {requests.slice(0, 5).map((request) => (
                           <button
                             key={request.id}
-                            onClick={() => setActiveSection("requests")}
+                            onClick={() => navigate(`/dashboard/requests/${request.id}`)}
                             className="w-full flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-border/50 hover:bg-muted/50 hover:border-primary/30 transition-all cursor-pointer text-left group"
                           >
                             <div className="flex items-center gap-4">

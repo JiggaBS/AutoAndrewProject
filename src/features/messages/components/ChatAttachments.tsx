@@ -103,10 +103,10 @@ export function AttachmentPicker({
 
       const newAttachments = await Promise.all(uploadPromises);
       onAttachmentsChange([...attachments, ...newAttachments]);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Errore caricamento',
-        description: error.message || 'Impossibile caricare il file.',
+        description: error instanceof Error ? error.message : 'Impossibile caricare il file.',
         variant: 'destructive',
       });
     } finally {

@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,14 +25,14 @@ import {
   Trash2,
   MessageSquare,
   Download,
-  Plus
+  Plus,
+  Eye
 } from "lucide-react";
 import { User, Session } from "@supabase/supabase-js";
 
 // Components
 import { AdminStats } from "@/components/admin/AdminStats";
 import { AdminFilters } from "@/components/admin/AdminFilters";
-import { RequestDetailDialog } from "@/components/admin/RequestDetailDialog";
 import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
 import { AdminSettings } from "@/components/admin/AdminSettings";
 import { ActivityLog } from "@/components/admin/ActivityLog";
@@ -100,7 +100,6 @@ const statusLabels: Record<string, string> = {
 export default function Admin() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [autoOpenRequestId, setAutoOpenRequestId] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -354,12 +353,8 @@ export default function Admin() {
   useEffect(() => {
     const requestId = new URLSearchParams(location.search).get("request");
     if (requestId) {
-      setActiveTab("requests");
-      setAutoOpenRequestId(requestId);
-      navigate("/admin", { replace: true });
-      // Clear autoOpenRequestId after dialog has time to open
-      const timer = setTimeout(() => setAutoOpenRequestId(null), 500);
-      return () => clearTimeout(timer);
+      // Navigate directly to the request detail page
+      navigate(`/admin/requests/${requestId}`, { replace: true });
     }
   }, [location.search, navigate]);
 
@@ -831,7 +826,6 @@ export default function Admin() {
                             key={request.id}
                             request={request}
                             onUpdateStatus={updateStatus}
-                            onUpdateRequest={updateRequest}
                           />
                         ))}
                       </div>
@@ -948,12 +942,12 @@ export default function Admin() {
                                   </Select>
                                 </TableCell>
                                 <TableCell>
-                                  <RequestDetailDialog
-                                    request={request}
-                                    onUpdateStatus={updateStatus}
-                                    onUpdateRequest={updateRequest}
-                                    autoOpen={autoOpenRequestId === request.id}
-                                  />
+                                  <Button size="sm" variant="outline" className="gap-2" asChild>
+                                    <Link to={`/admin/requests/${request.id}`}>
+                                      <Eye className="w-4 h-4" />
+                                      Dettagli
+                                    </Link>
+                                  </Button>
                                 </TableCell>
                               </TableRow>
                             ))}

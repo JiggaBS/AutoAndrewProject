@@ -88,7 +88,7 @@ const valuationRequestSchema = z.object({
     .optional(),
   name: z.string().min(2).max(100),
   email: z.string().email().max(255),
-  phone: z.string().min(9).max(20).regex(/^[\d\s\+\-\(\)]+$/),
+  phone: z.string().min(9).max(20).regex(/^[\d\s+\-()]+$/),
   notes: z.string().max(500).optional().nullable(),
   estimated_value: z
     .preprocess(
@@ -301,10 +301,11 @@ const handler = async (req: Request): Promise<Response> => {
         headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error in submit-valuation:", error);
+    const errorMessage = error instanceof Error ? error.message : "Errore interno";
     return new Response(
-      JSON.stringify({ error: error.message || "Errore interno" }),
+      JSON.stringify({ error: errorMessage }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },

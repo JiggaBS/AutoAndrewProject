@@ -16,7 +16,7 @@ const staticRoutes = [
 interface Vehicle {
   ad_number: number;
   images?: string[];
-  [key: string]: any; // Allow other properties
+  [key: string]: unknown; // Allow other properties
 }
 
 export default async function handler(

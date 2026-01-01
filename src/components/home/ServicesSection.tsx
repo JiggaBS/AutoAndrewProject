@@ -130,7 +130,7 @@ export const ServicesSection = forwardRef<HTMLElement>((props, ref) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 if (service.onClick) {
-                  service.onClick(e as any);
+                  service.onClick(e as unknown as React.MouseEvent);
                 } else if (service.href !== "#") {
                   navigate(service.href);
                 }

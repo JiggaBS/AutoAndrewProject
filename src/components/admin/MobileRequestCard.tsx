@@ -1,8 +1,9 @@
-import { Calendar, Gauge, Phone, Mail, Euro, MessageSquare } from "lucide-react";
+import { Calendar, Gauge, Phone, Mail, Euro, MessageSquare, Eye } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RequestDetailDialog } from "./RequestDetailDialog";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ValuationRequest {
@@ -30,7 +31,6 @@ interface ValuationRequest {
 interface MobileRequestCardProps {
   request: ValuationRequest;
   onUpdateStatus: (id: string, status: string) => void;
-  onUpdateRequest: (id: string, updates: Partial<ValuationRequest>) => void;
 }
 
 const statusColors: Record<string, string> = {
@@ -47,7 +47,7 @@ const statusLabels: Record<string, string> = {
   rejected: "Rifiutato",
 };
 
-export function MobileRequestCard({ request, onUpdateStatus, onUpdateRequest }: MobileRequestCardProps) {
+export function MobileRequestCard({ request, onUpdateStatus }: MobileRequestCardProps) {
   const { translateFuelType } = useLanguage();
   
   const formatDate = (dateString: string) => {
@@ -163,11 +163,12 @@ export function MobileRequestCard({ request, onUpdateStatus, onUpdateRequest }: 
               <SelectItem value="rejected">Rifiutato</SelectItem>
             </SelectContent>
           </Select>
-          <RequestDetailDialog
-            request={request}
-            onUpdateStatus={onUpdateStatus}
-            onUpdateRequest={onUpdateRequest}
-          />
+          <Button size="sm" variant="outline" className="gap-2" asChild>
+            <Link to={`/admin/requests/${request.id}`}>
+              <Eye className="w-4 h-4" />
+              Dettagli
+            </Link>
+          </Button>
         </div>
       </CardContent>
     </Card>

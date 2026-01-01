@@ -96,7 +96,7 @@ export function ClientChatPanel({ requestId, requestStatus }: ClientChatPanelPro
   // Auto-scroll when new messages arrive
   useEffect(() => {
     if (messages.length > previousMessagesLength.current && shouldAutoScroll) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
     previousMessagesLength.current = messages.length;
   }, [messages.length, shouldAutoScroll]);
@@ -104,9 +104,9 @@ export function ClientChatPanel({ requestId, requestStatus }: ClientChatPanelPro
   // Initial scroll to bottom
   useEffect(() => {
     if (!isLoading && messages.length > 0) {
-      messagesEndRef.current?.scrollIntoView();
+      messagesEndRef.current?.scrollIntoView({ block: 'end' });
     }
-  }, [isLoading]);
+  }, [isLoading, messages.length]);
 
   const handleSend = () => {
     if (!canSend) return;
@@ -159,7 +159,7 @@ export function ClientChatPanel({ requestId, requestStatus }: ClientChatPanelPro
       <div
         ref={containerRef}
         onScroll={handleScroll}
-        className="flex-1 min-h-0 overflow-y-auto overscroll-contain"
+        className="flex-1 min-h-0 overflow-y-auto overscroll-contain touch-pan-y [-webkit-overflow-scrolling:touch]"
       >
         {isLoading ? (
           <div className="p-4 space-y-4">
@@ -287,7 +287,7 @@ export function ClientChatPanel({ requestId, requestStatus }: ClientChatPanelPro
                 })}
               </div>
             ))}
-            <div ref={messagesEndRef} />
+            <div ref={messagesEndRef} className="h-px w-full scroll-mb-24" />
           </div>
         )}
       </div>
@@ -337,8 +337,9 @@ export function ClientChatPanel({ requestId, requestStatus }: ClientChatPanelPro
                 onKeyDown={handleKeyDown}
                 placeholder={language === 'it' ? 'Scrivi un messaggio...' : 'Write a message...'}
                 className={cn(
-                  "min-h-[44px] max-h-[120px] resize-none pr-14 py-2.5 sm:py-3 rounded-xl bg-background text-sm",
-                  isOverLimit && "border-destructive focus-visible:ring-destructive"
+                  "min-h-[44px] max-h-[120px] resize-none pr-14 py-2.5 sm:py-3 rounded-xl bg-background text-base md:text-sm focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-ring focus-visible:shadow-[inset_0_0_0_2px_hsl(var(--ring))]",
+                  isOverLimit &&
+                    "border-destructive focus-visible:border-destructive focus-visible:shadow-[inset_0_0_0_2px_hsl(var(--destructive))]"
                 )}
                 disabled={isSending}
               />
