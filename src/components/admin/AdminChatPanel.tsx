@@ -111,7 +111,13 @@ export function AdminChatPanel({ requestId, requestStatus, clientName = "Cliente
     sendMessage({ 
       body: message.trim() || (attachments.length > 0 ? '📎 Allegato' : ''),
       attachments: attachments.length > 0 
-        ? attachments.map(a => ({ name: a.name, url: a.url, type: a.type, size: a.size }))
+        ? attachments.map(a => ({ 
+            id: a.id, 
+            name: a.name, 
+            url: a.url, 
+            type: a.type, 
+            size: a.size 
+          }))
         : undefined 
     });
     setMessage('');
@@ -282,6 +288,7 @@ export function AdminChatPanel({ requestId, requestStatus, clientName = "Cliente
           <AttachmentPicker
             attachments={attachments}
             onAttachmentsChange={setAttachments}
+            requestId={requestId}
             disabled={isSending}
           />
           <div className="flex-1 relative">
