@@ -2,7 +2,7 @@
 
 > **Version:** 2.2.0  
 > **Last Updated:** January 2025  
-> **Platform:** Lovable + Supabase Cloud
+> **Platform:** Vercel + Supabase Cloud
 
 ---
 
@@ -95,7 +95,7 @@ AutoGroup Romagna is a professional **car dealership web application** designed 
 | **Recharts** | 2.15.4 | Charts & Analytics |
 | **next-themes** | 0.3.0 | Dark/Light Theme |
 
-### Backend (Lovable Cloud / Supabase)
+### Backend (Supabase Cloud)
 
 | Technology | Purpose |
 |------------|---------|
@@ -137,7 +137,7 @@ AutoGroup Romagna is a professional **car dealership web application** designed 
                            │
                            ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    LOVABLE CLOUD (Supabase)                     │
+│                    SUPABASE CLOUD                               │
 │  ┌─────────────────┐  ┌────────────────┐  ┌─────────────────┐  │
 │  │   PostgreSQL    │  │  Edge Functions │  │  Authentication │  │
 │  │   Database      │  │  (Deno Runtime) │  │  (Supabase Auth)│  │
@@ -183,7 +183,7 @@ AutoGroup Romagna is a professional **car dealership web application** designed 
 - Node.js 18+ 
 - npm or bun
 - Git
-- Lovable account (for cloud features)
+- Supabase account (for backend services)
 
 ### Local Development Setup
 
@@ -249,7 +249,7 @@ The app will be available at `http://localhost:8080`
 
 ### Backend Secrets (Supabase Edge Functions)
 
-These secrets are configured in Lovable Cloud:
+These secrets are configured in Supabase Dashboard (Edge Functions → Secrets):
 
 | Secret | Description | Required |
 |--------|-------------|----------|
@@ -1148,14 +1148,24 @@ trackEvent("vehicle_view", {
 
 ## 18. Deployment
 
-### Lovable Deployment
+### Deployment
 
-1. **Frontend Changes**: Click "Update" in the publish dialog
-2. **Backend Changes (Edge Functions)**: Deploy automatically
+#### Frontend Deployment (Vercel)
+
+1. **Connect Repository**: Link your Git repository to Vercel
+2. **Configure Environment Variables**: Set all required variables in Vercel dashboard
+3. **Deploy**: Push to main branch or use Vercel CLI (`npx vercel --prod`)
+
+#### Backend Deployment (Supabase Edge Functions)
+
+Deploy Edge Functions using Supabase CLI:
+```bash
+supabase functions deploy <function-name>
+```
 
 ### Environment Setup for Production
 
-Ensure all secrets are configured in Lovable Cloud:
+Ensure all secrets are configured in Supabase Dashboard:
 
 **Required:**
 - `ALLOWED_ORIGINS` - Comma-separated list of allowed CORS origins (e.g., `https://yourdomain.com,https://www.yourdomain.com`)
@@ -1412,7 +1422,7 @@ console.log('User role:', data);
 
 ### Documentation Links
 
-- [Lovable Docs](https://docs.lovable.dev/)
+- [Vercel Docs](https://vercel.com/docs)
 - [Tailwind CSS](https://tailwindcss.com/docs)
 - [Shadcn/UI](https://ui.shadcn.com/)
 - [React Router](https://reactrouter.com/)
@@ -1423,9 +1433,9 @@ console.log('User role:', data);
 ### Support
 
 For questions or issues:
-1. Use Lovable Chat for development help
-2. Check the troubleshooting section above
-3. Review Edge Function logs in Lovable Cloud
+1. Check the troubleshooting section above
+2. Review Edge Function logs in Supabase Dashboard
+3. Check Vercel deployment logs for frontend issues
 
 ---
 
