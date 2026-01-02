@@ -746,161 +746,160 @@ export default function CustomerArea() {
             {/* Overview Section */}
             {activeSection === "overview" && (
               <div className="space-y-6">
-                {/* Welcome Banner */}
-                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/15 via-primary/5 to-transparent p-6 lg:p-8 border border-primary/20">
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-                  <div className="relative z-10">
-                    <h1 className="text-2xl lg:text-3xl font-bold text-foreground mb-2">
-                      {language === "it" ? "Bentornato" : "Welcome back"}, {profile?.name || userName}!
-                    </h1>
-                    <p className="text-muted-foreground">
-                      {language === "it" 
-                        ? "Gestisci i tuoi veicoli preferiti, richieste di valutazione e impostazioni del profilo."
-                        : "Manage your favorite vehicles, valuation requests, and profile settings."}
-                    </p>
+                {/* Welcome Banner - Compact Version */}
+                <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-6 border border-primary/10">
+                  <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h1 className="text-xl lg:text-2xl font-bold text-foreground mb-1">
+                        {language === "it" ? "Bentornato" : "Welcome back"}, {profile?.name || userName}!
+                      </h1>
+                      <p className="text-sm text-muted-foreground">
+                        {language === "it" 
+                          ? "Il tuo pannello di controllo personale."
+                          : "Your personal control panel."}
+                      </p>
+                    </div>
+                     <Button asChild size="sm" className="w-full sm:w-auto">
+                      <Link to="/valutiamo">
+                        <Euro className="w-4 h-4 mr-2" />
+                        {language === "it" ? "Nuova Valutazione" : "New Valuation"}
+                      </Link>
+                    </Button>
                   </div>
                 </div>
 
-                {/* Quick Stats */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* Quick Stats - Compact Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <Card 
-                    className="border-border/50 cursor-pointer hover:border-primary/50 transition-all group"
+                    className="border-border/40 cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-all group"
                     onClick={() => setActiveSection("favorites")}
                   >
-                    <CardContent className="p-5">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <div className="p-3 rounded-xl bg-red-500/10 group-hover:bg-red-500/20 transition-colors">
-                            <Heart className="w-5 h-5 text-red-500" />
-                          </div>
-                          <div>
-                            <p className="text-sm text-muted-foreground">{language === "it" ? "Preferiti" : "Favorites"}</p>
-                            <p className="text-2xl font-bold">{savedVehicles.length}</p>
-                          </div>
+                    <CardContent className="p-4 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-red-500/10 text-red-500 group-hover:scale-110 transition-transform">
+                          <Heart className="w-5 h-5" />
                         </div>
-                        <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                        <div>
+                          <p className="text-xs text-muted-foreground font-medium">{language === "it" ? "Preferiti" : "Favorites"}</p>
+                          <p className="text-xl font-bold">{savedVehicles.length}</p>
+                        </div>
                       </div>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary transition-colors" />
                     </CardContent>
                   </Card>
 
                   <Card 
-                    className="border-border/50 cursor-pointer hover:border-primary/50 transition-all group"
+                    className="border-border/40 cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-all group"
                     onClick={() => setActiveSection("requests")}
                   >
-                    <CardContent className="p-5">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <div className="p-3 rounded-xl bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
-                            <FileText className="w-5 h-5 text-blue-500" />
-                          </div>
-                          <div>
-                            <p className="text-sm text-muted-foreground">{language === "it" ? "Richieste" : "Requests"}</p>
-                            <p className="text-2xl font-bold">{requests.length}</p>
-                          </div>
+                    <CardContent className="p-4 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500 group-hover:scale-110 transition-transform">
+                          <FileText className="w-5 h-5" />
                         </div>
-                        <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                        <div>
+                          <p className="text-xs text-muted-foreground font-medium">{language === "it" ? "Richieste" : "Requests"}</p>
+                          <p className="text-xl font-bold">{requests.length}</p>
+                        </div>
                       </div>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary transition-colors" />
                     </CardContent>
                   </Card>
 
                   <Card 
-                    className="border-border/50 cursor-pointer hover:border-primary/50 transition-all group"
+                    className="border-border/40 cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-all group"
                     onClick={() => setActiveSection("requests")}
                   >
-                    <CardContent className="p-5">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <div className="p-3 rounded-xl bg-green-500/10 group-hover:bg-green-500/20 transition-colors">
-                            <Euro className="w-5 h-5 text-green-500" />
-                          </div>
-                          <div>
-                            <p className="text-sm text-muted-foreground">{language === "it" ? "Offerte" : "Offers"}</p>
-                            <p className="text-2xl font-bold">{requests.filter(r => r.final_offer).length}</p>
-                          </div>
+                    <CardContent className="p-4 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-green-500/10 text-green-500 group-hover:scale-110 transition-transform">
+                          <Euro className="w-5 h-5" />
                         </div>
-                        <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                        <div>
+                          <p className="text-xs text-muted-foreground font-medium">{language === "it" ? "Offerte" : "Offers"}</p>
+                          <p className="text-xl font-bold">{requests.filter(r => r.final_offer).length}</p>
+                        </div>
                       </div>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary transition-colors" />
                     </CardContent>
                   </Card>
                 </div>
 
-                {/* My Valuation Requests */}
-                <Card className="border-border/50">
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                      <FileText className="w-5 h-5 text-primary" />
-                      {language === "it" ? "Le Mie Richieste di Valutazione" : "My Valuation Requests"}
+                {/* My Valuation Requests - Compact List */}
+                <Card className="border-border/40 shadow-sm">
+                  <CardHeader className="flex flex-row items-center justify-between py-4 px-5">
+                    <CardTitle className="text-base font-semibold flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-primary" />
+                      {language === "it" ? "Le Mie Richieste" : "My Requests"}
                     </CardTitle>
                     {requests.length > 0 && (
                       <Button 
                         variant="ghost" 
                         size="sm" 
                         onClick={() => setActiveSection("requests")}
-                        className="text-primary hover:text-primary"
+                        className="text-xs h-8"
                       >
                         {language === "it" ? "Vedi tutte" : "View all"}
-                        <ChevronRight className="w-4 h-4 ml-1" />
+                        <ChevronRight className="w-3 h-3 ml-1" />
                       </Button>
                     )}
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-0">
                     {loadingRequests ? (
-                      <div className="space-y-4">
-                        {[1, 2, 3].map((i) => (
-                          <Skeleton key={i} className="h-20 rounded-xl" />
+                      <div className="p-4 space-y-3">
+                        {[1, 2].map((i) => (
+                          <Skeleton key={i} className="h-16 w-full rounded-lg" />
                         ))}
                       </div>
                     ) : requests.length > 0 ? (
-                      <div className="space-y-3">
+                      <div className="divide-y divide-border/40">
                         {requests.slice(0, 5).map((request) => (
-                          <button
+                          <div
                             key={request.id}
                             onClick={() => navigate(`/dashboard/requests/${request.id}`)}
-                            className="w-full flex items-center justify-between p-4 rounded-xl bg-muted/30 border border-border/50 hover:bg-muted/50 hover:border-primary/30 transition-all cursor-pointer text-left group"
+                            className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors cursor-pointer group"
                           >
                             <div className="flex items-center gap-4">
-                              <div className="p-2.5 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                                <Car className="w-5 h-5 text-primary" />
+                              <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+                                <Car className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                               </div>
-                              <div>
-                                <p className="font-medium group-hover:text-primary transition-colors">
-                                  {request.make} {request.model} ({request.year})
-                                </p>
-                                <p className="text-sm text-muted-foreground">
-                                  {new Date(request.created_at).toLocaleDateString(language === "it" ? "it-IT" : "en-US")}
-                                  {request.final_offer && (
-                                    <span className="ml-2 text-green-600 font-medium">
-                                      • €{request.final_offer.toLocaleString()}
-                                    </span>
-                                  )}
-                                </p>
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2 mb-0.5">
+                                  <p className="font-medium text-sm truncate group-hover:text-primary transition-colors">
+                                    {request.make} {request.model}
+                                  </p>
+                                  <span className="text-xs text-muted-foreground">• {request.year}</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                   <span>{new Date(request.created_at).toLocaleDateString(language === "it" ? "it-IT" : "en-US")}</span>
+                                   {request.final_offer && (
+                                     <span className="font-medium text-green-600 bg-green-500/10 px-1.5 py-0.5 rounded">
+                                       Offerta: €{request.final_offer.toLocaleString()}
+                                     </span>
+                                   )}
+                                </div>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <Badge className={`${statusColors[request.status]} text-xs`}>
+                            
+                            <div className="flex items-center gap-3">
+                              <Badge variant="outline" className={cn("text-xs font-normal border-0", statusColors[request.status])}>
                                 {statusLabels[request.status]}
                               </Badge>
-                              <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                              <ChevronRight className="w-4 h-4 text-muted-foreground/30 group-hover:text-muted-foreground transition-colors" />
                             </div>
-                          </button>
+                          </div>
                         ))}
                       </div>
                     ) : (
-                      <div className="text-center py-8">
-                        <div className="p-4 rounded-full bg-muted/50 w-fit mx-auto mb-4">
-                          <FileText className="w-8 h-8 text-muted-foreground" />
+                      <div className="text-center py-10 px-4">
+                        <div className="p-3 rounded-full bg-muted/50 w-fit mx-auto mb-3">
+                          <FileText className="w-6 h-6 text-muted-foreground/60" />
                         </div>
-                        <p className="text-muted-foreground mb-2">
-                          {language === "it" ? "Nessuna richiesta di valutazione" : "No valuation requests"}
-                        </p>
                         <p className="text-sm text-muted-foreground mb-4">
-                          {language === "it" 
-                            ? "Vuoi vendere la tua auto? Richiedi una valutazione gratuita!"
-                            : "Want to sell your car? Request a free valuation!"}
+                          {language === "it" ? "Nessuna richiesta recente" : "No recent requests"}
                         </p>
-                        <Button asChild>
+                        <Button asChild size="sm" variant="outline">
                           <Link to="/valutiamo">
-                            <TrendingUp className="w-4 h-4 mr-2" />
                             {language === "it" ? "Richiedi Valutazione" : "Request Valuation"}
                           </Link>
                         </Button>
@@ -1034,7 +1033,7 @@ export default function CustomerArea() {
               <div className="space-y-6">
                 <div>
                   <h2 className="text-2xl font-bold">{language === "it" ? "Il Mio Profilo" : "My Profile"}</h2>
-                  <p className="text-muted-foreground">{language === "it" ? "Le tue informazioni personali" : "Your personal information"}</p>
+                  <p className="text-muted-foreground">{language === "it" ? "Aggiorna le tue informazioni personali" : "Update your personal information"}</p>
                 </div>
 
                 <Card className="border-border/50">
@@ -1043,55 +1042,94 @@ export default function CustomerArea() {
                       <User className="w-5 h-5 text-primary" />
                       {language === "it" ? "Dati Personali" : "Personal Data"}
                     </CardTitle>
-                    <CardDescription>
-                      {language === "it" ? "Riepilogo delle tue informazioni" : "Summary of your information"}
-                    </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="p-4 rounded-xl border bg-muted/30">
-                        <p className="text-sm text-muted-foreground mb-1">{language === "it" ? "Nome" : "First Name"}</p>
-                        <p className="font-medium flex items-center gap-2">
-                          <User className="w-4 h-4 text-primary" />
-                          {profile?.name || "-"}
-                        </p>
+                  <CardContent>
+                    <form onSubmit={handleSaveProfile} className="space-y-5">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div className="space-y-2">
+                          <Label htmlFor="name">{language === "it" ? "Nome" : "First Name"}</Label>
+                          <div className="relative">
+                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <Input 
+                              id="name"
+                              value={formData.name}
+                              onChange={(e) => setFormData({...formData, name: e.target.value})}
+                              className="pl-9 bg-muted/30 border-border/50" 
+                              placeholder={language === "it" ? "Il tuo nome" : "Your first name"}
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="surname">{language === "it" ? "Cognome" : "Last Name"}</Label>
+                          <div className="relative">
+                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <Input 
+                              id="surname"
+                              value={formData.surname}
+                              onChange={(e) => setFormData({...formData, surname: e.target.value})}
+                              className="pl-9 bg-muted/30 border-border/50" 
+                              placeholder={language === "it" ? "Il tuo cognome" : "Your last name"}
+                            />
+                          </div>
+                        </div>
                       </div>
-                      <div className="p-4 rounded-xl border bg-muted/30">
-                        <p className="text-sm text-muted-foreground mb-1">{language === "it" ? "Cognome" : "Last Name"}</p>
-                        <p className="font-medium flex items-center gap-2">
-                          <User className="w-4 h-4 text-primary" />
-                          {profile?.surname || "-"}
-                        </p>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div className="space-y-2">
+                          <Label htmlFor="email">Email</Label>
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <Input 
+                              id="email"
+                              type="email"
+                              value={formData.email}
+                              onChange={(e) => setFormData({...formData, email: e.target.value})}
+                              className="pl-9 bg-muted/30 border-border/50" 
+                              placeholder="tuamail@esempio.com"
+                            />
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            {language === "it" ? "Cambiare l'email richiederà una nuova verifica." : "Changing email will require re-verification."}
+                          </p>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="phone">{language === "it" ? "Telefono" : "Phone"}</Label>
+                          <div className="relative">
+                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <Input 
+                              id="phone"
+                              type="tel"
+                              value={formData.phone}
+                              onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                              className="pl-9 bg-muted/30 border-border/50" 
+                              placeholder="+39 333 1234567"
+                            />
+                          </div>
+                        </div>
                       </div>
-                    </div>
-
-                    <div className="p-4 rounded-xl border bg-muted/30">
-                      <p className="text-sm text-muted-foreground mb-1">Email</p>
-                      <p className="font-medium flex items-center gap-2">
-                        <Mail className="w-4 h-4 text-primary" />
-                        {user?.email || "-"}
-                      </p>
-                    </div>
-
-                    <div className="p-4 rounded-xl border bg-muted/30">
-                      <p className="text-sm text-muted-foreground mb-1">{language === "it" ? "Telefono" : "Phone"}</p>
-                      <p className="font-medium flex items-center gap-2">
-                        <Phone className="w-4 h-4 text-primary" />
-                        {profile?.phone || "-"}
-                      </p>
-                    </div>
-
-                    <div className="p-4 rounded-xl border bg-muted/30">
-                      <p className="text-sm text-muted-foreground mb-1">{language === "it" ? "Account creato" : "Account created"}</p>
-                      <p className="font-medium flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-primary" />
-                        {user?.created_at ? new Date(user.created_at).toLocaleDateString(language === "it" ? "it-IT" : "en-US", {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        }) : '-'}
-                      </p>
-                    </div>
+                      
+                      <div className="pt-4 flex items-center justify-between border-t border-border/50 mt-6">
+                         <div className="text-xs text-muted-foreground flex items-center gap-1.5">
+                            <Clock className="w-3.5 h-3.5" />
+                            <span>
+                              {language === "it" ? "Registrato il" : "Joined on"} {user?.created_at ? new Date(user.created_at).toLocaleDateString(language === "it" ? "it-IT" : "en-US") : '-'}
+                            </span>
+                         </div>
+                         <Button type="submit" disabled={saving}>
+                            {saving ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                {language === "it" ? "Salvataggio..." : "Saving..."}
+                              </>
+                            ) : (
+                              <>
+                                <Save className="w-4 h-4 mr-2" />
+                                {language === "it" ? "Salva Modifiche" : "Save Changes"}
+                              </>
+                            )}
+                         </Button>
+                      </div>
+                    </form>
                   </CardContent>
                 </Card>
               </div>
@@ -1119,91 +1157,98 @@ export default function CustomerArea() {
                   </CardHeader>
                   <CardContent>
                     <form onSubmit={handleChangePassword} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="current-password">{language === "it" ? "Password attuale" : "Current password"}</Label>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                          <Input
-                            id="current-password"
-                            type="password"
-                            placeholder={language === "it" ? "La tua password attuale" : "Your current password"}
-                            className="pl-10"
-                            value={currentPassword}
-                            onChange={(e) => setCurrentPassword(e.target.value)}
-                            disabled={changingPassword}
-                          />
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="current-password">{language === "it" ? "Password attuale" : "Current password"}</Label>
+                          <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <Input
+                              id="current-password"
+                              type="password"
+                              placeholder={language === "it" ? "La tua password attuale" : "Your current password"}
+                              className="pl-9 bg-muted/30 border-border/50"
+                              value={currentPassword}
+                              onChange={(e) => setCurrentPassword(e.target.value)}
+                              disabled={changingPassword}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="new-password">{language === "it" ? "Nuova password" : "New password"}</Label>
+                              <div className="relative">
+                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                <Input
+                                  id="new-password"
+                                  type="password"
+                                  placeholder={language === "it" ? "La tua nuova password" : "Your new password"}
+                                  className="pl-9 bg-muted/30 border-border/50"
+                                  value={newPassword}
+                                  onChange={(e) => setNewPassword(e.target.value)}
+                                  disabled={changingPassword}
+                                />
+                              </div>
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label htmlFor="confirm-password">{language === "it" ? "Conferma password" : "Confirm password"}</Label>
+                              <div className="relative">
+                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                <Input
+                                  id="confirm-password"
+                                  type="password"
+                                  placeholder={language === "it" ? "Conferma la nuova password" : "Confirm your new password"}
+                                  className="pl-9 bg-muted/30 border-border/50"
+                                  value={confirmPassword}
+                                  onChange={(e) => setConfirmPassword(e.target.value)}
+                                  disabled={changingPassword}
+                                />
+                              </div>
+                            </div>
                         </div>
                       </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="new-password">{language === "it" ? "Nuova password" : "New password"}</Label>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                          <Input
-                            id="new-password"
-                            type="password"
-                            placeholder={language === "it" ? "La tua nuova password" : "Your new password"}
-                            className="pl-10"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            disabled={changingPassword}
-                          />
-                        </div>
+                      <div className="pt-2 flex justify-end">
+                        <Button 
+                          type="submit" 
+                          disabled={changingPassword || !currentPassword || !newPassword || !confirmPassword}
+                        >
+                          {changingPassword ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              {language === "it" ? "Aggiornamento..." : "Updating..."}
+                            </>
+                          ) : (
+                            <>
+                              <Save className="w-4 h-4 mr-2" />
+                              {language === "it" ? "Aggiorna password" : "Update password"}
+                            </>
+                          )}
+                        </Button>
                       </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="confirm-password">{language === "it" ? "Conferma password" : "Confirm password"}</Label>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                          <Input
-                            id="confirm-password"
-                            type="password"
-                            placeholder={language === "it" ? "Conferma la nuova password" : "Confirm your new password"}
-                            className="pl-10"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            disabled={changingPassword}
-                          />
-                        </div>
-                      </div>
-
-                      <Button 
-                        type="submit" 
-                        disabled={changingPassword || !currentPassword || !newPassword || !confirmPassword}
-                      >
-                        {changingPassword ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            {language === "it" ? "Aggiornamento..." : "Updating..."}
-                          </>
-                        ) : (
-                          <>
-                            <Save className="w-4 h-4 mr-2" />
-                            {language === "it" ? "Aggiorna password" : "Update password"}
-                          </>
-                        )}
-                      </Button>
                     </form>
                   </CardContent>
                 </Card>
 
-                {/* Delete Account */}
-                <Card className="border-destructive/50">
-                  <CardContent className="pt-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-destructive/20 bg-destructive/5">
+                {/* Delete Account - Redesigned */}
+                <div className="border border-destructive/30 rounded-xl overflow-hidden bg-destructive/5">
+                   <div className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
                       <div>
-                        <p className="font-medium text-destructive">
-                          {language === "it" ? "Elimina Account" : "Delete Account"}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {language === "it" 
-                            ? "Elimina permanentemente il tuo account e tutti i dati associati" 
-                            : "Permanently delete your account and all associated data"}
+                        <h3 className="font-semibold text-destructive flex items-center gap-2 mb-1">
+                          <AlertTriangle className="w-5 h-5" />
+                          {language === "it" ? "Zona Pericolosa" : "Danger Zone"}
+                        </h3>
+                        <p className="text-sm text-muted-foreground max-w-xl">
+                           {language === "it" 
+                            ? "Eliminando il tuo account perderai permanentemente l'accesso ai tuoi veicoli salvati e alle tue richieste di valutazione. Questa azione non può essere annullata." 
+                            : "Deleting your account will permanently remove access to your saved vehicles and valuation requests. This action cannot be undone."}
                         </p>
                       </div>
+                      
                       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                         <AlertDialogTrigger asChild>
-                          <Button variant="destructive" className="shrink-0">
+                          <Button variant="destructive" className="shrink-0 bg-destructive text-destructive-foreground hover:bg-destructive/90">
                             <Trash2 className="w-4 h-4 mr-2" />
                             {language === "it" ? "Elimina Account" : "Delete Account"}
                           </Button>
@@ -1212,31 +1257,29 @@ export default function CustomerArea() {
                           <AlertDialogHeader>
                             <AlertDialogTitle className="flex items-center gap-2">
                               <AlertTriangle className="w-5 h-5 text-destructive" />
-                              {language === "it" ? "Conferma Eliminazione Account" : "Confirm Account Deletion"}
+                              {language === "it" ? "Sei assolutamente sicuro?" : "Are you absolutely sure?"}
                             </AlertDialogTitle>
                             <AlertDialogDescription>
                               {language === "it" 
-                                ? "Questa azione è irreversibile. Tutti i tuoi dati, preferiti e richieste verranno eliminati permanentemente." 
-                                : "This action is irreversible. All your data, favorites, and requests will be permanently deleted."}
+                                ? "Questa azione è irreversibile. Digita la tua password per confermare l'eliminazione definitiva del tuo account." 
+                                : "This action cannot be undone. Please enter your password to confirm the permanent deletion of your account."}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
-                          <div className="space-y-4 py-4">
-                            <div className="space-y-2">
-                              <Label htmlFor="delete-password" className="text-sm font-medium">
-                                {language === "it" ? "Inserisci la tua password per confermare" : "Enter your password to confirm"}
-                              </Label>
-                              <div className="relative">
+                          <div className="py-4">
+                            <Label htmlFor="delete-password" className="text-sm font-medium mb-2 block">
+                                {language === "it" ? "Conferma con la tua password" : "Confirm with your password"}
+                            </Label>
+                            <div className="relative">
                                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                 <Input
                                   id="delete-password"
                                   type="password"
                                   placeholder={language === "it" ? "La tua password" : "Your password"}
-                                  className="pl-10"
+                                  className="pl-9"
                                   value={deletePassword}
                                   onChange={(e) => setDeletePassword(e.target.value)}
                                   disabled={deleting}
                                 />
-                              </div>
                             </div>
                           </div>
                           <AlertDialogFooter>
@@ -1256,16 +1299,15 @@ export default function CustomerArea() {
                               ) : (
                                 <>
                                   <Trash2 className="w-4 h-4 mr-2" />
-                                  {language === "it" ? "Elimina definitivamente" : "Delete permanently"}
+                                  {language === "it" ? "Elimina il mio account" : "Delete my account"}
                                 </>
                               )}
                             </Button>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
-                    </div>
-                  </CardContent>
-                </Card>
+                   </div>
+                </div>
 
               </div>
             )}

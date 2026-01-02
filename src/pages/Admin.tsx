@@ -714,10 +714,7 @@ export default function Admin() {
         <AdminHeader
           title={getTabTitle()}
           subtitle={getTabSubtitle()}
-          searchTerm={activeTab === "requests" ? searchTerm : undefined}
-          onSearchChange={activeTab === "requests" ? setSearchTerm : undefined}
           onMenuClick={() => setMobileMenuOpen(true)}
-          showSearch={activeTab === "requests"}
           notificationBell={
             user ? (
               <NotificationBell isAdmin userId={user.id} userEmail={user.email} />
@@ -835,102 +832,98 @@ export default function Admin() {
                         <Table>
                           <TableHeader>
                             <TableRow className="bg-secondary/50">
-                              <TableHead>Data</TableHead>
+                              <TableHead className="w-[140px]">Data</TableHead>
                               <TableHead>Veicolo</TableHead>
                               <TableHead>Contatto</TableHead>
-                              <TableHead>Prezzo Desiderato</TableHead>
-                              <TableHead>Stima / Offerta</TableHead>
-                              <TableHead>Stato</TableHead>
-                              <TableHead>Azioni</TableHead>
+                              <TableHead className="text-right">Richiesta</TableHead>
+                              <TableHead className="text-right">Offerta</TableHead>
+                              <TableHead className="w-[150px]">Stato</TableHead>
+                              <TableHead className="w-[100px]"></TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
                             {filteredRequests.map((request) => (
                               <TableRow key={request.id} className="hover:bg-secondary/30">
-                                <TableCell className="whitespace-nowrap">
-                                  <div className="flex items-center gap-2">
-                                    <Calendar className="w-4 h-4 text-muted-foreground" />
-                                    <span className="text-sm">{formatDate(request.created_at)}</span>
-                                  </div>
-                                  {request.appointment_date && (
-                                    <p className="text-xs text-primary mt-1">
-                                      📅 {formatDate(request.appointment_date)}
-                                    </p>
-                                  )}
-                                </TableCell>
-                                <TableCell>
-                                  <div className="space-y-1">
-                                    <p className="font-medium">
-                                      {request.make} {request.model}
-                                    </p>
-                                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                                      <span>{request.year}</span>
-                                      <span>{request.fuel_type}</span>
-                                      <span className="flex items-center gap-1">
-                                        <Gauge className="w-3 h-3" />
-                                        {request.mileage.toLocaleString("it-IT")} km
-                                      </span>
-                                    </div>
-                                    {request.admin_notes && (
-                                      <p className="text-xs text-primary flex items-center gap-1">
-                                        <MessageSquare className="w-3 h-3" />
-                                        Nota interna
-                                      </p>
+                                <TableCell className="py-3">
+                                  <div className="flex flex-col gap-0.5">
+                                    <span className="text-sm font-medium">
+                                      {new Date(request.created_at).toLocaleDateString("it-IT", { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                                    </span>
+                                    {request.appointment_date && (
+                                      <div className="flex items-center gap-1 text-xs text-orange-500 font-medium">
+                                        <Calendar className="w-3 h-3" />
+                                        {new Date(request.appointment_date).toLocaleDateString("it-IT", { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                                      </div>
                                     )}
                                   </div>
                                 </TableCell>
-                                <TableCell>
-                                  <div className="space-y-1">
-                                    <p className="font-medium">{request.name}</p>
-                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                      <Phone className="w-3 h-3" />
-                                      <a href={`tel:${request.phone}`} className="hover:text-primary">
+                                <TableCell className="py-3">
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+                                      <Car className="w-5 h-5 text-muted-foreground" />
+                                    </div>
+                                    <div>
+                                      <p className="font-medium text-sm">
+                                        {request.make} {request.model}
+                                      </p>
+                                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                        <span>{request.year}</span>
+                                        <span>•</span>
+                                        <span>{request.fuel_type}</span>
+                                        <span>•</span>
+                                        <span>{request.mileage.toLocaleString("it-IT")} km</span>
+                                      </div>
+                                      {request.admin_notes && (
+                                        <div className="flex items-center gap-1 text-xs text-blue-500 mt-0.5">
+                                          <MessageSquare className="w-3 h-3" />
+                                          <span className="truncate max-w-[150px]">{request.admin_notes}</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                </TableCell>
+                                <TableCell className="py-3">
+                                  <div>
+                                    <p className="text-sm font-medium">{request.name}</p>
+                                    <div className="flex flex-col text-xs text-muted-foreground">
+                                      <a href={`tel:${request.phone}`} className="hover:text-primary transition-colors">
                                         {request.phone}
                                       </a>
-                                    </div>
-                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                      <Mail className="w-3 h-3" />
-                                      <a href={`mailto:${request.email}`} className="hover:text-primary">
+                                      <a href={`mailto:${request.email}`} className="hover:text-primary transition-colors truncate max-w-[180px]">
                                         {request.email}
                                       </a>
                                     </div>
                                   </div>
                                 </TableCell>
-                                <TableCell>
+                                <TableCell className="py-3 text-right">
                                   {request.price ? (
-                                    <div className="flex items-center gap-1 text-sm font-medium text-foreground">
-                                      <Euro className="w-4 h-4 text-primary" />
+                                    <span className="text-sm font-medium">
                                       {formatCurrency(request.price)}
+                                    </span>
+                                  ) : (
+                                    <span className="text-muted-foreground text-sm">-</span>
+                                  )}
+                                </TableCell>
+                                <TableCell className="py-3 text-right">
+                                  {request.final_offer ? (
+                                    <span className="text-sm font-bold text-primary">
+                                      {formatCurrency(request.final_offer)}
+                                    </span>
+                                  ) : request.estimated_value ? (
+                                    <div className="flex flex-col items-end">
+                                      <span className="text-xs text-muted-foreground">Stima</span>
+                                      <span className="text-sm text-muted-foreground">{formatCurrency(request.estimated_value)}</span>
                                     </div>
                                   ) : (
                                     <span className="text-muted-foreground text-sm">-</span>
                                   )}
                                 </TableCell>
-                                <TableCell>
-                                  <div className="space-y-1">
-                                    {request.estimated_value && (
-                                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                                        <span>Stima:</span>
-                                        <span>{formatCurrency(request.estimated_value)}</span>
-                                      </div>
-                                    )}
-                                    {request.final_offer && (
-                                      <div className="flex items-center gap-1 font-medium text-primary">
-                                        <Euro className="w-4 h-4" />
-                                        {formatCurrency(request.final_offer)}
-                                      </div>
-                                    )}
-                                    {!request.estimated_value && !request.final_offer && (
-                                      <span className="text-muted-foreground">-</span>
-                                    )}
-                                  </div>
-                                </TableCell>
-                                <TableCell>
+                                <TableCell className="py-3">
                                   <Select
                                     value={request.status}
                                     onValueChange={(value) => updateStatus(request.id, value)}
                                   >
-                                    <SelectTrigger className={`w-32 ${statusColors[request.status]}`}>
+                                    <SelectTrigger className={`w-full h-8 text-xs ${statusColors[request.status]}`}>
                                       <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -941,11 +934,10 @@ export default function Admin() {
                                     </SelectContent>
                                   </Select>
                                 </TableCell>
-                                <TableCell>
-                                  <Button size="sm" variant="outline" className="gap-2" asChild>
+                                <TableCell className="py-3 text-right">
+                                  <Button size="icon" variant="ghost" asChild className="h-8 w-8">
                                     <Link to={`/admin/requests/${request.id}`}>
-                                      <Eye className="w-4 h-4" />
-                                      Dettagli
+                                      <Eye className="w-4 h-4 text-muted-foreground hover:text-foreground" />
                                     </Link>
                                   </Button>
                                 </TableCell>

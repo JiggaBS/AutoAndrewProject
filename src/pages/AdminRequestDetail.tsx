@@ -316,9 +316,45 @@ export default function AdminRequestDetail() {
 
       setRequest((prev) => (prev ? { ...prev, ...updates } : prev));
 
-      // Try to notify client
+      // Try to notify client via email and in-app message
       const hasUpdates = finalOffer || appointmentDate;
       if (hasUpdates) {
+        // Build the in-app message text
+        const messageParts: string[] = [];
+        
+        if (finalOffer) {
+          const offerFormatted = new Intl.NumberFormat("it-IT", {
+            style: "currency",
+            currency: "EUR",
+            maximumFractionDigits: 0,
+          }).format(parseInt(finalOffer));
+          messageParts.push(`💰 La nostra offerta: ${offerFormatted}`);
+        }
+        
+        if (appointmentDate) {
+          const dateFormatted = new Date(appointmentDate).toLocaleString("it-IT", {
+            weekday: "long",
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+          messageParts.push(`📅 Appuntamento fissato: ${dateFormatted}`);
+        }
+
+        // Send in-app system message
+        try {
+          const systemMessage = messageParts.join("\n\n");
+          await supabase.rpc("insert_system_message", {
+            p_request_id: request.id,
+            p_body: systemMessage,
+          });
+        } catch (msgError) {
+          console.error("Failed to send in-app message:", msgError);
+        }
+
+        // Send email notification
         try {
           const { error: notifyError } = await supabase.functions.invoke(
             "notify-client",
@@ -342,22 +378,22 @@ export default function AdminRequestDetail() {
           if (notifyError) {
             console.error("Failed to send notification email:", notifyError);
             toast({
-              title: "Salvato",
+              title: "Salvato e Notificato",
               description:
-                "Dati salvati, ma l'email al cliente non è stata inviata.",
+                "Messaggio inviato al cliente, ma l'email non è stata inviata.",
               variant: "default",
             });
           } else {
             toast({
               title: "Salvato e Notificato",
-              description: `Email inviata a ${request.email}`,
+              description: `Messaggio inviato al cliente ed email inviata a ${request.email}`,
             });
           }
         } catch (emailError) {
           console.error("Email notification error:", emailError);
           toast({
-            title: "Salvato",
-            description: "Modifiche salvate con successo",
+            title: "Salvato e Notificato",
+            description: "Messaggio inviato al cliente",
           });
         }
       } else {
@@ -596,134 +632,144 @@ export default function AdminRequestDetail() {
             </TabsList>
 
             {/* Details Tab */}
-            <TabsContent value="details" className="space-y-6">
-              {/* Vehicle Stats Grid */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <div className="p-4 rounded-xl bg-secondary/50 border border-border">
-                  <div className="flex items-center gap-1.5 text-muted-foreground mb-2">
-                    <Gauge className="w-3.5 h-3.5" />
-                    <span className="text-xs">Chilometri</span>
+            <TabsContent value="details" className="space-y-4">
+              
+              {/* Row 1: Vehicle Stats & Pricing */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                
+                {/* Vehicle Specs - Takes 2/3 width on large screens */}
+                <div className="lg:col-span-2 p-4 rounded-xl bg-secondary/30 border border-border">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Car className="w-4 h-4 text-primary" />
+                    <h3 className="font-medium text-sm">Dati Veicolo</h3>
                   </div>
-                  <p className="text-lg font-bold">
-                    {request.mileage.toLocaleString("it-IT")} km
-                  </p>
-                </div>
-                <div className="p-4 rounded-xl bg-secondary/50 border border-border">
-                  <div className="flex items-center gap-1.5 text-muted-foreground mb-2">
-                    <Fuel className="w-3.5 h-3.5" />
-                    <span className="text-xs">Carburante</span>
-                  </div>
-                  <p className="text-lg font-bold truncate">
-                    {request.fuel_type}
-                  </p>
-                </div>
-                <div className="p-4 rounded-xl bg-secondary/50 border border-border">
-                  <div className="flex items-center gap-1.5 text-muted-foreground mb-2">
-                    <Star className="w-3.5 h-3.5" />
-                    <span className="text-xs">Condizioni</span>
-                  </div>
-                  <p className="text-lg font-bold truncate">
-                    {conditionLabels[request.condition] || request.condition}
-                  </p>
-                </div>
-                <div className="p-4 rounded-xl bg-secondary/50 border border-border">
-                  <div className="flex items-center gap-1.5 text-muted-foreground mb-2">
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span className="text-xs">Anno</span>
-                  </div>
-                  <p className="text-lg font-bold">{request.year}</p>
-                </div>
-              </div>
+                  
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                    <div>
+                      <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
+                        <Gauge className="w-3.5 h-3.5" />
+                        <span className="text-xs">Chilometri</span>
+                      </div>
+                      <p className="text-base font-bold">
+                        {request.mileage.toLocaleString("it-IT")} km
+                      </p>
+                    </div>
 
-              {/* Pricing Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-5 rounded-xl bg-secondary/30 border border-border">
-                  <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                    <Euro className="w-4 h-4" />
-                    <span className="text-sm">Prezzo Richiesto</span>
+                    <div>
+                      <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
+                        <Fuel className="w-3.5 h-3.5" />
+                        <span className="text-xs">Carburante</span>
+                      </div>
+                      <p className="text-base font-bold truncate">
+                        {request.fuel_type}
+                      </p>
+                    </div>
+
+                    <div>
+                      <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
+                        <Star className="w-3.5 h-3.5" />
+                        <span className="text-xs">Condizioni</span>
+                      </div>
+                      <p className="text-base font-bold truncate">
+                        {conditionLabels[request.condition] || request.condition}
+                      </p>
+                    </div>
+
+                    <div>
+                      <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
+                        <Calendar className="w-3.5 h-3.5" />
+                        <span className="text-xs">Anno</span>
+                      </div>
+                      <p className="text-base font-bold">{request.year}</p>
+                    </div>
                   </div>
-                  <p className="text-2xl font-bold">
-                    {request.price ? formatCurrency(request.price) : "—"}
-                  </p>
                 </div>
-                <div className="p-5 rounded-xl bg-primary/5 border border-primary/20">
-                  <div className="flex items-center gap-2 text-primary mb-2">
-                    <Euro className="w-4 h-4" />
-                    <span className="text-sm">Offerta Finale</span>
+
+                {/* Pricing - Takes 1/3 width on large screens */}
+                <div className="p-4 rounded-xl bg-secondary/30 border border-border">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Euro className="w-4 h-4 text-primary" />
+                    <h3 className="font-medium text-sm">Valutazione</h3>
                   </div>
-                  {request.final_offer ? (
-                    <p className="text-2xl font-bold text-primary">
-                      {formatCurrency(request.final_offer)}
-                    </p>
-                  ) : (
-                    <div className="h-1 w-8 bg-primary/40 rounded-full mt-3" />
-                  )}
+
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-baseline">
+                      <span className="text-sm text-muted-foreground">Richiesto</span>
+                      <span className="text-lg font-bold">
+                        {request.price ? formatCurrency(request.price) : "—"}
+                      </span>
+                    </div>
+                    
+                    <div className="pt-3 border-t border-border flex justify-between items-baseline">
+                      <span className="text-sm font-medium text-primary">Offerta Finale</span>
+                      {request.final_offer ? (
+                        <span className="text-xl font-bold text-primary">
+                          {formatCurrency(request.final_offer)}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-muted-foreground italic">Non definita</span>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Contact Info */}
-              <div className="p-5 rounded-xl bg-secondary/30 border border-border">
-                <div className="flex items-center gap-2 text-muted-foreground mb-4">
-                  <Mail className="w-4 h-4" />
-                  <span className="text-sm font-medium">
-                    Informazioni Contatto
-                  </span>
-                </div>
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                  <div className="min-w-0">
-                    <p className="text-xl font-bold mb-2 truncate">
-                      {request.name}
-                    </p>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-muted-foreground">
-                      <a
-                        href={`tel:${request.phone}`}
-                        className="flex items-center gap-1.5 hover:text-foreground transition-colors"
-                      >
-                        <Phone className="w-4 h-4 shrink-0" />
-                        <span className="break-all">{request.phone}</span>
-                      </a>
-                      <a
-                        href={`mailto:${request.email}`}
-                        className="flex items-center gap-1.5 hover:text-foreground transition-colors min-w-0"
-                      >
-                        <Mail className="w-4 h-4 shrink-0" />
-                        <span className="break-all">{request.email}</span>
-                      </a>
-                    </div>
+              <div className="p-4 rounded-xl bg-secondary/30 border border-border">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Mail className="w-4 h-4" />
+                    <span className="text-sm font-medium">Informazioni Contatto</span>
                   </div>
                   <Button
-                    className="bg-green-600 hover:bg-green-700 text-white rounded-lg gap-2 w-full lg:w-auto shrink-0"
+                    size="sm"
+                    className="bg-green-600 hover:bg-green-700 text-white gap-2 h-8"
                     onClick={openWhatsApp}
                   >
-                    <MessageSquare className="w-4 h-4" />
+                    <MessageSquare className="w-3.5 h-3.5" />
                     WhatsApp
                   </Button>
                 </div>
-                {request.notes && (
-                  <div className="mt-4 p-4 rounded-lg bg-background/50 border border-border">
-                    <p className="text-xs text-muted-foreground mb-1">
-                      Note del cliente
-                    </p>
-                    <p className="text-sm break-words">{request.notes}</p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <p className="text-lg font-bold mb-1">{request.name}</p>
+                    <div className="space-y-1 text-sm text-muted-foreground">
+                      <a href={`tel:${request.phone}`} className="flex items-center gap-2 hover:text-foreground transition-colors">
+                        <Phone className="w-3.5 h-3.5" />
+                        {request.phone}
+                      </a>
+                      <a href={`mailto:${request.email}`} className="flex items-center gap-2 hover:text-foreground transition-colors">
+                        <Mail className="w-3.5 h-3.5" />
+                        {request.email}
+                      </a>
+                    </div>
                   </div>
-                )}
+                  
+                  {request.notes && (
+                    <div className="bg-background/50 p-3 rounded-lg border border-border text-sm">
+                      <p className="text-xs text-muted-foreground mb-1 font-medium">Note del cliente</p>
+                      <p className="italic">{request.notes}</p>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Photos */}
               {request.images && request.images.length > 0 && (
-                <div className="p-5 rounded-xl bg-secondary/30 border border-border">
-                  <div className="flex items-center gap-2 text-muted-foreground mb-4">
+                <div className="p-4 rounded-xl bg-secondary/30 border border-border">
+                  <div className="flex items-center gap-2 text-muted-foreground mb-3">
                     <ImageIcon className="w-4 h-4" />
                     <span className="text-sm font-medium">
                       Foto ({request.images.length})
                     </span>
                   </div>
-                  <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                  <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
                     {request.images.map((img, idx) => (
                       <button
                         key={idx}
                         onClick={() => setLightboxIndex(idx)}
-                        className="relative aspect-square overflow-hidden rounded-lg border-2 border-border hover:border-primary/50 transition-all group"
+                        className="relative aspect-square overflow-hidden rounded-lg border border-border hover:border-primary/50 transition-all group"
                       >
                         <img
                           src={img}
@@ -740,61 +786,45 @@ export default function AdminRequestDetail() {
               )}
 
               {/* Admin Fields */}
-              <div className="p-5 rounded-xl bg-secondary/30 border border-border space-y-4">
-                <h4 className="font-medium text-sm flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-primary" />
-                  Gestione Pratica
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="finalOffer"
-                      className="text-xs text-muted-foreground flex items-center gap-1.5"
-                    >
-                      <Euro className="w-3.5 h-3.5 text-primary" />
-                      La Mia Offerta (€)
-                    </Label>
+              <div className="p-4 rounded-xl bg-secondary/30 border border-border">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-medium text-sm flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-primary" />
+                    Gestione Pratica
+                  </h4>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-4 items-end">
+                  <div className="w-full sm:w-1/3 space-y-1.5">
+                    <Label htmlFor="finalOffer" className="text-xs text-muted-foreground">La Mia Offerta (€)</Label>
                     <Input
                       id="finalOffer"
                       type="number"
                       placeholder="Es. 15000"
                       value={finalOffer}
                       onChange={(e) => setFinalOffer(e.target.value)}
-                      className="h-11 bg-secondary/50 border-border"
+                      className="h-9 bg-secondary/50"
                     />
-                    <p className="text-xs text-muted-foreground">
-                      L'offerta che proponi al cliente.
-                    </p>
                   </div>
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="appointmentDate"
-                      className="text-xs text-muted-foreground flex items-center gap-1.5"
-                    >
-                      <Calendar className="w-3.5 h-3.5 text-primary" />
-                      Data Appuntamento
-                    </Label>
+                  
+                  <div className="w-full sm:w-1/3 space-y-1.5">
+                    <Label htmlFor="appointmentDate" className="text-xs text-muted-foreground">Data Appuntamento</Label>
                     <Input
                       id="appointmentDate"
                       type="datetime-local"
                       value={appointmentDate}
                       onChange={(e) => setAppointmentDate(e.target.value)}
-                      className="h-11 bg-secondary/50 border-border"
+                      className="h-9 bg-secondary/50"
                     />
-                    <p className="text-xs text-muted-foreground">
-                      Quando vuoi incontrare il cliente.
-                    </p>
                   </div>
-                </div>
-                <div className="flex justify-end pt-2">
+
                   <Button
-                    variant="outline"
                     onClick={handleSave}
                     disabled={isSaving}
-                    className="gap-2"
+                    className="w-full sm:w-auto gap-2 h-9 ml-auto"
                   >
                     <Save className="w-4 h-4" />
-                    {isSaving ? "Salvataggio..." : "Salva Modifiche"}
+                    {isSaving ? "..." : "Salva"}
                   </Button>
                 </div>
               </div>

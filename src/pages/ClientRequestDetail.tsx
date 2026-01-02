@@ -360,118 +360,158 @@ export default function ClientRequestDetail() {
               <div className="min-h-[500px]">
             {/* Details Tab */}
             {activeTab === "details" && (
-              <div className="h-full overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
-                {/* Vehicle Details */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <div className="p-3 rounded-xl bg-muted/50">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Gauge className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">{language === "it" ? "Chilometraggio" : "Mileage"}</span>
+              <div className="h-full overflow-y-auto p-4 sm:p-6 space-y-6">
+                
+                {/* Top Section: Two Columns on Desktop */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  
+                  {/* Left Column: Vehicle Specs (2/3 width) */}
+                  <div className="lg:col-span-2 space-y-6">
+                    {/* Specs Grid */}
+                    <div className="bg-muted/30 rounded-xl p-5 border border-border/50">
+                      <h3 className="font-semibold mb-4 flex items-center gap-2">
+                        <Car className="w-4 h-4 text-primary" />
+                        {language === "it" ? "Dati Veicolo" : "Vehicle Data"}
+                      </h3>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-6 gap-x-4">
+                        <div>
+                          <div className="flex items-center gap-1.5 text-muted-foreground mb-1.5">
+                            <Gauge className="w-3.5 h-3.5" />
+                            <span className="text-xs">{language === "it" ? "Chilometri" : "Mileage"}</span>
+                          </div>
+                          <p className="font-semibold text-lg">{request.mileage.toLocaleString()} km</p>
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-1.5 text-muted-foreground mb-1.5">
+                            <Fuel className="w-3.5 h-3.5" />
+                            <span className="text-xs">{language === "it" ? "Carburante" : "Fuel"}</span>
+                          </div>
+                          <p className="font-semibold text-lg">{request.fuel_type}</p>
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-1.5 text-muted-foreground mb-1.5">
+                            <Info className="w-3.5 h-3.5" />
+                            <span className="text-xs">{language === "it" ? "Condizioni" : "Condition"}</span>
+                          </div>
+                          <p className="font-semibold text-lg">{conditionLabels[request.condition]}</p>
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-1.5 text-muted-foreground mb-1.5">
+                            <Calendar className="w-3.5 h-3.5" />
+                            <span className="text-xs">{language === "it" ? "Immatricolazione" : "Year"}</span>
+                          </div>
+                          <p className="font-semibold text-lg">{request.year}</p>
+                        </div>
+                      </div>
                     </div>
-                    <p className="font-bold">{request.mileage.toLocaleString()} km</p>
+
+                    {/* Photos Gallery */}
+                    {request.images && request.images.length > 0 && (
+                      <div className="bg-muted/30 rounded-xl p-5 border border-border/50">
+                        <h3 className="font-semibold mb-4 flex items-center gap-2">
+                          <ImageIcon className="w-4 h-4 text-primary" />
+                          {language === "it" ? "Foto" : "Photos"} <span className="text-muted-foreground font-normal">({request.images.length})</span>
+                        </h3>
+                        <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
+                          {request.images.map((image, index) => (
+                            <button
+                              key={index}
+                              onClick={() => setSelectedImage(image)}
+                              className="aspect-square rounded-lg overflow-hidden border border-border/50 hover:border-primary/50 transition-all hover:shadow-md group relative"
+                            >
+                              <img 
+                                src={image} 
+                                alt={`${request.make} ${request.model} - ${index + 1}`}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                              />
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                     {/* Notes */}
+                     {request.notes && (
+                      <div className="bg-muted/30 rounded-xl p-5 border border-border/50">
+                        <h3 className="font-semibold mb-2 flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-primary" />
+                          {language === "it" ? "Note Aggiuntive" : "Additional Notes"}
+                        </h3>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{request.notes}</p>
+                      </div>
+                    )}
                   </div>
-                  <div className="p-3 rounded-xl bg-muted/50">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Fuel className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">{language === "it" ? "Carburante" : "Fuel"}</span>
-                    </div>
-                    <p className="font-bold">{request.fuel_type}</p>
+
+                  {/* Right Column: Status & Offer (1/3 width) */}
+                  <div className="space-y-6">
+                     {/* Status Card */}
+                     <div className="bg-muted/30 rounded-xl p-5 border border-border/50 space-y-4">
+                        <h3 className="font-semibold flex items-center gap-2">
+                          <Info className="w-4 h-4 text-primary" />
+                          {language === "it" ? "Stato Pratica" : "Request Status"}
+                        </h3>
+                        
+                        <div className="flex items-center justify-between p-3 rounded-lg bg-background border border-border/50">
+                          <span className="text-sm text-muted-foreground">{language === "it" ? "Data invio" : "Sent date"}</span>
+                          <span className="font-medium">{new Date(request.created_at).toLocaleDateString(language === "it" ? "it-IT" : "en-US")}</span>
+                        </div>
+
+                        {request.appointment_date && (
+                          <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
+                            <div className="flex items-start gap-3">
+                              <Calendar className="w-5 h-5 text-primary mt-0.5" />
+                              <div>
+                                <p className="text-xs font-semibold uppercase tracking-wider text-primary/80 mb-1">
+                                  {language === "it" ? "Appuntamento" : "Appointment"}
+                                </p>
+                                <p className="font-bold text-primary text-lg">
+                                  {new Date(request.appointment_date).toLocaleDateString(language === "it" ? "it-IT" : "en-US", {
+                                    weekday: 'short', day: 'numeric', month: 'long'
+                                  })}
+                                </p>
+                                <p className="text-primary/80">
+                                   {new Date(request.appointment_date).toLocaleTimeString(language === "it" ? "it-IT" : "en-US", {
+                                    hour: '2-digit', minute: '2-digit'
+                                  })}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                     </div>
+
+                     {/* Valuation Card */}
+                     <div className="bg-muted/30 rounded-xl p-5 border border-border/50 space-y-4">
+                        <h3 className="font-semibold flex items-center gap-2">
+                          <Euro className="w-4 h-4 text-primary" />
+                          {language === "it" ? "Valutazione" : "Valuation"}
+                        </h3>
+
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-end pb-3 border-b border-border/50">
+                            <span className="text-sm text-muted-foreground">{language === "it" ? "Tua richiesta" : "Your request"}</span>
+                            <span className="font-semibold text-lg">
+                              {request.price ? `€${request.price.toLocaleString()}` : "—"}
+                            </span>
+                          </div>
+                          
+                          <div className="pt-1">
+                             <span className="text-sm text-muted-foreground block mb-1">{language === "it" ? "Nostra offerta" : "Our offer"}</span>
+                             {request.final_offer ? (
+                               <div className="text-3xl font-bold text-green-600">
+                                 €{request.final_offer.toLocaleString()}
+                               </div>
+                             ) : (
+                               <div className="text-sm italic text-muted-foreground">
+                                 {language === "it" ? "In elaborazione..." : "Processing..."}
+                               </div>
+                             )}
+                          </div>
+                        </div>
+                     </div>
                   </div>
-                  <div className="p-3 rounded-xl bg-muted/50">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Car className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">{language === "it" ? "Condizioni" : "Condition"}</span>
-                    </div>
-                    <p className="font-bold">{conditionLabels[request.condition]}</p>
-                  </div>
-                  <div className="p-3 rounded-xl bg-muted/50">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Calendar className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">{language === "it" ? "Data richiesta" : "Request date"}</span>
-                    </div>
-                    <p className="font-bold">{new Date(request.created_at).toLocaleDateString(language === "it" ? "it-IT" : "en-US")}</p>
-                  </div>
+
                 </div>
-
-                {/* Price/Offer Section */}
-                {(request.price || request.final_offer) && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {request.price && (
-                      <div className="p-4 rounded-xl bg-muted/30 border">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Euro className="w-4 h-4 text-muted-foreground" />
-                          <p className="text-xs text-muted-foreground">{language === "it" ? "Prezzo richiesto" : "Requested price"}</p>
-                        </div>
-                        <p className="text-xl font-bold">€{request.price.toLocaleString()}</p>
-                      </div>
-                    )}
-                    {request.final_offer && (
-                      <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Euro className="w-4 h-4 text-green-600" />
-                          <p className="text-xs text-green-600">{language === "it" ? "Offerta finale" : "Final offer"}</p>
-                        </div>
-                        <p className="text-xl font-bold text-green-600">€{request.final_offer.toLocaleString()}</p>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Notes */}
-                {request.notes && (
-                  <div className="p-4 rounded-xl bg-muted/30 border">
-                    <div className="flex items-center gap-2 mb-2">
-                      <FileText className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm font-medium">{language === "it" ? "Note" : "Notes"}</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{request.notes}</p>
-                  </div>
-                )}
-
-                {/* Photos */}
-                {request.images && request.images.length > 0 && (
-                  <div className="p-4 rounded-xl bg-muted/30 border">
-                    <div className="flex items-center gap-2 mb-3">
-                      <ImageIcon className="w-4 h-4 text-primary" />
-                      <h4 className="font-semibold text-sm">{language === "it" ? "Foto" : "Photos"} ({request.images.length})</h4>
-                    </div>
-                    <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
-                      {request.images.map((image, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setSelectedImage(image)}
-                          className="aspect-square rounded-lg overflow-hidden border border-border/50 hover:border-primary/50 transition-colors"
-                        >
-                          <img 
-                            src={image} 
-                            alt={`${request.make} ${request.model} - ${index + 1}`}
-                            className="w-full h-full object-cover"
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Appointment */}
-                {request.appointment_date && (
-                  <div className="p-4 rounded-xl bg-primary/10 border border-primary/20">
-                    <div className="flex items-center gap-3">
-                      <Calendar className="w-5 h-5 text-primary" />
-                      <div>
-                        <p className="text-xs text-muted-foreground">{language === "it" ? "Appuntamento fissato" : "Appointment scheduled"}</p>
-                        <p className="font-bold text-primary">
-                          {new Date(request.appointment_date).toLocaleDateString(language === "it" ? "it-IT" : "en-US", {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                          })}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
 

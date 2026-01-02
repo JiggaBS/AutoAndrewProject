@@ -129,13 +129,14 @@ const Listings = forwardRef<HTMLDivElement>((props, ref) => {
     }
 
     // Filter by year
-    if (activeFilters.yearFrom) {
-      const yearFrom = parseInt(activeFilters.yearFrom);
+    if (activeFilters.yearFrom || activeFilters.yearTo) {
+      const yearFrom = activeFilters.yearFrom ? parseInt(activeFilters.yearFrom) : 0;
+      const yearTo = activeFilters.yearTo ? parseInt(activeFilters.yearTo) : 9999;
       result = result.filter((v) => {
         const match = v.first_registration_date?.match(/(\d{4})/);
         if (match) {
           const vehicleYear = parseInt(match[1]);
-          return vehicleYear >= yearFrom;
+          return vehicleYear >= yearFrom && vehicleYear <= yearTo;
         }
         return true;
       });
@@ -155,11 +156,12 @@ const Listings = forwardRef<HTMLDivElement>((props, ref) => {
     }
 
     // Filter by mileage
-    if (activeFilters.mileageMax) {
-      const maxMileage = parseInt(activeFilters.mileageMax);
+    if (activeFilters.mileageMin || activeFilters.mileageMax) {
+      const minMileage = activeFilters.mileageMin ? parseInt(activeFilters.mileageMin) : 0;
+      const maxMileage = activeFilters.mileageMax ? parseInt(activeFilters.mileageMax) : 9999999;
       result = result.filter((v) => {
         const mileage = parseInt(v.mileage?.replace(/\D/g, "") || "0");
-        return mileage <= maxMileage;
+        return mileage >= minMileage && mileage <= maxMileage;
       });
     }
 

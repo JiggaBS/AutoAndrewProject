@@ -39,7 +39,8 @@ export function AdminStats({ requests, onStatusFilter }: AdminStatsProps) {
       icon: Clock,
       trend: "Da gestire",
       highlight: false,
-      color: "warning",
+      color: "text-yellow-500",
+      bgColor: "bg-yellow-500/10",
       filterStatus: "pending",
     },
     {
@@ -48,7 +49,8 @@ export function AdminStats({ requests, onStatusFilter }: AdminStatsProps) {
       icon: CheckCircle2,
       trend: "Questo mese",
       highlight: false,
-      color: "success",
+      color: "text-green-500",
+      bgColor: "bg-green-500/10",
       filterStatus: "completed",
     },
     {
@@ -57,7 +59,8 @@ export function AdminStats({ requests, onStatusFilter }: AdminStatsProps) {
       icon: TrendingUp,
       trend: "In corso",
       highlight: false,
-      color: "blue",
+      color: "text-blue-500",
+      bgColor: "bg-blue-500/10",
       filterStatus: "contacted",
     },
   ];
@@ -70,8 +73,10 @@ export function AdminStats({ requests, onStatusFilter }: AdminStatsProps) {
           <Card
             key={stat.label}
             className={cn(
-              "relative overflow-hidden transition-all duration-300 hover:shadow-lg",
-              stat.highlight && "bg-primary text-primary-foreground border-primary"
+              "relative overflow-hidden transition-all duration-300 hover:shadow-lg border-l-4",
+              stat.highlight 
+                ? "bg-primary text-primary-foreground border-l-primary border-t-0 border-r-0 border-b-0" 
+                : cn("border-t-0 border-r-0 border-b-0", stat.color?.replace("text-", "border-"))
             )}
           >
             <CardContent className="p-3 lg:p-6">
@@ -91,7 +96,7 @@ export function AdminStats({ requests, onStatusFilter }: AdminStatsProps) {
                     "p-1.5 lg:p-2 rounded-lg transition-colors hidden sm:flex",
                     stat.highlight 
                       ? "bg-primary-foreground/20 hover:bg-primary-foreground/30" 
-                      : "bg-secondary hover:bg-secondary/80"
+                      : cn("bg-secondary hover:bg-secondary/80", stat.color)
                   )}
                 >
                   <ArrowUpRight className="w-3 h-3 lg:w-4 lg:h-4" />
@@ -101,7 +106,7 @@ export function AdminStats({ requests, onStatusFilter }: AdminStatsProps) {
                 "flex items-center gap-1 lg:gap-2 text-xs lg:text-sm",
                 stat.highlight ? "text-primary-foreground/80" : "text-muted-foreground"
               )}>
-                <Icon className="w-3 h-3 lg:w-4 lg:h-4" />
+                <Icon className={cn("w-3 h-3 lg:w-4 lg:h-4", !stat.highlight && stat.color)} />
                 <span className="truncate">{stat.trend}</span>
               </div>
               {stat.highlight && (

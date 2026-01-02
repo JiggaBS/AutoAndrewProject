@@ -193,6 +193,42 @@ export function RequestDetailDialog({ request, onUpdateStatus, onUpdateRequest, 
 
     const hasUpdates = finalOffer || appointmentDate;
     if (hasUpdates) {
+      // Build the in-app message text
+      const messageParts: string[] = [];
+      
+      if (finalOffer) {
+        const offerFormatted = new Intl.NumberFormat("it-IT", {
+          style: "currency",
+          currency: "EUR",
+          maximumFractionDigits: 0,
+        }).format(parseInt(finalOffer));
+        messageParts.push(`💰 La nostra offerta: ${offerFormatted}`);
+      }
+      
+      if (appointmentDate) {
+        const dateFormatted = new Date(appointmentDate).toLocaleString("it-IT", {
+          weekday: "long",
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        messageParts.push(`📅 Appuntamento fissato: ${dateFormatted}`);
+      }
+
+      // Send in-app system message
+      try {
+        const systemMessage = messageParts.join("\n\n");
+        await supabase.rpc("insert_system_message", {
+          p_request_id: request.id,
+          p_body: systemMessage,
+        });
+      } catch (msgError) {
+        console.error("Failed to send in-app message:", msgError);
+      }
+
+      // Send email notification
       try {
         const { error } = await supabase.functions.invoke("notify-client", {
           body: {
@@ -211,18 +247,22 @@ export function RequestDetailDialog({ request, onUpdateStatus, onUpdateRequest, 
         if (error) {
           console.error("Failed to send notification email:", error);
           toast({
-            title: "Salvato",
-            description: "Dati salvati, ma l'email al cliente non è stata inviata.",
+            title: "Salvato e Notificato",
+            description: "Messaggio inviato al cliente, ma l'email non è stata inviata.",
             variant: "default",
           });
         } else {
           toast({
             title: "Salvato e Notificato",
-            description: `Email inviata a ${request.email}`,
+            description: `Messaggio inviato al cliente ed email inviata a ${request.email}`,
           });
         }
       } catch (emailError) {
         console.error("Email notification error:", emailError);
+        toast({
+          title: "Salvato e Notificato",
+          description: "Messaggio inviato al cliente",
+        });
       }
     } else {
       toast({
