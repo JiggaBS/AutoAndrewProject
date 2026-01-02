@@ -110,6 +110,12 @@ export function ImageLightbox({ images, initialIndex, onClose }: ImageLightboxPr
 
   // Touch handlers for swipe and pinch-to-zoom
   const handleTouchStart = (e: React.TouchEvent) => {
+    // Don't handle touches on buttons or header
+    const target = e.target as HTMLElement;
+    if (target.closest('button') || target.closest('[class*="absolute top-0"]')) {
+      return;
+    }
+
     // Pinch-to-zoom: two fingers
     if (e.touches.length === 2) {
       e.preventDefault();
@@ -126,6 +132,13 @@ export function ImageLightbox({ images, initialIndex, onClose }: ImageLightboxPr
     if (scale <= 1) {
       setTouchEnd(null);
       setTouchStart(e.targetTouches[0].clientX);
+      // Also track Y for vertical swipe to close
+      if (e.targetTouches[0].clientY) {
+        setDragStart({ 
+          x: e.targetTouches[0].clientX, 
+          y: e.targetTouches[0].clientY 
+        });
+      }
     } else {
       // Panning when zoomed
       setIsDragging(true);
@@ -169,6 +182,12 @@ export function ImageLightbox({ images, initialIndex, onClose }: ImageLightboxPr
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
+    // Don't handle touches on buttons or header
+    const target = e.target as HTMLElement;
+    if (target.closest('button') || target.closest('[class*="absolute top-0"]')) {
+      return;
+    }
+
     // End pinch-to-zoom
     if (isPinching) {
       setInitialPinchDistance(null);
@@ -186,12 +205,26 @@ export function ImageLightbox({ images, initialIndex, onClose }: ImageLightboxPr
     }
 
     // End panning
-    if (isDragging) {
+    if (isDragging && scale > 1) {
       setIsDragging(false);
       return;
     }
 
-    // Swipe navigation
+    // Check for vertical swipe down to close (when not zoomed and single finger)
+    if (scale <= 1 && touchStart && dragStart.y && e.changedTouches[0]) {
+      const verticalDistance = e.changedTouches[0].clientY - dragStart.y;
+      const horizontalDistance = Math.abs(e.changedTouches[0].clientX - dragStart.x);
+      
+      // If swiped down significantly more than horizontally, close
+      if (verticalDistance > 100 && verticalDistance > horizontalDistance * 2) {
+        onClose();
+        setTouchStart(null);
+        setTouchEnd(null);
+        return;
+      }
+    }
+
+    // Swipe navigation (horizontal)
     if (!touchStart || !touchEnd || scale > 1) {
       setTouchStart(null);
       setTouchEnd(null);
@@ -263,16 +296,25 @@ export function ImageLightbox({ images, initialIndex, onClose }: ImageLightboxPr
     }
   };
 
-  const handleClose = (e: React.MouseEvent) => {
+  const handleBackdropTouch = (e: React.TouchEvent) => {
     e.stopPropagation();
+    if (e.target === containerRef.current) {
+      onClose();
+    }
+  };
+
+  const handleClose = (e: React.MouseEvent | React.TouchEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     onClose();
   };
 
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center touch-none"
+      className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center"
       onClick={handleBackdropClick}
+      onTouchStart={handleBackdropTouch}
       onMouseDown={(e) => e.stopPropagation()}
     >
       {/* Header */}
@@ -288,29 +330,37 @@ export function ImageLightbox({ images, initialIndex, onClose }: ImageLightboxPr
         <div className="flex items-center gap-2">
           <button
             onClick={zoomOut}
+            onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); if (scale > 1) zoomOut(); }}
             disabled={scale <= 1}
-            className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            className="p-3 sm:p-2 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 transition-colors disabled:opacity-30 disabled:cursor-not-allowed touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
+            aria-label="Zoom out"
           >
-            <ZoomOut className="w-5 h-5 text-white" />
+            <ZoomOut className="w-6 h-6 sm:w-5 sm:h-5 text-white" />
           </button>
           <button
             onClick={zoomIn}
+            onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); if (scale < 4) zoomIn(); }}
             disabled={scale >= 4}
-            className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            className="p-3 sm:p-2 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 transition-colors disabled:opacity-30 disabled:cursor-not-allowed touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
+            aria-label="Zoom in"
           >
-            <ZoomIn className="w-5 h-5 text-white" />
+            <ZoomIn className="w-6 h-6 sm:w-5 sm:h-5 text-white" />
           </button>
           <button
             onClick={handleDownload}
-            className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+            onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); handleDownload(); }}
+            className="p-3 sm:p-2 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 transition-colors touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
+            aria-label="Download"
           >
-            <Download className="w-5 h-5 text-white" />
+            <Download className="w-6 h-6 sm:w-5 sm:h-5 text-white" />
           </button>
           <button
             onClick={handleClose}
-            className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+            onTouchEnd={handleClose}
+            className="p-3 sm:p-2 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 transition-colors touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
+            aria-label="Close"
           >
-            <X className="w-5 h-5 text-white" />
+            <X className="w-6 h-6 sm:w-5 sm:h-5 text-white" />
           </button>
         </div>
       </div>
@@ -320,13 +370,17 @@ export function ImageLightbox({ images, initialIndex, onClose }: ImageLightboxPr
         <>
           <button
             onClick={goToPrevious}
-            className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors z-10"
+            onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); goToPrevious(); }}
+            className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-3 sm:p-3 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 transition-colors z-10 touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
+            aria-label="Previous image"
           >
             <ChevronLeft className="w-6 h-6 text-white" />
           </button>
           <button
             onClick={goToNext}
-            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors z-10"
+            onTouchEnd={(e) => { e.preventDefault(); e.stopPropagation(); goToNext(); }}
+            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-3 sm:p-3 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/30 transition-colors z-10 touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
+            aria-label="Next image"
           >
             <ChevronRight className="w-6 h-6 text-white" />
           </button>
@@ -348,6 +402,7 @@ export function ImageLightbox({ images, initialIndex, onClose }: ImageLightboxPr
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
         onDoubleClick={handleDoubleClick}
+        onClick={(e) => e.stopPropagation()}
       >
         <img
           src={currentImage.url}
