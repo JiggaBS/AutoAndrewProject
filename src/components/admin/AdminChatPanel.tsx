@@ -24,24 +24,31 @@ function groupMessagesByDate(messages: Message[]): Map<string, Message[]> {
   const groups = new Map<string, Message[]>();
   
   messages.forEach((message) => {
-    const date = new Date(message.created_at).toLocaleDateString();
-    const existing = groups.get(date) || [];
-    groups.set(date, [...existing, message]);
+    // Use ISO date string (YYYY-MM-DD) for consistent grouping
+    const date = new Date(message.created_at);
+    const dateKey = date.toISOString().split('T')[0];
+    const existing = groups.get(dateKey) || [];
+    groups.set(dateKey, [...existing, message]);
   });
   
   return groups;
 }
 
 function formatDateSeparator(dateStr: string): string {
-  const date = new Date(dateStr);
+  // dateStr is now in YYYY-MM-DD format
+  const date = new Date(dateStr + 'T00:00:00');
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
 
-  if (date.toDateString() === today.toDateString()) {
+  const dateOnly = new Date(date);
+  dateOnly.setHours(0, 0, 0, 0);
+
+  if (dateOnly.getTime() === today.getTime()) {
     return 'Oggi';
   }
-  if (date.toDateString() === yesterday.toDateString()) {
+  if (dateOnly.getTime() === yesterday.getTime()) {
     return 'Ieri';
   }
   
