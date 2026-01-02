@@ -1,4 +1,5 @@
-import { Car, BarChart3, Users, Activity, Settings, LogOut, LayoutDashboard, HelpCircle } from "lucide-react";
+import { Car, BarChart3, Users, Activity, Settings, LogOut, LayoutDashboard, HelpCircle, Home } from "lucide-react";
+import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 interface AdminSidebarProps {
   activeTab: string;
@@ -50,6 +51,13 @@ export function AdminSidebar({
             <p className="text-xs text-muted-foreground">Admin Panel</p>
           </div>
         </div>
+        <Link 
+          to="/" 
+          className="mt-3 flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <Home className="w-3.5 h-3.5" />
+          <span>Home</span>
+        </Link>
       </div>
 
       {/* Menu Section */}
