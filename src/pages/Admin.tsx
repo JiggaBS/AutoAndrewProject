@@ -242,11 +242,15 @@ export default function Admin() {
         throw error;
       }
 
-      console.log(`Fetched ${data?.length || 0} requests (total in DB: ${count || 0})`);
+      if (import.meta.env.DEV) {
+        console.log(`Fetched ${data?.length || 0} requests (total in DB: ${count || 0})`);
+      }
       setRequests((data as ValuationRequest[]) || []);
       
       if (data && data.length === 0 && count === 0) {
-        console.log("No requests found in database");
+        if (import.meta.env.DEV) {
+          console.log("No requests found in database");
+        }
       }
     } catch (error) {
       console.error("Fetch error:", error);
@@ -765,7 +769,9 @@ export default function Admin() {
                             const { data, error, count } = await supabase
                               .from("valuation_requests")
                               .select("*", { count: "exact", head: false });
-                            console.log("Debug query result:", { data, error, count });
+                            if (import.meta.env.DEV) {
+                              console.log("Debug query result:", { data, error, count });
+                            }
                             toast({
                               title: "Debug Info",
                               description: `Found ${count || 0} requests. Check console for details.`,

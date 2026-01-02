@@ -24,16 +24,20 @@ async function getSignedUrl(filePath: string): Promise<string | null> {
 
     const { data, error } = await supabase.storage
       .from('chat-attachments')
-      .createSignedUrl(path, 60 * 60 * 24 * 365); // 1 year
+      .createSignedUrl(path, 60 * 60 * 24); // 24 hours
 
     if (error) {
-      console.error('Error generating signed URL:', error);
+      if (import.meta.env.DEV) {
+        console.error('Error generating signed URL:', error);
+      }
       return null;
     }
 
     return data?.signedUrl || null;
   } catch (error) {
-    console.error('Error generating signed URL:', error);
+    if (import.meta.env.DEV) {
+      console.error('Error generating signed URL:', error);
+    }
     return null;
   }
 }
@@ -126,10 +130,10 @@ export function AttachmentPicker({
 
         if (uploadError) throw uploadError;
 
-        // Generate signed URL for private bucket (1 year expiry)
+        // Generate signed URL for private bucket (24 hours expiry)
         const { data: signedUrlData, error: signedUrlError } = await supabase.storage
           .from('chat-attachments')
-          .createSignedUrl(filePath, 60 * 60 * 24 * 365); // 1 year
+          .createSignedUrl(filePath, 60 * 60 * 24); // 24 hours
 
         if (signedUrlError) throw signedUrlError;
 

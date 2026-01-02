@@ -28,14 +28,18 @@ export const GoogleAnalytics = () => {
             }
           }
         } catch (err) {
-          console.warn("Failed to fetch GA config from backend:", err);
+          if (import.meta.env.DEV) {
+            console.warn("Failed to fetch GA config from backend:", err);
+          }
         }
       }
 
       if (cancelled) return;
 
       if (!measurementId) {
-        console.warn("Google Analytics Measurement ID non configurato (VITE_GA_MEASUREMENT_ID).");
+        if (import.meta.env.DEV) {
+          console.warn("Google Analytics Measurement ID non configurato (VITE_GA_MEASUREMENT_ID).");
+        }
         return;
       }
 

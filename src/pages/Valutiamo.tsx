@@ -362,7 +362,9 @@ export default function Valutiamo() {
       const trackingCode = resultId ? String(resultId).substring(0, 8).toUpperCase() : null;
       
       if (!trackingCode) {
-        console.warn("No tracking code received from server:", result);
+        if (import.meta.env.DEV) {
+          console.warn("No tracking code received from server:", result);
+        }
         // Still show success but without tracking code
       }
       

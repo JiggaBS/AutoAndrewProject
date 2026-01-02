@@ -46,7 +46,9 @@ export class ErrorBoundary extends Component<Props, State> {
       });
     } catch (sentryError) {
       // Sentry not initialized or error sending to Sentry
-      console.warn('Failed to send error to Sentry:', sentryError);
+      if (import.meta.env.DEV) {
+        console.warn('Failed to send error to Sentry:', sentryError);
+      }
     }
   }
 

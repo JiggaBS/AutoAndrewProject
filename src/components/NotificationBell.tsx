@@ -156,7 +156,9 @@ export function NotificationBell({ isAdmin, userId, userEmail }: NotificationBel
         const { error } = await supabase.rpc("mark_thread_read", { p_request_id: requestId });
         if (error) throw error;
       } catch (e) {
-        console.warn("[NotificationBell] mark_thread_read failed", e);
+        if (import.meta.env.DEV) {
+          console.warn("[NotificationBell] mark_thread_read failed", e);
+        }
       }
     },
     []
