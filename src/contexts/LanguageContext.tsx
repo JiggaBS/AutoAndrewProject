@@ -761,7 +761,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Listings Page
     "listings.title": "Our Vehicles",
     "listings.subtitle": "Browse our selection of guaranteed used cars",
-    "listings.filters.brand": "Brand",
+    "listings.filters.brand": "Make",
     "listings.filters.model": "Model",
     "listings.filters.price": "Price",
     "listings.filters.year": "Year",
