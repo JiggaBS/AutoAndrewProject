@@ -144,7 +144,9 @@ const Listings = forwardRef<HTMLDivElement>((props, ref) => {
     // Filter by transmissions
     if (filters.transmissions.length > 0) {
       result = result.filter((v) => {
-        const normalized = v.gearbox?.toLowerCase().includes("auto") ? "Automatico" : "Manuale";
+        const normalized = v.gearbox?.toLowerCase().includes("auto") 
+          ? (language === "it" ? "Automatico" : "Automatic")
+          : (language === "it" ? "Manuale" : "Manual");
         return filters.transmissions.includes(normalized);
       });
     }
@@ -401,27 +403,27 @@ const Listings = forwardRef<HTMLDivElement>((props, ref) => {
               <FilterSidebar 
                 facets={facets}
                 translations={{
-                  filters: "Filtri",
-                  resetFilters: t("listings.filters.reset") || "Reset filtri",
-                  make: t("listings.filters.brand") || "Marca",
-                  model: t("listings.filters.model") || "Modello",
-                  price: t("listings.filters.price") || "Prezzo",
-                  priceMin: "Prezzo minimo",
-                  priceMax: "Prezzo massimo",
-                  bodyType: "Carrozzeria",
-                  fuel: t("listings.filters.fuel") || "Carburante",
-                  transmission: "Cambio",
-                  year: t("listings.filters.year") || "Anno",
-                  yearFrom: "Da anno",
-                  yearTo: "A anno",
-                  mileage: t("listings.filters.km") || "Chilometraggio",
-                  mileageMin: "Chilometraggio minimo",
-                  mileageMax: "Chilometraggio massimo",
-                  power: "Potenza",
-                  powerMin: "Potenza minima",
-                  powerMax: "Potenza massima",
-                  doors: "Porte",
-                  colors: "Colori",
+                  filters: t("filters.label"),
+                  resetFilters: t("listings.filters.reset"),
+                  make: t("listings.filters.brand"),
+                  model: t("listings.filters.model"),
+                  price: t("listings.filters.price"),
+                  priceMin: t("filters.priceMin"),
+                  priceMax: t("filters.priceMax"),
+                  bodyType: t("filters.bodyType"),
+                  fuel: t("listings.filters.fuel"),
+                  transmission: t("filters.transmission"),
+                  year: t("listings.filters.year"),
+                  yearFrom: t("filters.yearFrom"),
+                  yearTo: t("filters.yearTo"),
+                  mileage: t("listings.filters.km"),
+                  mileageMin: t("filters.mileageMin"),
+                  mileageMax: t("filters.mileageMax"),
+                  power: t("filters.power"),
+                  powerMin: t("filters.powerMin"),
+                  powerMax: t("filters.powerMax"),
+                  doors: t("filters.doors"),
+                  colors: t("filters.colors"),
                 }}
               />
             </div>
@@ -441,7 +443,7 @@ const Listings = forwardRef<HTMLDivElement>((props, ref) => {
                     className="flex-shrink-0 min-h-[44px]"
                   >
                     <SlidersHorizontal className="h-4 w-4 mr-2" />
-                    Filtri
+                    {t("filters.label")}
                   </Button>
                   <span className="text-sm text-muted-foreground dark:text-[#888] truncate">
                     {sortedVehicles.length} {language === "it" ? "veicoli" : "vehicles"}
@@ -490,7 +492,7 @@ const Listings = forwardRef<HTMLDivElement>((props, ref) => {
                     onClick={() => setMobileFiltersOpen(true)}
                   >
                     <SlidersHorizontal className="h-4 w-4 mr-2" />
-                    Filtri
+                    {t("filters.label")}
                   </Button>
                   <h1 className="text-lg font-bold text-black dark:text-white">
                     {sortedVehicles.length} {language === "it" ? "veicoli" : "vehicles"}
@@ -567,28 +569,28 @@ const Listings = forwardRef<HTMLDivElement>((props, ref) => {
           onClose={() => setMobileFiltersOpen(false)}
           facets={facets}
           translations={{
-            filters: "Filtri",
-            resetFilters: t("listings.filters.reset") || "Reset filtri",
-            applyFilters: t("listings.filters.apply") || "Applica filtri",
-            make: t("listings.filters.brand") || "Marca",
-            model: t("listings.filters.model") || "Modello",
-            price: t("listings.filters.price") || "Prezzo",
-            priceMin: "Prezzo minimo",
-            priceMax: "Prezzo massimo",
-            bodyType: "Carrozzeria",
-            fuel: t("listings.filters.fuel") || "Carburante",
-            transmission: "Cambio",
-            year: t("listings.filters.year") || "Anno",
-            yearFrom: "Da anno",
-            yearTo: "A anno",
-            mileage: t("listings.filters.km") || "Chilometraggio",
-            mileageMin: "Chilometraggio minimo",
-            mileageMax: "Chilometraggio massimo",
-            power: "Potenza",
-            powerMin: "Potenza minima",
-            powerMax: "Potenza massima",
-            doors: "Porte",
-            colors: "Colori",
+            filters: t("filters.label"),
+            resetFilters: t("listings.filters.reset"),
+            applyFilters: t("listings.filters.apply"),
+            make: t("listings.filters.brand"),
+            model: t("listings.filters.model"),
+            price: t("listings.filters.price"),
+            priceMin: t("filters.priceMin"),
+            priceMax: t("filters.priceMax"),
+            bodyType: t("filters.bodyType"),
+            fuel: t("listings.filters.fuel"),
+            transmission: t("filters.transmission"),
+            year: t("listings.filters.year"),
+            yearFrom: t("filters.yearFrom"),
+            yearTo: t("filters.yearTo"),
+            mileage: t("listings.filters.km"),
+            mileageMin: t("filters.mileageMin"),
+            mileageMax: t("filters.mileageMax"),
+            power: t("filters.power"),
+            powerMin: t("filters.powerMin"),
+            powerMax: t("filters.powerMax"),
+            doors: t("filters.doors"),
+            colors: t("filters.colors"),
           }}
         />
       </main>
