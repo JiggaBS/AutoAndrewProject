@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Option {
   label: string;
@@ -28,6 +29,7 @@ export function ChipFilter({
   className,
   maxRows,
 }: ChipFilterProps) {
+  const { t } = useLanguage();
   const [expanded, setExpanded] = useState(false);
   
   // Logic to limit items? 
@@ -71,9 +73,9 @@ export function ChipFilter({
             onClick={() => setExpanded(!expanded)}
           >
             {expanded ? (
-              <><ChevronUp className="h-3 w-3 mr-1" /> Meno</>
+              <><ChevronUp className="h-3 w-3 mr-1" /> {t("filters.less")}</>
             ) : (
-              <><ChevronDown className="h-3 w-3 mr-1" /> Altro</>
+              <><ChevronDown className="h-3 w-3 mr-1" /> {t("filters.more")}</>
             )}
           </Button>
         )}

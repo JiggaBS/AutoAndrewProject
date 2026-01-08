@@ -103,6 +103,9 @@ const translations: Record<Language, Record<string, string>> = {
     "listings.sort.mileage_desc": "Km: dal più alto",
     "listings.sort.year_desc": "Anno: dal più recente",
     "listings.sort.year_asc": "Anno: dal più vecchio",
+    "listings.sort.label": "Ordina:",
+    "listings.sort.ascending": "Ordina crescente",
+    "listings.sort.descending": "Ordina decrescente",
     "listings.results": "veicoli trovati",
     "listings.noResults": "Nessun veicolo trovato",
     "listings.loading": "Caricamento...",
@@ -471,6 +474,18 @@ const translations: Record<Language, Record<string, string>> = {
     "filters.doors3": "3 porte",
     "filters.doors4": "4 porte",
     "filters.doors5": "5 porte",
+    "filters.characteristics": "Caratteristiche",
+    "filters.updating": "Aggiornamento...",
+    "filters.showResults": "Mostra risultati",
+    "filters.more": "Altro",
+    "filters.less": "Meno",
+
+    // Vehicle Types
+    "vehicleType.car": "Auto",
+    "vehicleType.motorcycle": "Moto",
+    "vehicleType.camper": "Camper",
+    "vehicleType.truck": "Veicoli Commerciali",
+    "vehicleType.caravan": "Caravan",
 
     // Body Types
     "body.cityCar": "City car",
@@ -761,6 +776,9 @@ const translations: Record<Language, Record<string, string>> = {
     "listings.sort.mileage_desc": "Mileage: High to Low",
     "listings.sort.year_desc": "Year: Newest First",
     "listings.sort.year_asc": "Year: Oldest First",
+    "listings.sort.label": "Sort:",
+    "listings.sort.ascending": "Sort ascending",
+    "listings.sort.descending": "Sort descending",
     "listings.results": "vehicles found",
     "listings.noResults": "No vehicles found",
     "listings.loading": "Loading...",
@@ -1127,6 +1145,18 @@ const translations: Record<Language, Record<string, string>> = {
     "filters.doors3": "3 doors",
     "filters.doors4": "4 doors",
     "filters.doors5": "5 doors",
+    "filters.characteristics": "Features",
+    "filters.updating": "Updating...",
+    "filters.showResults": "Show results",
+    "filters.more": "More",
+    "filters.less": "Less",
+
+    // Vehicle Types
+    "vehicleType.car": "Cars",
+    "vehicleType.motorcycle": "Motorcycles",
+    "vehicleType.camper": "Camper",
+    "vehicleType.truck": "Commercial Vehicles",
+    "vehicleType.caravan": "Caravan",
 
     // Body Types
     "body.cityCar": "City car",

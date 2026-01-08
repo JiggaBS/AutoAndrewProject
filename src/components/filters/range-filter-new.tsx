@@ -5,6 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Option {
   value: number;
@@ -28,6 +29,7 @@ export function RangeFilterNew({
   onChange,
   options,
 }: RangeFilterNewProps) {
+  const { t } = useLanguage();
   const CLEAR_VALUE = "__any__";
   
   return (
@@ -41,7 +43,7 @@ export function RangeFilterNew({
         </SelectTrigger>
         <SelectContent className="bg-white dark:bg-[#1a1a1a] border-gray-200 dark:border-[#2a2a2a]">
           <SelectItem value={CLEAR_VALUE} className="text-black dark:text-white focus:bg-black focus:text-white dark:focus:bg-[#ff6b35]">
-            Qualsiasi
+            {t("filters.any")}
           </SelectItem>
           {options
             .filter((opt) => !maxValue || opt.value <= maxValue)
@@ -66,7 +68,7 @@ export function RangeFilterNew({
         </SelectTrigger>
         <SelectContent className="bg-white dark:bg-[#1a1a1a] border-gray-200 dark:border-[#2a2a2a]">
           <SelectItem value={CLEAR_VALUE} className="text-black dark:text-white focus:bg-black focus:text-white dark:focus:bg-[#ff6b35]">
-            Qualsiasi
+            {t("filters.any")}
           </SelectItem>
           {options
             .filter((opt) => !minValue || opt.value >= minValue)

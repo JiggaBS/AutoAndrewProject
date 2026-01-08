@@ -40,14 +40,14 @@ export function SortSelector({
   onToggleDirection,
   showDirectionToggle = false 
 }: SortSelectorProps) {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const current = sortOptions.find(s => s.value === currentSort) || sortOptions[0];
   const canToggleDirection = current.field !== "ad_number"; // Don't toggle for "newest"
 
   return (
     <div className="flex items-center gap-3 md:gap-4 w-full md:w-auto">
       <span className="text-sm text-gray-500 dark:text-[#888] whitespace-nowrap">
-        {language === "it" ? "Ordina:" : "Sort:"}
+        {t("listings.sort.label")}
       </span>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -83,8 +83,8 @@ export function SortSelector({
           onClick={onToggleDirection}
           className="bg-white dark:bg-card border-gray-200 dark:border-[#2a2a2a] text-black dark:text-white hover:bg-gray-50 dark:hover:bg-[#2a2a2a] min-h-[44px] min-w-[44px] flex-shrink-0"
           aria-label={current.direction === "asc" 
-            ? (language === "it" ? "Ordina decrescente" : "Sort descending")
-            : (language === "it" ? "Ordina crescente" : "Sort ascending")
+            ? t("listings.sort.descending")
+            : t("listings.sort.ascending")
           }
         >
           {current.direction === "asc" ? (

@@ -533,7 +533,7 @@ export function SearchFilters({
            
            {/* Section: Caratteristiche */}
            <div className="space-y-4">
-             <div className="text-xs font-semibold text-foreground/70 uppercase tracking-wider">Caratteristiche</div>
+             <div className="text-xs font-semibold text-foreground/70 uppercase tracking-wider">{t("filters.characteristics")}</div>
              
              <div className="grid grid-cols-12 gap-x-4 gap-y-4">
                  <div className="col-span-12 md:col-span-4 lg:col-span-3">
@@ -713,7 +713,7 @@ export function SearchFilters({
                             className="h-8 text-xs px-2 hover:bg-destructive/10 hover:text-destructive"
                         >
                             <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
-                            Reset
+                            {t("listings.filters.reset")}
                         </Button>
                     </SheetTitle>
                 </SheetHeader>
@@ -741,7 +741,7 @@ export function SearchFilters({
                              </div>
                              <Separator />
                              <div className="space-y-4">
-                                <div className="text-xs font-semibold text-foreground/70 uppercase tracking-wider">Caratteristiche</div>
+                                <div className="text-xs font-semibold text-foreground/70 uppercase tracking-wider">{t("filters.characteristics")}</div>
                                 <ChipFilter label={t("filters.bodyType")} options={bodyTypeOptions} value={filters.bodyType} onChange={(v) => handleFilterChange("bodyType", v)} />
                                 <ChipFilter
                                     label={t("filters.doors")}
@@ -761,9 +761,9 @@ export function SearchFilters({
                 <div className="p-4 border-t bg-background sticky bottom-0 z-10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
                      <Button className="w-full h-11 bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg" onClick={() => setIsMobileOpen(false)}>
                         {debouncing ? (
-                            <span className="animate-pulse">Aggiornamento...</span>
+                            <span className="animate-pulse">{t("filters.updating")}</span>
                         ) : (
-                            `Mostra ${resultCount} risultati`
+                            `${t("filters.showResults")} ${resultCount} ${t("filters.results")}`
                         )}
                      </Button>
                 </div>
