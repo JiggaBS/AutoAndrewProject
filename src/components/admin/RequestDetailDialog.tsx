@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -107,6 +107,16 @@ export function RequestDetailDialog({ request, onUpdateStatus, onUpdateRequest, 
     }
   }, [dialogOpen]);
 
+  const goToPreviousImage = useCallback(() => {
+    if (expandedImageIndex === null || !request.images) return;
+    setExpandedImageIndex(expandedImageIndex === 0 ? request.images.length - 1 : expandedImageIndex - 1);
+  }, [expandedImageIndex, request.images]);
+
+  const goToNextImage = useCallback(() => {
+    if (expandedImageIndex === null || !request.images) return;
+    setExpandedImageIndex(expandedImageIndex === request.images.length - 1 ? 0 : expandedImageIndex + 1);
+  }, [expandedImageIndex, request.images]);
+
   useEffect(() => {
     if (expandedImageIndex === null) return;
     
@@ -122,17 +132,7 @@ export function RequestDetailDialog({ request, onUpdateStatus, onUpdateRequest, 
     
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [expandedImageIndex, request.images]);
-
-  const goToPreviousImage = () => {
-    if (expandedImageIndex === null || !request.images) return;
-    setExpandedImageIndex(expandedImageIndex === 0 ? request.images.length - 1 : expandedImageIndex - 1);
-  };
-
-  const goToNextImage = () => {
-    if (expandedImageIndex === null || !request.images) return;
-    setExpandedImageIndex(expandedImageIndex === request.images.length - 1 ? 0 : expandedImageIndex + 1);
-  };
+  }, [expandedImageIndex, goToPreviousImage, goToNextImage]);
 
   const closeLightbox = () => {
     setExpandedImageIndex(null);

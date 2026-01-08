@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Star, Share2, Printer, MapPin, CheckCircle } from "lucide-react";
+import { ArrowLeft, Star, Share2, Printer, MapPin, CheckCircle, ChevronDown, Plus, Minus } from "lucide-react";
 import { Header } from "@/components/Header";
 import { ImageGallery } from "@/components/ImageGallery";
 import { VehicleSpecs } from "@/components/VehicleSpecs";
@@ -16,6 +16,8 @@ import { saveVehicle, unsaveVehicle, isVehicleSaved } from "@/lib/api/savedVehic
 import { toast } from "@/hooks/use-toast";
 import { trackVehicleView, trackSaveVehicle, trackShare } from "@/lib/analytics";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { cn } from "@/lib/utils";
 
 const VehicleDetail = () => {
   const { t, language } = useLanguage();
@@ -24,6 +26,7 @@ const VehicleDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
 
   const loadVehicle = useCallback(async () => {
     setIsLoading(true);
@@ -306,6 +309,31 @@ const VehicleDetail = () => {
               {/* Vehicle Specs - under price on mobile */}
               <VehicleSpecs vehicle={vehicle} />
 
+              {/* Description - Mobile only, appears after Dettagli aggiuntivi */}
+              {vehicle.description && (
+                <Collapsible open={isDescriptionOpen} onOpenChange={setIsDescriptionOpen}>
+                  <div>
+                    <div className="border-t border-border/50"></div>
+                    <CollapsibleTrigger className="w-full py-4 flex items-center justify-between hover:opacity-80 transition-opacity">
+                      <h3 className="font-bold text-foreground uppercase tracking-wide text-sm">
+                        {language === "it" ? "ULTERIORI INFORMAZIONI" : "FURTHER INFORMATION"}
+                      </h3>
+                      {isDescriptionOpen ? (
+                        <Minus className="w-5 h-5 text-foreground" />
+                      ) : (
+                        <Plus className="w-5 h-5 text-foreground" />
+                      )}
+                    </CollapsibleTrigger>
+                    <div className="border-b border-border/50"></div>
+                    <CollapsibleContent className="pt-4 pb-6">
+                      <p className="text-muted-foreground text-sm leading-relaxed">
+                        {vehicle.description}
+                      </p>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+              )}
+
               {/* Dealer Card */}
               <DealerCard vehicle={vehicle} />
             </div>
@@ -315,13 +343,30 @@ const VehicleDetail = () => {
               <VehicleSpecs vehicle={vehicle} />
             </div>
             
-            {/* Description */}
+            {/* Description - Desktop only */}
             {vehicle.description && (
-              <div className="bg-card rounded-lg border border-border p-4 md:p-6">
-                <h3 className="font-semibold text-foreground mb-3">{t("vehicleDetail.description")}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  {vehicle.description}
-                </p>
+              <div className="hidden lg:block">
+                <Collapsible open={isDescriptionOpen} onOpenChange={setIsDescriptionOpen}>
+                  <div>
+                    <div className="border-t border-border/50"></div>
+                    <CollapsibleTrigger className="w-full py-4 flex items-center justify-between hover:opacity-80 transition-opacity">
+                      <h3 className="font-bold text-foreground uppercase tracking-wide text-sm">
+                        {language === "it" ? "ULTERIORI INFORMAZIONI" : "FURTHER INFORMATION"}
+                      </h3>
+                      {isDescriptionOpen ? (
+                        <Minus className="w-5 h-5 text-foreground" />
+                      ) : (
+                        <Plus className="w-5 h-5 text-foreground" />
+                      )}
+                    </CollapsibleTrigger>
+                    <div className="border-b border-border/50"></div>
+                    <CollapsibleContent className="pt-4 pb-6">
+                      <p className="text-muted-foreground text-sm leading-relaxed">
+                        {vehicle.description}
+                      </p>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
               </div>
             )}
           </div>

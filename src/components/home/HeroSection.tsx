@@ -25,7 +25,7 @@ export const HeroSection = forwardRef<HTMLElement>((props, ref) => {
   };
 
   return (
-    <section ref={ref} className="relative min-h-[75vh] md:min-h-[88vh] flex items-center overflow-hidden">
+    <section ref={ref} className="relative min-h-[65vh] md:min-h-[88vh] flex items-center overflow-hidden pb-12 lg:pb-20">
       {/* Background Image with Overlay */}
       <div
         className="absolute inset-0 bg-cover bg-no-repeat scale-105 animate-[pulse_20s_ease-in-out_infinite] bg-[position:70%_center] md:bg-center"
@@ -41,16 +41,16 @@ export const HeroSection = forwardRef<HTMLElement>((props, ref) => {
       <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-background/30 dark:block hidden" />
       
       {/* Light mode overlay - darker for better text contrast on mobile */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/20 dark:hidden" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent dark:hidden" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/30 to-black/8 dark:hidden" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/10 to-transparent dark:hidden" />
 
       {/* Animated Accent Lines */}
       <div className="absolute top-1/4 left-0 w-1 h-40 bg-gradient-to-b from-transparent via-primary to-transparent opacity-70" />
       <div className="absolute top-1/3 left-4 w-0.5 h-24 bg-gradient-to-b from-transparent via-primary/50 to-transparent opacity-50" />
 
       {/* Content */}
-      <div className="container relative z-10 py-8 md:py-20">
-        <div className="max-w-2xl space-y-8">
+      <div className="container relative z-10 py-6 md:py-20">
+        <div className="max-w-2xl space-y-6 md:space-y-8">
           {/* Brand Tag */}
           <span
             className="inline-block text-primary font-semibold text-sm uppercase tracking-[0.2em] opacity-0 animate-fade-in"
@@ -109,16 +109,16 @@ export const HeroSection = forwardRef<HTMLElement>((props, ref) => {
             {t("hero.subtitle")}
           </p>
 
-          {/* CTA Buttons - Clear Hierarchy */}
+          {/* CTA Buttons - Clear Hierarchy - Stacked on mobile for thumb reach */}
           <div
-            className="flex flex-col sm:flex-row gap-4 pt-2 opacity-0 animate-fade-in"
+            className="flex flex-col gap-3 sm:flex-row sm:gap-4 pt-2 opacity-0 animate-fade-in"
             style={{ animationDelay: "400ms", animationFillMode: "forwards" }}
           >
-            {/* Primary CTA - Solid Orange */}
+            {/* Primary CTA - Dominant filled orange button */}
             <Button 
               asChild 
               size="lg" 
-              className="text-base font-semibold group h-12 px-8 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              className="text-base font-bold group h-12 min-h-[44px] px-8 shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               <Link to="/listings">
                 {t("hero.cta.browse")}
@@ -126,12 +126,12 @@ export const HeroSection = forwardRef<HTMLElement>((props, ref) => {
               </Link>
             </Button>
             
-            {/* Secondary CTA - Ghost/Outline */}
+            {/* Secondary CTA - Demoted outline style */}
             <Button
               asChild
-              variant="ghost"
+              variant="outline"
               size="lg"
-              className="text-base font-semibold h-12 px-8 bg-white/10 border border-white/30 text-white backdrop-blur-sm hover:bg-white/20 hover:border-white/50 dark:bg-foreground/5 dark:border-foreground/20 dark:text-foreground dark:hover:bg-foreground/10 dark:hover:border-foreground/40 transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              className="text-base font-medium h-12 min-h-[44px] px-8 border-2 border-white/40 text-white/90 backdrop-blur-sm hover:bg-white/10 hover:border-white/60 hover:text-white dark:border-foreground/30 dark:text-foreground/80 dark:hover:bg-foreground/5 dark:hover:border-foreground/50 dark:hover:text-foreground transition-all focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               <Link to="/valutiamo">{t("hero.cta.valuation")}</Link>
             </Button>

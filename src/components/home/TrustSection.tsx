@@ -37,13 +37,13 @@ export const TrustSection = forwardRef<HTMLElement>((props, ref) => {
   ];
 
   return (
-    <section ref={ref} className="py-20 md:py-28 bg-card/50 relative overflow-hidden">
+    <section ref={ref} className="py-12 lg:py-24 bg-card/50 relative overflow-hidden">
       {/* Subtle decorative gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-primary/[0.02] pointer-events-none" />
       
       <div className="container relative">
         {/* Section Title */}
-        <div className="text-center mb-14">
+        <div className="text-center mb-10">
           <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-5">
             <Award className="w-4 h-4" />
             {t("trust.badge") || "Perché Sceglierci"}
@@ -55,7 +55,7 @@ export const TrustSection = forwardRef<HTMLElement>((props, ref) => {
         </div>
 
         {/* Trust Items - Cards with icons */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 mb-12">
           {trustItems.map((item, index) => (
             <div
               key={item.title}
@@ -86,7 +86,7 @@ export const TrustSection = forwardRef<HTMLElement>((props, ref) => {
         </div>
 
         {/* Stats - Prominent Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
           {stats.map((stat, index) => (
             <div
               key={stat.label}

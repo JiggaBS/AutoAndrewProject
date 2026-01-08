@@ -106,14 +106,17 @@ export const TestimonialsSection = forwardRef<HTMLElement>((props, ref) => {
   const others = testimonials.slice(1);
 
   return (
-    <section ref={ref} className="py-20 md:py-28 bg-secondary/40 relative overflow-hidden">
+    <section ref={ref} className="py-12 lg:py-20 pb-20 lg:pb-28 bg-secondary/40 relative overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
       
+      {/* Subtle divider at bottom for visual separation */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+      
       <div className="container relative">
         {/* Header */}
-        <div className="text-center mb-14">
+        <div className="text-center mb-10">
           <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-5">
             <Star className="w-4 h-4 fill-primary" />
             {t("testimonials.badge")}
@@ -217,12 +220,12 @@ export const TestimonialsSection = forwardRef<HTMLElement>((props, ref) => {
 
         {/* Mobile/Tablet: Horizontal Scroll */}
         <div className="lg:hidden relative">
-          {/* Scroll Buttons */}
+          {/* Scroll Buttons - Touch-friendly on mobile */}
           <div className="absolute -left-2 top-1/2 -translate-y-1/2 z-10 hidden sm:block">
             <Button
               variant="secondary"
               size="icon"
-              className="w-10 h-10 rounded-full shadow-lg bg-card border border-border hover:bg-primary hover:text-primary-foreground"
+              className="w-10 h-10 min-h-[44px] min-w-[44px] rounded-full shadow-lg bg-card border border-border hover:bg-primary hover:text-primary-foreground"
               onClick={scrollLeft}
               aria-label="Scroll left"
             >
@@ -233,7 +236,7 @@ export const TestimonialsSection = forwardRef<HTMLElement>((props, ref) => {
             <Button
               variant="secondary"
               size="icon"
-              className="w-10 h-10 rounded-full shadow-lg bg-card border border-border hover:bg-primary hover:text-primary-foreground"
+              className="w-10 h-10 min-h-[44px] min-w-[44px] rounded-full shadow-lg bg-card border border-border hover:bg-primary hover:text-primary-foreground"
               onClick={scrollRight}
               aria-label="Scroll right"
             >
@@ -241,16 +244,16 @@ export const TestimonialsSection = forwardRef<HTMLElement>((props, ref) => {
             </Button>
           </div>
 
-          {/* Scrollable Container */}
+          {/* Scrollable Container - Reduced card width on mobile for better density */}
           <div 
             ref={scrollContainerRef}
-            className="flex gap-5 overflow-x-auto pb-4 -mx-4 px-4 snap-x snap-mandatory scrollbar-hide"
+            className="flex gap-4 sm:gap-5 overflow-x-auto pb-4 -mx-4 px-4 snap-x snap-mandatory scrollbar-hide"
           >
             {testimonials.map((testimonial, index) => (
               <article
                 key={testimonial.id}
                 className={cn(
-                  "group relative bg-card rounded-xl p-5 border border-border flex-shrink-0 w-[300px] snap-start",
+                  "group relative bg-card rounded-xl p-4 sm:p-5 border border-border flex-shrink-0 w-[280px] sm:w-[300px] snap-start",
                   "hover:border-primary/30 hover:shadow-lg",
                   "transition-all duration-300"
                 )}
@@ -286,15 +289,26 @@ export const TestimonialsSection = forwardRef<HTMLElement>((props, ref) => {
           </div>
           
           {/* Scroll indicator dots for mobile */}
-          <div className="flex justify-center gap-2 mt-4 sm:hidden">
+          <div className="flex justify-center gap-2 mt-6 sm:hidden">
             {testimonials.map((_, index) => (
-              <div key={index} className="w-2 h-2 rounded-full bg-border" />
+              <button
+                key={index}
+                className="w-2.5 h-2.5 rounded-full bg-border hover:bg-primary/50 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center p-0"
+                aria-label={`Go to testimonial ${index + 1}`}
+                onClick={() => {
+                  if (scrollContainerRef.current) {
+                    scrollContainerRef.current.scrollTo({ left: index * 300, behavior: 'smooth' });
+                  }
+                }}
+              >
+                <span className="w-2.5 h-2.5 rounded-full bg-current" />
+              </button>
             ))}
           </div>
         </div>
 
         {/* Trust Badges - Enhanced */}
-        <div className="hidden md:block mt-14 pt-10 border-t border-border/50">
+        <div className="hidden md:block mt-10 pt-8 border-t border-border/50">
           <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10">
             <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-card/50 border border-border/50">
               <div className="w-10 h-10 rounded-full bg-success/15 flex items-center justify-center">

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
@@ -136,18 +136,12 @@ export default function AdminRequestDetail() {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  // Role check
-  useEffect(() => {
-    if (user) {
-      checkAdminRole();
-    }
-  }, [user]);
-
-  const checkAdminRole = async () => {
+  const checkAdminRole = useCallback(async () => {
+    if (!user) return;
     setCheckingRole(true);
     try {
       const { data, error } = await supabase.rpc("has_role", {
-        _user_id: user!.id,
+        _user_id: user.id,
         _role: "admin",
       });
 
@@ -169,16 +163,16 @@ export default function AdminRequestDetail() {
     } finally {
       setCheckingRole(false);
     }
-  };
+  }, [user, navigate]);
 
-  // Fetch request
+  // Role check
   useEffect(() => {
-    if (isAdmin && id) {
-      fetchRequest();
+    if (user) {
+      checkAdminRole();
     }
-  }, [isAdmin, id]);
+  }, [user, checkAdminRole]);
 
-  const fetchRequest = async () => {
+  const fetchRequest = useCallback(async () => {
     if (!id) return;
     setLoadingRequest(true);
     try {
@@ -218,7 +212,14 @@ export default function AdminRequestDetail() {
     } finally {
       setLoadingRequest(false);
     }
-  };
+  }, [id, navigate]);
+
+  // Fetch request
+  useEffect(() => {
+    if (isAdmin && id) {
+      fetchRequest();
+    }
+  }, [isAdmin, id, fetchRequest]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString("it-IT", {

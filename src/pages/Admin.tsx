@@ -760,35 +760,6 @@ export default function Admin() {
                         <RefreshCw className="w-4 h-4 lg:mr-2" />
                         <span className="hidden lg:inline">Aggiorna</span>
                       </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={async () => {
-                          // Debug: Check if we can query directly
-                          try {
-                            const { data, error, count } = await supabase
-                              .from("valuation_requests")
-                              .select("*", { count: "exact", head: false });
-                            if (import.meta.env.DEV) {
-                              console.log("Debug query result:", { data, error, count });
-                            }
-                            toast({
-                              title: "Debug Info",
-                              description: `Found ${count || 0} requests. Check console for details.`,
-                            });
-                          } catch (e) {
-                            console.error("Debug query error:", e);
-                            toast({
-                              title: "Debug Error",
-                              description: e.message,
-                              variant: "destructive",
-                            });
-                          }
-                        }}
-                        className="hidden lg:flex"
-                      >
-                        Debug
-                      </Button>
                     </div>
                   </div>
                 </CardHeader>

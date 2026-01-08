@@ -42,6 +42,24 @@ export interface FilterState {
   bodyType: string;
 }
 
+// Map vehicle_category to bodyType filter values - static mapping
+const CATEGORY_TO_BODY_TYPE: Record<string, string> = {
+  "City car": "city_car",
+  "SUV": "suv",
+  "Pick-up": "suv",
+  "Furgoni": "van",
+  "Van": "van",
+  "Cabrio": "cabrio",
+  "Monovolume": "monovolume",
+  "Berlina": "berlina",
+  "Station Wagon": "station_wagon",
+  "Coupé": "coupe",
+  "Coupe": "coupe",
+};
+
+// Static door options
+const DOOR_OPTIONS = ["2", "3", "4", "5"];
+
 const defaultFilters: FilterState = {
   vehicleType: "car",
   make: "",
@@ -224,27 +242,12 @@ export function SearchFilters({
     return { min: Math.max(0, min), max: Math.max(min + 0.5, max) }; // Ensure at least 0.5L range
   }, [vehicles]);
 
-  // Map vehicle_category to bodyType filter values
-  const categoryToBodyType: Record<string, string> = {
-    "City car": "city_car",
-    "SUV": "suv",
-    "Pick-up": "suv",
-    "Furgoni": "van",
-    "Van": "van",
-    "Cabrio": "cabrio",
-    "Monovolume": "monovolume",
-    "Berlina": "berlina",
-    "Station Wagon": "station_wagon",
-    "Coupé": "coupe",
-    "Coupe": "coupe",
-  };
-
   const availableBodyTypes = useMemo(() => {
     const bodyTypeSet = new Set<string>();
     vehicles.forEach(v => {
       if (v.vehicle_category) {
         const normalizedCategory = v.vehicle_category.trim();
-        const bodyType = categoryToBodyType[normalizedCategory];
+        const bodyType = CATEGORY_TO_BODY_TYPE[normalizedCategory];
         if (bodyType) {
           bodyTypeSet.add(bodyType);
         }
@@ -265,7 +268,7 @@ export function SearchFilters({
       { value: "coupe", label: t("body.coupe") },
     ];
     // If no vehicles, show all options; otherwise filter to only available ones
-    let filtered = vehicles.length === 0 || availableBodyTypes.length === 0
+    const filtered = vehicles.length === 0 || availableBodyTypes.length === 0
       ? allOptions
       : allOptions.filter(opt => availableBodyTypes.includes(opt.value));
     
@@ -276,12 +279,10 @@ export function SearchFilters({
     return [...priorityOptions, ...otherOptions];
   }, [availableBodyTypes, vehicles.length, t]);
 
-  const doorOptions = ["2", "3", "4", "5"];
-
   const doorFilterOptions = useMemo(() => {
     const allDoors = [
       { value: "", label: t("filters.any") },
-      ...doorOptions.map(d => ({ value: d, label: d }))
+      ...DOOR_OPTIONS.map(d => ({ value: d, label: d }))
     ];
     // Prioritize "Qualsiasi" and "4" - show them first, then others
     const priority = ["4"];

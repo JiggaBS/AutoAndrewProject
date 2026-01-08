@@ -49,6 +49,33 @@ export function ImageLightbox({ images, initialIndex, onClose }: ImageLightboxPr
     setPosition({ x: 0, y: 0 });
   }, [currentIndex]);
 
+  const goToPrevious = useCallback(() => {
+    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  }, [images.length]);
+
+  const goToNext = useCallback(() => {
+    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  }, [images.length]);
+
+  const zoomIn = useCallback(() => {
+    setScale((prev) => Math.min(prev + 0.5, 4));
+  }, []);
+
+  const zoomOut = useCallback(() => {
+    setScale((prev) => {
+      const newScale = Math.max(prev - 0.5, 1);
+      if (newScale === 1) {
+        setPosition({ x: 0, y: 0 });
+      }
+      return newScale;
+    });
+  }, []);
+
+  const resetZoom = useCallback(() => {
+    setScale(1);
+    setPosition({ x: 0, y: 0 });
+  }, []);
+
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -79,34 +106,7 @@ export function ImageLightbox({ images, initialIndex, onClose }: ImageLightboxPr
       window.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = '';
     };
-  }, [currentIndex, hasMultiple]);
-
-  const goToPrevious = () => {
-    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-  };
-
-  const goToNext = () => {
-    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-  };
-
-  const zoomIn = () => {
-    setScale((prev) => Math.min(prev + 0.5, 4));
-  };
-
-  const zoomOut = () => {
-    setScale((prev) => {
-      const newScale = Math.max(prev - 0.5, 1);
-      if (newScale === 1) {
-        setPosition({ x: 0, y: 0 });
-      }
-      return newScale;
-    });
-  };
-
-  const resetZoom = () => {
-    setScale(1);
-    setPosition({ x: 0, y: 0 });
-  };
+  }, [hasMultiple, goToPrevious, goToNext, zoomIn, zoomOut, onClose]);
 
   // Touch handlers for swipe and pinch-to-zoom
   const handleTouchStart = (e: React.TouchEvent) => {

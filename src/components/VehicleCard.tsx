@@ -139,9 +139,6 @@ export const VehicleCard = forwardRef<HTMLElement, VehicleCardProps>(({
             aspectRatio="aspect-[4/3]"
             className="group-hover:scale-[1.02] transition-transform duration-500"
           />
-          
-          {/* Subtle gradient overlay on hover */}
-          <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
           {/* New Arrival Badge - Smaller, chip style */}
           {isNewArrival && (

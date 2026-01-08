@@ -87,13 +87,13 @@ export const ServicesSection = forwardRef<HTMLElement>((props, ref) => {
   ];
 
   return (
-    <section ref={ref} className="py-20 md:py-28 relative overflow-hidden">
+    <section ref={ref} className="py-12 lg:py-16 relative overflow-hidden">
       {/* Background gradient accent */}
       <div className="absolute inset-0 bg-gradient-to-t from-card/50 via-transparent to-transparent pointer-events-none" />
       
       <div className="container relative">
         {/* Section Header */}
-        <div className="text-center mb-14">
+        <div className="text-center mb-8">
           <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-5">
             <Wrench className="w-4 h-4" />
             {language === "it" ? "Cosa Offriamo" : "What We Offer"}
@@ -112,7 +112,7 @@ export const ServicesSection = forwardRef<HTMLElement>((props, ref) => {
         </div>
 
         {/* Services Grid - 3 Cards Only */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 max-w-6xl mx-auto">
           {services.map((service, index) => {
             const handleCardClick = (e: React.MouseEvent) => {
               // Only handle card click if button wasn't clicked
@@ -183,17 +183,14 @@ export const ServicesSection = forwardRef<HTMLElement>((props, ref) => {
                   </ul>
                 </div>
                 
-                {/* CTA Button - aligned at bottom */}
+                {/* CTA Button - Tertiary style, visually secondary to card interaction */}
                 {service.onClick ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
+                  <button
                     className={cn(
-                      "h-11 px-5 border-primary/30 text-primary bg-transparent",
-                      "hover:bg-primary/10 hover:border-primary/50",
-                      "font-semibold transition-all duration-300",
-                      "group/btn focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
-                      "mt-auto"
+                      "group/btn mt-auto min-h-[44px] px-5 py-2.5 text-sm font-medium text-primary",
+                      "hover:text-primary/80 transition-colors duration-200",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card",
+                      "inline-flex items-center justify-center gap-1.5"
                     )}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -201,29 +198,22 @@ export const ServicesSection = forwardRef<HTMLElement>((props, ref) => {
                     }}
                   >
                     {service.ctaText}
-                    <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
-                  </Button>
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-0.5" />
+                  </button>
                 ) : (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    asChild
+                  <Link 
+                    to={service.href}
+                    onClick={(e) => e.stopPropagation()}
                     className={cn(
-                      "h-11 px-5 border-primary/30 text-primary bg-transparent",
-                      "hover:bg-primary/10 hover:border-primary/50",
-                      "font-semibold transition-all duration-300",
-                      "group/btn focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
-                      "mt-auto"
+                      "group/btn mt-auto min-h-[44px] px-5 py-2.5 text-sm font-medium text-primary",
+                      "hover:text-primary/80 transition-colors duration-200",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-card",
+                      "inline-flex items-center justify-center gap-1.5"
                     )}
                   >
-                    <Link 
-                      to={service.href}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {service.ctaText}
-                      <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
-                    </Link>
-                  </Button>
+                    {service.ctaText}
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-0.5" />
+                  </Link>
                 )}
               </div>
             );

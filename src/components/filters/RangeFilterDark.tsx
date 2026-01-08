@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Slider } from "@/components/ui/slider";
+import { SliderDark } from "./SliderDark";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-interface RangeFilterProps {
+interface RangeFilterDarkProps {
   label: string;
   icon?: React.ReactNode;
   min: number;
@@ -16,7 +16,7 @@ interface RangeFilterProps {
   className?: string;
 }
 
-export function RangeFilter({
+export function RangeFilterDark({
   label,
   icon,
   min,
@@ -27,7 +27,7 @@ export function RangeFilter({
   maxValue,
   onChange,
   className,
-}: RangeFilterProps) {
+}: RangeFilterDarkProps) {
   const getSliderValues = useCallback(() => {
     const vMin = minValue && minValue !== "" ? parseFloat(minValue) : min;
     const vMax = maxValue && maxValue !== "" ? parseFloat(maxValue) : max;
@@ -38,13 +38,10 @@ export function RangeFilter({
 
   useEffect(() => {
     const [currentMin, currentMax] = getSliderValues();
-    setLocalValues(prev => {
-      if (currentMin !== prev[0] || currentMax !== prev[1]) {
-        return [currentMin, currentMax];
-      }
-      return prev;
-    });
-  }, [getSliderValues]);
+    if (currentMin !== localValues[0] || currentMax !== localValues[1]) {
+      setLocalValues([currentMin, currentMax]);
+    }
+  }, [minValue, maxValue, min, max, getSliderValues, localValues]);
 
   const handleSliderChange = (values: number[]) => {
     setLocalValues(values);
@@ -72,17 +69,20 @@ export function RangeFilter({
   return (
     <div className={cn("space-y-3", className)}>
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-          {icon && <span className="text-primary">{icon}</span>}
+        <div className="flex items-center gap-2 text-xs font-medium text-[#888]">
+          {icon && <span className="text-[#ff6b35]">{icon}</span>}
           {label}
         </div>
-        <Badge variant="outline" className="h-7 px-3 text-xs font-mono font-normal bg-secondary/30 border-secondary-foreground/20 text-foreground">
+        <Badge 
+          variant="outline" 
+          className="h-7 px-3 text-xs font-mono font-normal bg-[#2a2a2a] border-[#3a3a3a] text-white"
+        >
           {formatValue(localValues[0])} – {formatValue(localValues[1])} {unit}
         </Badge>
       </div>
 
       <div className="px-1">
-        <Slider
+        <SliderDark
           value={localValues}
           min={min}
           max={max}

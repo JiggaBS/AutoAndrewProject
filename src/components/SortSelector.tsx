@@ -29,42 +29,71 @@ interface SortSelectorProps {
   currentSort: string;
   onSortChange: (sort: SortOption) => void;
   resultCount: number;
+  onToggleDirection?: () => void;
+  showDirectionToggle?: boolean;
 }
 
-export function SortSelector({ currentSort, onSortChange, resultCount }: SortSelectorProps) {
-  const { t } = useLanguage();
+export function SortSelector({ 
+  currentSort, 
+  onSortChange, 
+  resultCount,
+  onToggleDirection,
+  showDirectionToggle = false 
+}: SortSelectorProps) {
+  const { t, language } = useLanguage();
   const current = sortOptions.find(s => s.value === currentSort) || sortOptions[0];
+  const canToggleDirection = current.field !== "ad_number"; // Don't toggle for "newest"
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-4">
-      <p className="text-muted-foreground text-sm hidden">
-        <span className="text-foreground font-semibold">{resultCount}</span> {t("listings.results")}
-      </p>
-      
+    <div className="flex items-center gap-3 md:gap-4 w-full md:w-auto">
+      <span className="text-sm text-gray-500 dark:text-[#888] whitespace-nowrap">
+        {language === "it" ? "Ordina:" : "Sort:"}
+      </span>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="w-full sm:w-auto justify-between gap-2 ml-auto">
-            <ArrowUpDown className="w-4 h-4" />
-            <span className="flex-1 text-left">{t(current.labelKey)}</span>
+          <Button 
+            variant="outline" 
+            className="bg-white dark:bg-card border-gray-200 dark:border-[#2a2a2a] text-black dark:text-white hover:bg-gray-50 dark:hover:bg-[#2a2a2a] justify-between gap-2 min-w-[140px] md:min-w-[160px] flex-1 md:flex-initial text-sm min-h-[44px]"
+          >
+            <span className="flex-1 text-left truncate">{t(current.labelKey)}</span>
+            <ArrowUpDown className="w-4 h-4 opacity-50 flex-shrink-0" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56 bg-card border-border">
+        <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-card border-gray-200 dark:border-[#2a2a2a]">
           {sortOptions.map((option) => (
             <DropdownMenuItem
               key={option.value}
               onClick={() => onSortChange(option)}
-              className={currentSort === option.value ? "bg-primary/10 text-primary" : ""}
+              className={currentSort === option.value ? "bg-[#ff6b35]/10 text-[#ff6b35] dark:bg-[#ff6b35]/20 dark:text-[#ff6b35]" : "text-black dark:text-white"}
             >
               <span className="flex-1">{t(option.labelKey)}</span>
               {option.direction === "asc" ? (
-                <ArrowUp className="w-3 h-3 text-muted-foreground" />
+                <ArrowUp className="w-3 h-3 text-gray-500 dark:text-[#888]" />
               ) : (
-                <ArrowDown className="w-3 h-3 text-muted-foreground" />
+                <ArrowDown className="w-3 h-3 text-gray-500 dark:text-[#888]" />
               )}
             </DropdownMenuItem>
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
+      {showDirectionToggle && canToggleDirection && onToggleDirection && (
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={onToggleDirection}
+          className="bg-white dark:bg-card border-gray-200 dark:border-[#2a2a2a] text-black dark:text-white hover:bg-gray-50 dark:hover:bg-[#2a2a2a] min-h-[44px] min-w-[44px] flex-shrink-0"
+          aria-label={current.direction === "asc" 
+            ? (language === "it" ? "Ordina decrescente" : "Sort descending")
+            : (language === "it" ? "Ordina crescente" : "Sort ascending")
+          }
+        >
+          {current.direction === "asc" ? (
+            <ArrowDown className="w-4 h-4" />
+          ) : (
+            <ArrowUp className="w-4 h-4" />
+          )}
+        </Button>
+      )}
     </div>
   );
 }

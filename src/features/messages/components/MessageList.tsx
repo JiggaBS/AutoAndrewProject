@@ -82,7 +82,7 @@ export function MessageList({ messages, isLoading, isAdmin, clientName }: Messag
     if (!isLoading && messages.length > 0) {
       messagesEndRef.current?.scrollIntoView();
     }
-  }, [isLoading]);
+  }, [isLoading, messages.length]);
 
   if (isLoading) {
     return (
