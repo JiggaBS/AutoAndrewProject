@@ -104,9 +104,9 @@ export function FilterDrawer({ open, onClose, facets, translations = {} }: Filte
     <Sheet open={open} onOpenChange={onClose}>
       <SheetContent 
         side="left" 
-        className="w-full sm:max-w-md p-0 bg-white dark:bg-card border-gray-200 dark:border-[#2a2a2a] [&>button]:text-black dark:[&>button]:text-white [&>button]:hover:bg-gray-100 dark:[&>button]:hover:bg-[#2a2a2a]"
+        className="w-full sm:max-w-md p-0 bg-white dark:bg-card border-gray-200 dark:border-[#2a2a2a] [&>button]:text-black dark:[&>button]:text-white [&>button]:hover:bg-gray-100 dark:[&>button]:hover:bg-[#2a2a2a] flex flex-col"
       >
-        <SheetHeader className="p-4 pr-14 border-b border-gray-200 dark:border-[#2a2a2a]">
+        <SheetHeader className="p-4 pr-14 border-b border-gray-200 dark:border-[#2a2a2a] flex-shrink-0">
           <div className="flex items-center justify-between gap-3">
             <SheetTitle className="text-black dark:text-white flex-shrink-0">{t.filters || "Filtri"}</SheetTitle>
             {activeFilterCount > 0 && (
@@ -122,7 +122,7 @@ export function FilterDrawer({ open, onClose, facets, translations = {} }: Filte
           </div>
         </SheetHeader>
 
-        <ScrollArea className="h-[calc(100vh-140px)]">
+        <ScrollArea className="flex-1 min-h-0">
           <div className="p-4 space-y-1">
             {/* Make */}
             <FilterSection
@@ -337,7 +337,7 @@ export function FilterDrawer({ open, onClose, facets, translations = {} }: Filte
         </ScrollArea>
 
         {/* Footer */}
-        <div className="p-4 border-t border-gray-200 dark:border-[#2a2a2a]">
+        <div className="p-4 pb-[max(1rem,env(safe-area-inset-bottom,0px)+1rem)] border-t border-gray-200 dark:border-[#2a2a2a] bg-white dark:bg-card flex-shrink-0">
           <Button 
             onClick={onClose} 
             className="w-full bg-[#ff6b35] hover:bg-[#ff5722] text-white"
