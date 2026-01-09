@@ -231,6 +231,9 @@ export default function Auth() {
         provider: "google",
         options: {
           redirectTo: `${window.location.origin}/dashboard`,
+          queryParams: {
+            prompt: "select_account", // Force Google to show account selection screen
+          },
         },
       });
 
