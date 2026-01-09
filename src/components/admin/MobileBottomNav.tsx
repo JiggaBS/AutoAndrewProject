@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { LayoutDashboard, BarChart3, Users, Activity, Settings } from "lucide-react";
+import { LayoutDashboard, BarChart3, Users, Activity, Settings, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface MobileBottomNavProps {
@@ -12,7 +12,7 @@ const navItems = [
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "users", label: "Utenti", icon: Users },
   { id: "activity", label: "Attività", icon: Activity },
-  { id: "settings", label: "Impost.", icon: Settings },
+  { id: "vehicles", label: "Veicoli", icon: Sparkles },
 ];
 
 // Hook to detect if virtual keyboard is open

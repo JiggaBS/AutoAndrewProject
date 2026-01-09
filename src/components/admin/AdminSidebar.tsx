@@ -1,4 +1,4 @@
-import { Car, BarChart3, Users, Activity, Settings, LogOut, LayoutDashboard, HelpCircle, Home } from "lucide-react";
+import { Car, BarChart3, Users, Activity, Settings, LogOut, LayoutDashboard, HelpCircle, Home, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 interface AdminSidebarProps {
@@ -23,6 +23,10 @@ const menuItems = [{
   id: "activity",
   label: "Attività",
   icon: Activity
+}, {
+  id: "vehicles",
+  label: "Veicoli",
+  icon: Sparkles
 }];
 const generalItems = [{
   id: "settings",

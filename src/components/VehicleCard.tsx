@@ -8,6 +8,7 @@ import { Chip } from "./ui/chip";
 import { Button } from "./ui/button";
 import { saveVehicle, unsaveVehicle, isVehicleSaved } from "@/lib/api/savedVehicles";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { hasInArrivoBadge } from "@/lib/api/vehicleBadges";
 
 interface VehicleCardProps {
   vehicle: Vehicle;
@@ -28,6 +29,7 @@ export const VehicleCard = forwardRef<HTMLElement, VehicleCardProps>(({
   const [isSaved, setIsSaved] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [isNewArrival, setIsNewArrival] = useState(false);
 
   const checkIfSaved = useCallback(async () => {
     const saved = await isVehicleSaved(vehicle);
@@ -38,6 +40,16 @@ export const VehicleCard = forwardRef<HTMLElement, VehicleCardProps>(({
   useEffect(() => {
     checkIfSaved();
   }, [checkIfSaved]);
+
+  // Check if vehicle has the "in_arrivo" badge from database
+  useEffect(() => {
+    const checkBadge = async () => {
+      const hasBadge = await hasInArrivoBadge(vehicle.ad_number);
+      setIsNewArrival(hasBadge);
+    };
+    
+    checkBadge();
+  }, [vehicle.ad_number]);
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -73,9 +85,6 @@ export const VehicleCard = forwardRef<HTMLElement, VehicleCardProps>(({
       maximumFractionDigits: 0,
     }).format(price);
   };
-
-  // Check if vehicle is "new arrival" (within first 4 items or has is_new flag)
-  const isNewArrival = vehicle.is_new || index < 4;
 
   // Get year from registration date
   const getYear = (dateStr: string) => {

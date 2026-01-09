@@ -40,6 +40,7 @@ import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { MobileRequestCard } from "@/components/admin/MobileRequestCard";
 import { MobileBottomNav } from "@/components/admin/MobileBottomNav";
+import { VehicleBadgeManager } from "@/components/admin/VehicleBadgeManager";
 
 interface ValuationRequest {
   id: string;
@@ -630,6 +631,7 @@ export default function Admin() {
       case "analytics": return "Analytics";
       case "users": return "Gestione Utenti";
       case "activity": return "Log Attività";
+      case "vehicles": return "Gestione Veicoli";
       case "settings": return "Impostazioni";
       case "help": return "Aiuto";
       default: return "Dashboard";
@@ -642,6 +644,7 @@ export default function Admin() {
       case "analytics": return "Visualizza statistiche e report";
       case "users": return "Gestisci utenti e ruoli";
       case "activity": return "Cronologia delle attività";
+      case "vehicles": return "Gestisci badge e caratteristiche veicoli";
       case "settings": return "Configura le impostazioni";
       case "help": return "Centro assistenza";
       default: return "";
@@ -1077,6 +1080,13 @@ export default function Admin() {
           {activeTab === "activity" && (
             <div className="space-y-6">
               <ActivityLog />
+            </div>
+          )}
+
+          {/* Vehicles Tab */}
+          {activeTab === "vehicles" && (
+            <div className="space-y-6">
+              <VehicleBadgeManager userId={user!.id} />
             </div>
           )}
 
