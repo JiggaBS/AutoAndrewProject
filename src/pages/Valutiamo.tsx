@@ -177,24 +177,69 @@ export default function Valutiamo() {
 
         if (profile && !profileError) {
           // Profile found in database
-          // Fix: Handle null surname properly - filter out null/undefined values
-          const fullName = [profile.name, profile.surname].filter(Boolean).join(" ") || profile.name || "";
+          // Fix: Check if name already contains surname to avoid duplication
+          let fullName = profile.name || "";
+          const surname = profile.surname || "";
+          
+          // If both name and surname exist, check if name already contains surname
+          if (fullName && surname) {
+            const nameTrimmed = fullName.trim();
+            const surnameTrimmed = surname.trim();
+            
+            // Check if name already ends with surname (to avoid duplication)
+            if (nameTrimmed.endsWith(surnameTrimmed) && nameTrimmed !== surnameTrimmed) {
+              // Name already contains surname, use it as-is
+              fullName = nameTrimmed;
+            } else if (!nameTrimmed.includes(' ') && surnameTrimmed) {
+              // Name doesn't have spaces and surname exists, join them
+              fullName = `${nameTrimmed} ${surnameTrimmed}`.trim();
+            } else {
+              // Name already looks like a full name (has spaces), use it as-is
+              fullName = nameTrimmed;
+            }
+          } else if (fullName) {
+            // Only name exists, use it
+            fullName = fullName.trim();
+          } else if (surname) {
+            // Only surname exists (unlikely but handle it)
+            fullName = surname.trim();
+          }
+          
           setUserProfile({
             name: fullName,
-            surname: profile.surname || "",
-            phone: profile.phone,
+            surname: surname,
+            phone: profile.phone || "",
             email: user.email || "",
           });
           
           // Pre-fill form with profile data
           form.setValue("name", fullName);
-          form.setValue("phone", profile.phone);
+          form.setValue("phone", profile.phone || "");
           form.setValue("email", user.email || "");
         } else {
           // Fallback to user metadata
           const metadata = user.user_metadata || {};
           if (metadata.name || metadata.surname || metadata.phone) {
-            const fullName = metadata.full_name || `${metadata.name || ""} ${metadata.surname || ""}`.trim();
+            // Handle full_name or construct from name + surname
+            let fullName = "";
+            if (metadata.full_name) {
+              fullName = metadata.full_name.trim();
+            } else if (metadata.name && metadata.surname) {
+              // Check if name already contains surname to avoid duplication
+              const nameTrimmed = (metadata.name || "").trim();
+              const surnameTrimmed = (metadata.surname || "").trim();
+              
+              if (nameTrimmed.endsWith(surnameTrimmed) && nameTrimmed !== surnameTrimmed) {
+                // Name already contains surname, use it as-is
+                fullName = nameTrimmed;
+              } else {
+                // Join name and surname
+                fullName = `${nameTrimmed} ${surnameTrimmed}`.trim();
+              }
+            } else {
+              fullName = (metadata.name || metadata.surname || "").trim();
+            }
+            
             setUserProfile({
               name: fullName,
               surname: metadata.surname || "",

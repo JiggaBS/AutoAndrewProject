@@ -3,6 +3,15 @@
 -- =============================================
 -- Single migration file for fresh database setup
 -- Last updated: January 2025
+-- 
+-- IMPORTANT FIXES APPLIED:
+-- - get_user_email() now uses plpgsql and tries user_profiles first before auth.users
+-- - All functions use SET search_path = public, auth (includes auth schema)
+-- - Removed direct auth.users access in user_owns_valuation_request()
+-- - Removed direct auth.users access in valuation_request_is_pending()
+-- - Removed direct auth.users access in send_valuation_message()
+-- - Removed direct auth.users access in mark_thread_read()
+-- - Removed conflicting RLS policy "Users and admins can view valuation requests"
 -- =============================================
 -- 
 -- INSTRUCTIONS:
@@ -167,44 +176,81 @@ AS $$
 $$;
 
 -- Get user email (helper function)
+-- IMPORTANT: Uses plpgsql to try user_profiles first, then auth.users
+-- This avoids permission errors when accessing auth.users directly
 CREATE OR REPLACE FUNCTION public.get_user_email()
 RETURNS text
-LANGUAGE sql
-STABLE SECURITY DEFINER
-SET search_path TO 'public'
+LANGUAGE plpgsql
+STABLE
+SECURITY DEFINER
+SET search_path = public, auth
 AS $$
-  SELECT email FROM auth.users WHERE id = auth.uid()
+DECLARE
+  user_email text;
+BEGIN
+  -- First try user_profiles (most reliable, no auth.users needed)
+  SELECT email INTO user_email
+  FROM public.user_profiles
+  WHERE user_id = auth.uid()
+  LIMIT 1;
+  
+  IF user_email IS NOT NULL AND user_email != '' THEN
+    RETURN user_email;
+  END IF;
+  
+  -- Fallback: get from auth.users (requires SECURITY DEFINER + auth in search_path)
+  SELECT email INTO user_email
+  FROM auth.users
+  WHERE id = auth.uid()
+  LIMIT 1;
+  
+  RETURN COALESCE(user_email, '');
+END;
 $$;
 
+-- Grant execute permission
+GRANT EXECUTE ON FUNCTION public.get_user_email() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_user_email() TO anon;
+
 -- Check if user owns valuation request
+-- IMPORTANT: Uses get_user_email() helper function instead of direct auth.users access
 CREATE OR REPLACE FUNCTION public.user_owns_valuation_request(_request_id uuid)
 RETURNS boolean
 LANGUAGE sql
 STABLE SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path = public, auth
 AS $$
   SELECT EXISTS (
     SELECT 1 FROM public.valuation_requests vr
     WHERE vr.id = _request_id
-    AND (vr.user_id = auth.uid() OR vr.email = (SELECT email FROM auth.users WHERE id = auth.uid()))
+    AND (
+      vr.user_id = auth.uid()
+      OR vr.email = public.get_user_email()
+    )
   )
 $$;
 
 -- Check if valuation request is pending
+-- IMPORTANT: Uses get_user_email() helper function instead of direct auth.users access
 CREATE OR REPLACE FUNCTION public.valuation_request_is_pending(_request_id uuid)
 RETURNS boolean
 LANGUAGE sql
 STABLE SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path = public, auth
 AS $$
   SELECT EXISTS (
     SELECT 1 FROM public.valuation_requests vr
-    WHERE vr.id = _request_id AND vr.status = 'pending'
-    AND (vr.user_id = auth.uid() OR vr.email = (SELECT email FROM auth.users WHERE id = auth.uid()))
+    WHERE vr.id = _request_id
+    AND vr.status = 'pending'
+    AND (
+      vr.user_id = auth.uid()
+      OR vr.email = public.get_user_email()
+    )
   )
 $$;
 
 -- Send valuation message (RPC function)
+-- IMPORTANT: Uses get_user_email() helper function instead of direct auth.users access
 CREATE OR REPLACE FUNCTION public.send_valuation_message(
   p_request_id uuid, 
   p_body text, 
@@ -213,7 +259,7 @@ CREATE OR REPLACE FUNCTION public.send_valuation_message(
 RETURNS uuid
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path = public, auth
 AS $$
 DECLARE
   v_caller_id uuid;
@@ -234,7 +280,8 @@ BEGIN
   
   IF v_request_status IS NULL THEN RAISE EXCEPTION 'REQUEST_NOT_FOUND'; END IF;
   
-  SELECT email INTO v_caller_email FROM auth.users WHERE id = v_caller_id;
+  -- Get caller email using helper function (not direct auth.users access)
+  v_caller_email := public.get_user_email();
   
   IF v_caller_role = 'admin' THEN
     v_sender_role := 'admin';
@@ -270,11 +317,12 @@ END;
 $$;
 
 -- Mark thread as read
+-- IMPORTANT: Uses get_user_email() helper function instead of direct auth.users access
 CREATE OR REPLACE FUNCTION public.mark_thread_read(p_request_id uuid)
 RETURNS void
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path = public, auth
 AS $$
 DECLARE
   v_caller_id uuid;
@@ -291,7 +339,8 @@ BEGIN
   
   IF v_request_owner_id IS NULL AND v_request_email IS NULL THEN RAISE EXCEPTION 'REQUEST_NOT_FOUND'; END IF;
   
-  SELECT email INTO v_caller_email FROM auth.users WHERE id = v_caller_id;
+  -- Get caller email using helper function (not direct auth.users access)
+  v_caller_email := public.get_user_email();
   
   IF v_caller_role = 'admin' THEN
     UPDATE public.valuation_messages SET read_at = now()
@@ -313,7 +362,7 @@ CREATE OR REPLACE FUNCTION public.insert_system_message(p_request_id uuid, p_bod
 RETURNS uuid
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path = public, auth
 AS $$
 DECLARE
   v_caller_id uuid;
@@ -342,7 +391,7 @@ CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path TO 'public'
+SET search_path = public, auth
 AS $$
 BEGIN
   INSERT INTO public.user_profiles (user_id, email, name)
@@ -420,6 +469,8 @@ DROP POLICY IF EXISTS "Admins can update roles" ON public.user_roles;
 DROP POLICY IF EXISTS "Admins can delete roles" ON public.user_roles;
 DROP POLICY IF EXISTS "Anyone can submit valuation request" ON public.valuation_requests;
 DROP POLICY IF EXISTS "Authenticated or validated submissions" ON public.valuation_requests;
+DROP POLICY IF EXISTS "Users and admins can view valuation requests" ON public.valuation_requests;
+DROP POLICY IF EXISTS "Clients can view their own requests by user_id" ON public.valuation_requests;
 DROP POLICY IF EXISTS "Admins can view valuation requests" ON public.valuation_requests;
 DROP POLICY IF EXISTS "Users can view own requests" ON public.valuation_requests;
 DROP POLICY IF EXISTS "Admins can update valuation requests" ON public.valuation_requests;
@@ -542,6 +593,13 @@ CREATE POLICY "Users can view own requests"
   ON public.valuation_requests FOR SELECT 
   USING (
     user_id = (SELECT auth.uid()) 
+    OR email = public.get_user_email()
+  );
+
+CREATE POLICY "Clients can view their own requests by user_id" 
+  ON public.valuation_requests FOR SELECT 
+  USING (
+    auth.uid() = user_id
     OR email = public.get_user_email()
   );
 
