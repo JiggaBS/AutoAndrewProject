@@ -25,7 +25,7 @@ export const HeroSection = forwardRef<HTMLElement>((props, ref) => {
   };
 
   return (
-    <section ref={ref} className="relative min-h-[65vh] md:min-h-[88vh] flex items-center overflow-hidden pb-12 lg:pb-20">
+    <section ref={ref} className="relative min-h-[65vh] md:min-h-[88vh] flex items-center overflow-hidden pb-24 sm:pb-12 lg:pb-20">
       {/* Background Image with Overlay */}
       <div
         className="absolute inset-0 bg-cover bg-no-repeat scale-105 animate-[pulse_20s_ease-in-out_infinite] bg-[position:70%_center] md:bg-center"
