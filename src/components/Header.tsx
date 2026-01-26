@@ -164,8 +164,8 @@ export const Header = forwardRef<HTMLElement>((props, ref) => {
       await supabase.auth.signOut();
       navigate("/");
       toast({
-        title: t("nav.logout"),
-        description: t("nav.logout"),
+        title: t("dashboard.logoutSuccess"),
+        description: t("dashboard.logoutSuccessDesc"),
       });
     } catch (error) {
       console.error("Error logging out:", error);
