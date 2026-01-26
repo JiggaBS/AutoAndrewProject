@@ -682,7 +682,7 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Dealer Card
     "dealer.googleReviews": "Recensioni Google",
-    "dealer.contactSeller": "Contatta venditore",
+    "dealer.contactSeller": "Scrivi su WhatsApp",
     "dealer.showNumber": "Mostra numero",
 
     // Financing Calculator
@@ -1363,7 +1363,7 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Dealer Card
     "dealer.googleReviews": "Google Reviews",
-    "dealer.contactSeller": "Contact seller",
+    "dealer.contactSeller": "Message on WhatsApp",
     "dealer.showNumber": "Show number",
 
     // Financing Calculator
