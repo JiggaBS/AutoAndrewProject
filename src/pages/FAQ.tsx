@@ -70,7 +70,7 @@ const FAQ = () => {
   return (
     <>
       <SEO
-        title={`FAQ - ${t("faq.title")} | AutoAndrew`}
+        title={`FAQ - ${t("faq.title")}`}
         description={t("faq.subtitle")}
         keywords="domande frequenti auto, FAQ concessionaria, informazioni auto usate, risposte vendita auto"
         url="/faq"

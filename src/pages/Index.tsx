@@ -56,7 +56,7 @@ const Index = forwardRef<HTMLDivElement>((props, ref) => {
   return (
     <div ref={ref} className="min-h-screen bg-background">
       <SEO
-        title="Auto Usate Italia | Concessionaria AutoAndrew - Veicoli Garantiti"
+        title="Home"
         description="Concessionaria auto usate in Italia. Scopri veicoli selezionati, garantiti e controllati. Prezzi competitivi, finanziamenti e permute. Trova l'auto perfetta per te."
         keywords="auto usate Italia, concessionaria auto usate, vendita auto garantite, automobili usate certificate, auto km 0, veicoli occasione Italia"
         url="/"

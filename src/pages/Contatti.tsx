@@ -63,7 +63,7 @@ const Contatti = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title={language === "it" ? "Contatti - AutoAndrew" : "Contact - AutoAndrew"}
+        title={language === "it" ? "Contatti" : "Contact"}
         description={language === "it" 
           ? "Contatta AutoAndrew per informazioni su veicoli, valutazioni e servizi. Siamo a tua disposizione per rispondere a tutte le tue domande."
           : "Contact AutoAndrew for information about vehicles, valuations and services. We are at your disposal to answer all your questions."}

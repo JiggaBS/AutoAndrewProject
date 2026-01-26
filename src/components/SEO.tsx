@@ -12,10 +12,10 @@ interface SEOProps {
   canonical?: string;
 }
 
-const defaultTitle = "AutoMarket - Trova la tua Auto Perfetta";
+const defaultTitle = "AutoAndrew - Trova la tua Auto Perfetta";
 const defaultDescription = "Vendita di auto usate selezionate e garantite. Scopri il nostro parco auto e trova il veicolo ideale per te.";
 const defaultImage = "/placeholder.svg";
-const siteUrl = import.meta.env.VITE_SITE_URL || "https://automarket.it";
+const siteUrl = import.meta.env.VITE_SITE_URL || "https://andrewauto.vercel.app";
 
 export const SEO = forwardRef<HTMLDivElement, SEOProps>(({
   title,
@@ -27,7 +27,8 @@ export const SEO = forwardRef<HTMLDivElement, SEOProps>(({
   noindex = false,
   canonical,
 }: SEOProps) => {
-  const fullTitle = title ? `${title} | AutoMarket` : defaultTitle;
+  // Put site name first, then page title
+  const fullTitle = title ? `AutoAndrew | ${title}` : defaultTitle;
   const fullDescription = description || defaultDescription;
   const fullImage = image ? (image.startsWith("http") ? image : `${siteUrl}${image}`) : `${siteUrl}${defaultImage}`;
   const fullUrl = url ? (url.startsWith("http") ? url : `${siteUrl}${url}`) : siteUrl;
@@ -45,7 +46,7 @@ export const SEO = forwardRef<HTMLDivElement, SEOProps>(({
       ) : (
         <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
       )}
-      <meta name="author" content="AutoMarket" />
+      <meta name="author" content="AutoAndrew" />
       <meta name="language" content="Italian" />
       <meta name="geo.region" content="IT" />
       <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -60,7 +61,7 @@ export const SEO = forwardRef<HTMLDivElement, SEOProps>(({
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={fullDescription} />
       <meta property="og:image" content={fullImage} />
-      <meta property="og:site_name" content="AutoMarket" />
+      <meta property="og:site_name" content="AutoAndrew" />
       <meta property="og:locale" content="it_IT" />
 
       {/* Twitter */}
@@ -75,7 +76,7 @@ export const SEO = forwardRef<HTMLDivElement, SEOProps>(({
       <meta name="apple-mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       <meta name="mobile-web-app-capable" content="yes" />
-      <meta name="application-name" content="AutoMarket" />
+      <meta name="application-name" content="AutoAndrew" />
     </Helmet>
   );
 });

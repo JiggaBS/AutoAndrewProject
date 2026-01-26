@@ -449,7 +449,7 @@ export default function Valutiamo() {
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title={language === "it" ? "Valutazione Auto Gratuita - Valutiamo la Tua Auto" : "Free Car Valuation - We Value Your Car"}
+        title={language === "it" ? "Valutazione Auto Gratuita" : "Free Car Valuation"}
         description={language === "it" 
           ? "Richiedi una valutazione gratuita e senza impegno della tua auto. Ottieni una stima istantanea e ricevi una risposta entro 24 ore. Valutazione professionale per vendere o permutare il tuo veicolo."
           : "Request a free, no-obligation valuation of your car. Get an instant estimate and receive a response within 24 hours. Professional valuation to sell or trade-in your vehicle."}

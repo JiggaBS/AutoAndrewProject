@@ -111,7 +111,7 @@ export default function Blog() {
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="Blog Auto - Guide, Consigli e News | AutoAndrew"
+        title="Blog"
         description="Scopri guide complete, recensioni, consigli per la manutenzione e le ultime novità dal mondo dell'automotive. Tutto quello che serve per scegliere e mantenere la tua auto. Articoli aggiornati su auto usate, finanziamenti e manutenzione."
         keywords="blog auto, guide auto, consigli auto, manutenzione auto, recensioni auto, news automotive, articoli auto, guide acquisto auto"
         url="/blog"

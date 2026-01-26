@@ -142,7 +142,7 @@ export default function TrackRequest() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEO
-        title="Traccia la Tua Richiesta | AutoAndrew"
+        title="Traccia la Tua Richiesta"
         description="Controlla lo stato della tua richiesta di valutazione auto inserendo il codice pratica."
         url="/traccia-richiesta"
       />

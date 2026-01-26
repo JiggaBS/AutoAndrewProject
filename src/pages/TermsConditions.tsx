@@ -7,7 +7,7 @@ const TermsConditions = () => {
   return (
     <>
       <SEO
-        title="Termini e Condizioni | AutoAndrew"
+        title="Termini e Condizioni"
         description="Termini e condizioni di utilizzo del sito AutoAndrew. Leggi attentamente prima di utilizzare i nostri servizi. Informazioni su garanzie, diritti di recesso e responsabilità."
         keywords="termini e condizioni, condizioni di utilizzo, garanzia veicoli, diritto di recesso, condizioni vendita"
         url="/terms"

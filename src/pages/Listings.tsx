@@ -343,11 +343,11 @@ const Listings = forwardRef<HTMLDivElement>((props, ref) => {
     if (filters.model) parts.push(filters.model);
     return parts.length > 0 
       ? language === "it" 
-        ? `${parts.join(" ")} Usate Italia | Concessionaria AutoAndrew`
-        : `Used ${parts.join(" ")} Italy | AutoAndrew Dealership`
+        ? `${parts.join(" ")} Usate`
+        : `Used ${parts.join(" ")}`
       : language === "it" 
-        ? "Auto Usate Italia | Listino Veicoli Garantiti - AutoAndrew"
-        : "Used Cars Italy | Guaranteed Vehicles Listing - AutoAndrew";
+        ? "Listino Auto Usate"
+        : "Used Cars Listing";
   };
 
   const getSEODescription = () => {
