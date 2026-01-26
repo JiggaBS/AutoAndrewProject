@@ -2,13 +2,60 @@ import { MapPin, Phone, Star, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Vehicle } from "@/data/sampleVehicles";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { trackWhatsAppClick } from "@/lib/analytics";
 
 interface DealerCardProps {
   vehicle: Vehicle;
 }
 
 export function DealerCard({ vehicle }: DealerCardProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const phoneNumber = "+393333889908";
+  const formattedPhoneNumber = "+39 333 388 9908";
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("it-IT", {
+      style: "currency",
+      currency: "EUR",
+      maximumFractionDigits: 0
+    }).format(price);
+  };
+
+  const handleWhatsAppClick = () => {
+    // Get vehicle year from registration date
+    const yearMatch = vehicle.first_registration_date?.match(/(\d{4})/);
+    const year = yearMatch ? yearMatch[1] : '';
+    
+    // Build vehicle link
+    const vehicleUrl = `${window.location.origin}/vehicle/${vehicle.ad_number}`;
+    
+    // Build WhatsApp message with vehicle information
+    const message = language === "it"
+      ? `Ciao! Sono interessato a questo veicolo:\n\n` +
+        `🚗 ${vehicle.make} ${vehicle.model}${vehicle.version ? ` ${vehicle.version}` : ''}${year ? ` (${year})` : ''}\n` +
+        `💰 Prezzo: ${formatPrice(vehicle.price)}\n` +
+        `${vehicle.mileage ? `📏 Chilometraggio: ${vehicle.mileage}\n` : ''}` +
+        `${vehicle.fuel_type ? `⛽ Carburante: ${vehicle.fuel_type}\n` : ''}` +
+        `${vehicle.gearbox ? `⚙️ Cambio: ${vehicle.gearbox}\n` : ''}\n` +
+        `🔗 Link: ${vehicleUrl}`
+      : `Hello! I'm interested in this vehicle:\n\n` +
+        `🚗 ${vehicle.make} ${vehicle.model}${vehicle.version ? ` ${vehicle.version}` : ''}${year ? ` (${year})` : ''}\n` +
+        `💰 Price: ${formatPrice(vehicle.price)}\n` +
+        `${vehicle.mileage ? `📏 Mileage: ${vehicle.mileage}\n` : ''}` +
+        `${vehicle.fuel_type ? `⛽ Fuel: ${vehicle.fuel_type}\n` : ''}` +
+        `${vehicle.gearbox ? `⚙️ Transmission: ${vehicle.gearbox}\n` : ''}\n` +
+        `🔗 Link: ${vehicleUrl}`;
+    
+    // Encode message for URL
+    const encodedMessage = encodeURIComponent(message);
+    const whatsAppUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+    
+    // Track the click
+    trackWhatsAppClick(`vehicle-${vehicle.ad_number}`);
+    
+    // Open WhatsApp
+    window.open(whatsAppUrl, '_blank', 'noopener,noreferrer');
+  };
 
   return (
     <div className="dealer-card">
@@ -64,17 +111,20 @@ export function DealerCard({ vehicle }: DealerCardProps) {
 
       {/* Action Buttons */}
       <div className="space-y-2">
-        <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+        <Button 
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+          onClick={handleWhatsAppClick}
+        >
           <MessageCircle className="w-4 h-4 mr-2" />
           {t("dealer.contactSeller")}
         </Button>
-        <Button
-          variant="outline"
-          className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+        <a
+          href={`tel:${phoneNumber}`}
+          className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border bg-transparent hover:border-primary/50 active:scale-[0.98] h-10 px-4 py-2 w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
         >
           <Phone className="w-4 h-4 mr-2" />
-          {t("dealer.showNumber")}
-        </Button>
+          {formattedPhoneNumber}
+        </a>
       </div>
     </div>
   );

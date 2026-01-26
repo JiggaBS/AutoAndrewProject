@@ -28,7 +28,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-const ITEMS_PER_PAGE = 16;
+const ITEMS_PER_PAGE = 12;
 
 // Map UI body-type IDs to vehicle_category values from the API
 const bodyTypeToCategoryMap: Record<string, string[]> = {
@@ -509,7 +509,7 @@ const Listings = forwardRef<HTMLDivElement>((props, ref) => {
 
             {/* Vehicle Grid */}
             {isLoading ? (
-              <VehicleGridSkeleton count={16} />
+              <VehicleGridSkeleton count={12} />
             ) : sortedVehicles.length === 0 ? (
               <div className="py-12 text-center">
                 <p className="text-lg text-muted-foreground">{t("listings.noResults")}</p>
